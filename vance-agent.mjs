@@ -174,18 +174,15 @@ function packageHtml(rawHtml, item, checkoutUrl, hubUrl = '../../index.html', hu
 `;
 
   if (rawHtml.includes('<body')) {
-    return rawHtml.replace(/<body[^>]*>/i, match => `${match}
-${injectedSnippet}`);
+    return rawHtml.replace(/<body[^>]*>/i, match => `${match}\n${injectedSnippet}`);
   }
-  return `${injectedSnippet}
-${rawHtml}`;
+  return `${injectedSnippet}\n${rawHtml}`;
 }
 
 // ---------------------------------------------------------------------
 // 2. GEMINI CASCADE INFERENCE
 // ---------------------------------------------------------------------
 async function callGemini(prompt, isJson = false, timeoutMs = 60000) {
-  // Cascades 3.5 Flash Lite -> 3.1 Flash Lite -> 3.8 Flash
   const modelCascade = [
     'gemini-3.5-flash-lite',
     'gemini-3.1-flash-lite',
@@ -267,15 +264,15 @@ function getDailyJlptSpec() {
     1: {
       level: "N5",
       dayName: "Monday",
-      titleSuffix: "Elementary Monday",
+      titleSuffix: "Elementary Foundations",
       paragraphs: 2,
       charCap: 200,
-      grammarGuide: "Strict JLPT N5 grammar: です/ます endings, core particles (は, が, を, に, で, と, も), basic adjective predicates, simple non-past/past."
+      grammarGuide: "Strict JLPT N5 grammar: です/ます forms, core particles (は, が, を, に, で, と, も), basic adjective predicates, simple non-past/past."
     },
     2: {
       level: "N4",
       dayName: "Tuesday",
-      titleSuffix: "Foundational Tuesday",
+      titleSuffix: "Early Intermediate Clauses",
       paragraphs: 2,
       charCap: 260,
       grammarGuide: "JLPT N4 grammar: 〜たり〜たり, 〜ている, 〜てから, 〜たら/〜ば, 〜ので/から, basic potential and passive forms."
@@ -283,7 +280,7 @@ function getDailyJlptSpec() {
     3: {
       level: "N3",
       dayName: "Wednesday",
-      titleSuffix: "Intermediate Wednesday",
+      titleSuffix: "Intermediate Bridge",
       paragraphs: 3,
       charCap: 340,
       grammarGuide: "JLPT N3 grammar: 〜に対して, 〜によって, 〜に関する, 〜わけではない, compound verbs, authentic written だ/である register."
@@ -291,7 +288,7 @@ function getDailyJlptSpec() {
     4: {
       level: "N2",
       dayName: "Thursday",
-      titleSuffix: "Advanced News Thursday",
+      titleSuffix: "Advanced Press Register",
       paragraphs: 3,
       charCap: 380,
       grammarGuide: "JLPT N2 newspaper register: 〜をはじめとする, 〜にともなって, 〜をめぐって, 〜ざるを得ない, high-density kanji compounds."
@@ -299,7 +296,7 @@ function getDailyJlptSpec() {
     5: {
       level: "N1",
       dayName: "Friday",
-      titleSuffix: "Mastery Friday",
+      titleSuffix: "Mastery Editorial Register",
       paragraphs: 3,
       charCap: 420,
       grammarGuide: "JLPT N1 editorial register: 〜を余儀なくされる, 〜ならではの, 〜極まりない, formal discourse particles and nuanced critique."
@@ -333,77 +330,104 @@ async function synthesizeDailyDossier() {
   const previousDossiers = (state.autonomous_lab_assets || []).map(a => a.name).join(', ');
 
   const prompt = `
-You are an expert bilingual Japanese curriculum developer designing a rapid, smartphone-optimized train commute dossier for English speakers based on real, authentic world news.
+You are a bilingual senior Japanese news editor and curriculum designer writing for English-speaking adults learning Japanese.
 
-TARGET CONSTRAINTS:
-- Target Level: ${spec.level} (${spec.titleSuffix})
-- Linguistic Scope: ${spec.grammarGuide}
-- Passage Length: EXACTLY ${spec.paragraphs} concise paragraphs in Japanese. Total character count MUST NOT exceed ${spec.charCap} characters.
-- Topic: Choose an authentic, inspiring discovery or trend in space exploration, clean energy, marine biology, robotics, or global society. Avoid previously covered topics if possible: ${previousDossiers || 'None yet'}.
+TASK:
+Write an authentic, engaging, real-world Japanese news story and its comprehensive study dossier.
+
+TOPIC ROTATION:
+Pick a real, timely, or evergreen news story from one of these broad categories:
+- Technology & Innovation (AI, robotics, space, gadgets, clean energy)
+- Business & Market Trends (startups, retail shifts, remote work, consumer trends)
+- Food & Culinary Culture (regional cuisine, agricultural breakthroughs, culinary arts)
+- Travel, Regional Japan & Nature (bullet train routes, historic towns, national parks)
+- Sports & Athletics (baseball, sumo, marathons, international athletics)
+- Arts, Pop Culture & Entertainment (cinema, animation, gaming milestones, architecture)
+(Avoid recently covered topics if possible: ${previousDossiers || 'None yet'}).
+
+PEDAGOGICAL CONTRACT FOR ${spec.level}:
+1. GRAMMAR AS THE LEVEL CEILING:
+   - Grammatical complexity must adhere strictly to ${spec.level} conventions.
+   - Grammatical Scope: ${spec.grammarGuide}
+2. NATURAL ADULT VOCABULARY:
+   - Do NOT infantilize the language or write unnatural children's sentences.
+   - Use standard Japanese kanji (e.g., write 清掃ロボット not 清潔なロボット; write 旅行客 or 観光地, not unnatural literal translations).
+   - All kanji MUST have accurate <ruby> annotations in "furi_html".
+3. CONCISE COMMUTE LENGTH:
+   - EXACTLY ${spec.paragraphs} concise paragraphs.
+   - Total character count must NOT exceed ${spec.charCap} characters.
+4. ACCURATE VOCABULARY CATEGORIES:
+   - Categorize the 25 vocabulary items accurately based on their actual nature (e.g., "Technology", "Food", "Action", "Travel", "Descriptor", "Business"), NOT one repeated category.
+5. GRAMMAR INTEGRATION:
+   - The 5 grammar patterns must appear naturally in the article.
+   - The example sentence for each grammar pattern must use ONLY words from the 25 vocabulary words.
+6. CLOZE EXERCISES & COMPREHENSION:
+   - 10 cloze exercises with 4 plausible options each, testing authentic particles, forms, or connectors.
+   - 5 reading comprehension questions with 4 distinct choices, strictly answerable from the text.
 
 OUTPUT FORMAT (STRICT JSON ONLY):
-Return a single JSON payload with this exact schema:
 {
   "edition_slug": "news-${spec.level.toLowerCase()}-[kebab-topic-slug]",
   "meta": {
     "level": "${spec.level}",
-    "category": "Topic Category (e.g. Astronomy, Ecology, Robotics)",
-    "source_title": "Original News Publication Citation",
+    "category": "Selected Category (e.g. Travel & Regional Culture / Food Trends / Sports)",
+    "source_title": "Real News Outlet or Organization Citation (e.g. NHK World, Kyodo News, Mainichi, Japan Times)",
     "source_url": "https://...",
     "target_level": "${spec.level}"
   },
   "article": {
-    "title_jp": "Clear Japanese Headline (${spec.level} level)",
+    "title_jp": "Natural Japanese Headline using standard adult kanji",
     "title_en": "Natural English Headline",
-    "raw_text": "Paragraph 1.\n\nParagraph 2.",
-    "furi_html": "<p><ruby>漢字<rt>かんじ</rt></ruby>...</p><p>...</p>",
-    "translation_en": "Full English translation of the 2-3 paragraphs."
+    "raw_text": "Paragraph 1 in natural Japanese.\n\nParagraph 2...",
+    "furi_html": "<p><ruby>新幹線<rt>しんかんせん</rt></ruby>の...</p><p>...</p>",
+    "translation_en": "Natural, idiomatic English translation."
   },
   "vocabulary_25": [
-    // EXACTLY 25 essential words taken directly from the text
     {
       "id": "v1",
-      "category": "Topic Category",
-      "word": "漢字",
-      "kana": "かんじ",
-      "en": "English definition",
-      "type": "Noun / Verb / i-Adj / na-Adj / Adverb"
+      "category": "Travel",
+      "word": "新幹線",
+      "kana": "しんかんせん",
+      "en": "bullet train",
+      "type": "Noun"
     }
   ],
   "grammar_5": [
-    // EXACTLY 5 key sentence patterns used in the text
     {
       "id": "g1",
-      "pattern": "〜sentence pattern〜",
-      "formation": "Formation Rule",
-      "meaning": "English Meaning",
-      "nuance": "Specific contextual nuance",
-      "sentence_jp": "Japanese example sentence using ONLY words from the 25 vocabulary items",
-      "sentence_furi": "<ruby>漢字<rt>かんじ</rt></ruby> example with furigana",
-      "sentence_en": "Natural English translation",
-      "breakdown": "Grammatical component breakdown"
+      "pattern": "〜で行く（手段・交通）",
+      "formation": "Transportation/Tool + で + 行く / 来る",
+      "meaning": "to go by [means of transport]",
+      "nuance": "Particle で marks the instrument or method of travel.",
+      "sentence_jp": "新幹線で新しい町へ行きます。",
+      "sentence_furi": "<ruby>新幹線<rt>しんかんせん</rt></ruby>で<ruby>新<rt>あたら</rt></ruby>しい<ruby>町<rt>まち</rt></ruby>へ<ruby>行<rt>い</rt></ruby>きます。",
+      "sentence_en": "I go to the new town by bullet train.",
+      "breakdown": "新幹線 (Transport) で + 新しい町へ (Destination) + 行きます (Verb)"
     }
   ],
   "grammar_quiz_10": [
-    // EXACTLY 10 cloze multiple-choice questions testing particles/conjugations
     {
       "id": 1,
-      "prompt": "Japanese sentence with [ ? ] blank slot.",
-      "translation": "English translation of the full sentence.",
-      "options": ["correct", "distractor1", "distractor2", "distractor3"],
-      "correct": "correct",
-      "explanation": "Brief explanation of why this particle or form is required."
+      "prompt": "東京から京都まで新幹線 [ ? ] 行きました。",
+      "translation": "I went from Tokyo to Kyoto by bullet train.",
+      "options": ["で", "に", "を", "へ"],
+      "correct": "で",
+      "explanation": "で indicates the method of transportation used for moving."
     }
   ],
   "comprehension_quiz_5": [
-    // EXACTLY 5 reading comprehension questions based on the text
     {
       "id": "rc1",
-      "question_jp": "Japanese comprehension question",
-      "question_en": "English translation of question",
-      "options": ["Correct answer", "Distractor 1", "Distractor 2", "Distractor 3"],
+      "question_jp": "記事によると、旅行客は何を利用して町を訪れていますか？",
+      "question_en": "According to the article, what are travelers using to visit the town?",
+      "options": [
+        "新しく開通した新幹線",
+        "海岸沿いを走る自転車",
+        "国際線の大型飛行機",
+        "川を下る観光用の船"
+      ],
       "correct": 0,
-      "explanation": "Reference to where this is answered in the text."
+      "explanation": "本文の第1段落に新幹線の利用について書かれています。"
     }
   ]
 }
