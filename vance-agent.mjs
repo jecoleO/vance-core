@@ -4,6 +4,7 @@ import path from 'path';
 const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY;
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const STATE_PATH = './vance.state.json';
+const TEMPLATE_PATH = './templates/dossier-shell.html';
 
 if (!STRIPE_SECRET_KEY) {
   console.error('[VANCE] Missing STRIPE_SECRET_KEY in environment.');
@@ -16,7 +17,11 @@ state.deployed_assets = Array.isArray(state.deployed_assets) ? state.deployed_as
 state.catalog_manifest = Array.isArray(state.catalog_manifest) ? state.catalog_manifest : [];
 state.autonomous_lab_assets = Array.isArray(state.autonomous_lab_assets) ? state.autonomous_lab_assets : [];
 state.execution_log = Array.isArray(state.execution_log) ? state.execution_log : [];
+state.financial_telemetry = state.financial_telemetry || {};
 
+// ---------------------------------------------------------------------
+// 1. STRIPE HELPERS & TELEMETRY
+// ---------------------------------------------------------------------
 function toFormUrlEncoded(obj, prefix = '') {
   const str = [];
   for (const p in obj) {
@@ -169,17 +174,22 @@ function packageHtml(rawHtml, item, checkoutUrl, hubUrl = '../../index.html', hu
 `;
 
   if (rawHtml.includes('<body')) {
-    return rawHtml.replace(/<body[^>]*>/i, match => `${match}\n${injectedSnippet}`);
+    return rawHtml.replace(/<body[^>]*>/i, match => `${match}
+${injectedSnippet}`);
   }
-  return `${injectedSnippet}\n${rawHtml}`;
+  return `${injectedSnippet}
+${rawHtml}`;
 }
 
+// ---------------------------------------------------------------------
+// 2. GEMINI CASCADE INFERENCE
+// ---------------------------------------------------------------------
 async function callGemini(prompt, isJson = false, timeoutMs = 60000) {
-  // Ordered cascade: Premier reasoning model first, high-volume Lite backups next
+  // Cascades 3.5 Flash Lite -> 3.1 Flash Lite -> 3.8 Flash
   const modelCascade = [
-    'gemini-3.8-flash',
     'gemini-3.5-flash-lite',
-    'gemini-3.1-flash-lite'
+    'gemini-3.1-flash-lite',
+    'gemini-3.8-flash'
   ];
 
   for (let mIdx = 0; mIdx < modelCascade.length; mIdx++) {
@@ -190,7 +200,7 @@ async function callGemini(prompt, isJson = false, timeoutMs = 60000) {
       contents: [{ parts: [{ text: prompt }] }],
       generationConfig: {
         temperature: isJson ? 0.2 : 0.3,
-        maxOutputTokens: 2500
+        maxOutputTokens: 6000
       }
     };
 
@@ -214,7 +224,6 @@ async function callGemini(prompt, isJson = false, timeoutMs = 60000) {
       const raw = await res.text();
       clearTimeout(timer);
 
-      // If rate-limited, capacity-choked, or quota reached on this model tier, cascade to the next
       if (res.status === 503 || res.status === 429) {
         console.warn(`[VANCE-AI] ${model} capacity/rate limit hit (HTTP ${res.status}). Cascading to backup...`);
         await new Promise(r => setTimeout(r, 2000));
@@ -243,12 +252,273 @@ async function callGemini(prompt, isJson = false, timeoutMs = 60000) {
     }
   }
 
-  throw new Error('All model tiers in the cascade (3.8 Flash -> 3.5 Lite -> 3.1 Lite) were exhausted.');
+  throw new Error('All model tiers in the cascade (3.5 Lite -> 3.1 Lite -> 3.8 Flash) were exhausted.');
 }
 
-async function generateMarketingDispatch(toolSpec, webUrl, checkoutUrl) {
+// ---------------------------------------------------------------------
+// 3. DAILY LEVEL PROGRESSION ROUTER & DOSSIER SYNTHESIS (STORE B)
+// ---------------------------------------------------------------------
+function getDailyJlptSpec() {
+  const now = new Date();
+  const jstDate = new Date(now.getTime() + (9 * 60 * 60 * 1000));
+  const jstDay = jstDate.getUTCDay(); // 0 = Sun, 1 = Mon, ..., 6 = Sat
+
+  const levelConfigs = {
+    1: {
+      level: "N5",
+      dayName: "Monday",
+      titleSuffix: "Elementary Monday",
+      paragraphs: 2,
+      charCap: 200,
+      grammarGuide: "Strict JLPT N5 grammar: です/ます endings, core particles (は, が, を, に, で, と, も), basic adjective predicates, simple non-past/past."
+    },
+    2: {
+      level: "N4",
+      dayName: "Tuesday",
+      titleSuffix: "Foundational Tuesday",
+      paragraphs: 2,
+      charCap: 260,
+      grammarGuide: "JLPT N4 grammar: 〜たり〜たり, 〜ている, 〜てから, 〜たら/〜ば, 〜ので/から, basic potential and passive forms."
+    },
+    3: {
+      level: "N3",
+      dayName: "Wednesday",
+      titleSuffix: "Intermediate Wednesday",
+      paragraphs: 3,
+      charCap: 340,
+      grammarGuide: "JLPT N3 grammar: 〜に対して, 〜によって, 〜に関する, 〜わけではない, compound verbs, authentic written だ/である register."
+    },
+    4: {
+      level: "N2",
+      dayName: "Thursday",
+      titleSuffix: "Advanced News Thursday",
+      paragraphs: 3,
+      charCap: 380,
+      grammarGuide: "JLPT N2 newspaper register: 〜をはじめとする, 〜にともなって, 〜をめぐって, 〜ざるを得ない, high-density kanji compounds."
+    },
+    5: {
+      level: "N1",
+      dayName: "Friday",
+      titleSuffix: "Mastery Friday",
+      paragraphs: 3,
+      charCap: 420,
+      grammarGuide: "JLPT N1 editorial register: 〜を余儀なくされる, 〜ならではの, 〜極まりない, formal discourse particles and nuanced critique."
+    }
+  };
+
+  return levelConfigs[jstDay] || {
+    level: "N3",
+    dayName: "Weekend Edition",
+    titleSuffix: "Consolidated Weekend Review",
+    paragraphs: 3,
+    charCap: 340,
+    grammarGuide: "Balanced JLPT N3 intermediate news register with practical compound patterns."
+  };
+}
+
+async function synthesizeDailyDossier() {
+  if (!GEMINI_API_KEY) {
+    console.log('[VANCE-AI] No GEMINI_API_KEY detected. Skipping Store B synthesis.');
+    return;
+  }
+
+  if (!fs.existsSync(TEMPLATE_PATH)) {
+    console.warn(`[VANCE-AI] Master template ${TEMPLATE_PATH} missing. Skipping Store B synthesis.`);
+    return;
+  }
+
+  const spec = getDailyJlptSpec();
+  console.log(`[VANCE-AI] Target schedule: ${spec.level} (${spec.dayName} Commute Edition)`);
+
+  const previousDossiers = (state.autonomous_lab_assets || []).map(a => a.name).join(', ');
+
+  const prompt = `
+You are an expert bilingual Japanese curriculum developer designing a rapid, smartphone-optimized train commute dossier for English speakers based on real, authentic world news.
+
+TARGET CONSTRAINTS:
+- Target Level: ${spec.level} (${spec.titleSuffix})
+- Linguistic Scope: ${spec.grammarGuide}
+- Passage Length: EXACTLY ${spec.paragraphs} concise paragraphs in Japanese. Total character count MUST NOT exceed ${spec.charCap} characters.
+- Topic: Choose an authentic, inspiring discovery or trend in space exploration, clean energy, marine biology, robotics, or global society. Avoid previously covered topics if possible: ${previousDossiers || 'None yet'}.
+
+OUTPUT FORMAT (STRICT JSON ONLY):
+Return a single JSON payload with this exact schema:
+{
+  "edition_slug": "news-${spec.level.toLowerCase()}-[kebab-topic-slug]",
+  "meta": {
+    "level": "${spec.level}",
+    "category": "Topic Category (e.g. Astronomy, Ecology, Robotics)",
+    "source_title": "Original News Publication Citation",
+    "source_url": "https://...",
+    "target_level": "${spec.level}"
+  },
+  "article": {
+    "title_jp": "Clear Japanese Headline (${spec.level} level)",
+    "title_en": "Natural English Headline",
+    "raw_text": "Paragraph 1.\n\nParagraph 2.",
+    "furi_html": "<p><ruby>漢字<rt>かんじ</rt></ruby>...</p><p>...</p>",
+    "translation_en": "Full English translation of the 2-3 paragraphs."
+  },
+  "vocabulary_25": [
+    // EXACTLY 25 essential words taken directly from the text
+    {
+      "id": "v1",
+      "category": "Topic Category",
+      "word": "漢字",
+      "kana": "かんじ",
+      "en": "English definition",
+      "type": "Noun / Verb / i-Adj / na-Adj / Adverb"
+    }
+  ],
+  "grammar_5": [
+    // EXACTLY 5 key sentence patterns used in the text
+    {
+      "id": "g1",
+      "pattern": "〜sentence pattern〜",
+      "formation": "Formation Rule",
+      "meaning": "English Meaning",
+      "nuance": "Specific contextual nuance",
+      "sentence_jp": "Japanese example sentence using ONLY words from the 25 vocabulary items",
+      "sentence_furi": "<ruby>漢字<rt>かんじ</rt></ruby> example with furigana",
+      "sentence_en": "Natural English translation",
+      "breakdown": "Grammatical component breakdown"
+    }
+  ],
+  "grammar_quiz_10": [
+    // EXACTLY 10 cloze multiple-choice questions testing particles/conjugations
+    {
+      "id": 1,
+      "prompt": "Japanese sentence with [ ? ] blank slot.",
+      "translation": "English translation of the full sentence.",
+      "options": ["correct", "distractor1", "distractor2", "distractor3"],
+      "correct": "correct",
+      "explanation": "Brief explanation of why this particle or form is required."
+    }
+  ],
+  "comprehension_quiz_5": [
+    // EXACTLY 5 reading comprehension questions based on the text
+    {
+      "id": "rc1",
+      "question_jp": "Japanese comprehension question",
+      "question_en": "English translation of question",
+      "options": ["Correct answer", "Distractor 1", "Distractor 2", "Distractor 3"],
+      "correct": 0,
+      "explanation": "Reference to where this is answered in the text."
+    }
+  ]
+}
+`;
+
+  try {
+    const rawJson = await callGemini(prompt, true, 45000);
+    const dossierData = JSON.parse(rawJson);
+
+    if (!dossierData || !dossierData.edition_slug) {
+      console.warn('[VANCE-AI] Invalid dossier payload returned.');
+      return;
+    }
+
+    const slug = dossierData.edition_slug;
+    if (state.autonomous_lab_assets.some(a => a.slug === slug)) {
+      console.log(`[VANCE-AI] Dossier edition ${slug} is already deployed.`);
+      return;
+    }
+
+    const itemSpec = {
+      slug: slug,
+      type: 'news_dossier',
+      name: `World News Japanese: ${dossierData.article.title_en} (${spec.level})`,
+      tagline: `${spec.dayName} Commute Edition &bull; 25-Word Match, 5 Grammar Cloze & Reading Check.`,
+      price_cents: 500
+    };
+
+    const targetRedirectUrl = `${state.agent_identity.storefront_url}products/${slug}/?unlocked=true`;
+    const stripeData = await getOrCreateStripeLink(itemSpec, targetRedirectUrl);
+
+    const templateHtml = fs.readFileSync(TEMPLATE_PATH, 'utf8');
+    let compiledHtml = templateHtml
+      .replace('__DOSSIER_DATA__', JSON.stringify(dossierData))
+      .replace('World News Japanese Dossier', `${dossierData.article.title_en} (${spec.level})`);
+
+    // Attach Vance Store B header and live checkout URL
+    compiledHtml = compiledHtml.replace(
+      'href="#" target="_blank" style="background:#0284c7;',
+      `href="${stripeData.checkout_url}" target="_blank" style="background:#0284c7;`
+    );
+
+    const targetDir = path.join(state.pipeline_policy.products_dir, slug);
+    fs.mkdirSync(targetDir, { recursive: true });
+    fs.writeFileSync(path.join(targetDir, 'index.html'), compiledHtml, 'utf8');
+
+    const webUrl = `${state.agent_identity.storefront_url}products/${slug}/`;
+    state.autonomous_lab_assets.push({
+      slug: slug,
+      type: 'news_dossier',
+      level: spec.level,
+      name: itemSpec.name,
+      tagline: itemSpec.tagline,
+      price_cents: itemSpec.price_cents,
+      revenue_cents: 0,
+      web_url: `../products/${slug}/`,
+      checkout_url: stripeData.checkout_url,
+      stripe_product_id: stripeData.product_id,
+      invented_at: new Date().toISOString()
+    });
+
+    state.execution_log.unshift(`${new Date().toISOString().slice(0, 10)}: Vance Lab deployed ${itemSpec.name}`);
+    console.log(`[VANCE-AI] Deployed ${itemSpec.name} to Vance Lab.`);
+
+    await generateMarketingDispatch(itemSpec, webUrl, stripeData.checkout_url, dossierData, spec);
+  } catch (err) {
+    console.warn('[VANCE-AI] Dossier synthesis failed:', err.message);
+  }
+}
+
+// ---------------------------------------------------------------------
+// 4. MARKETING DISPATCH GENERATION
+// ---------------------------------------------------------------------
+async function generateMarketingDispatch(toolSpec, webUrl, checkoutUrl, dossierData = null, spec = null) {
   if (!GEMINI_API_KEY) return;
   console.log(`[VANCE-MARKETING] Generating launch dispatch for ${toolSpec.name}...`);
+
+  const dispatchDir = './marketing/dispatches';
+  fs.mkdirSync(dispatchDir, { recursive: true });
+  const filename = `${new Date().toISOString().slice(0, 10)}-${toolSpec.slug}.md`;
+
+  if (dossierData && spec) {
+    const markdownContent = `# Daily Japanese News Dossier: ${dossierData.article.title_en} (${spec.level})
+
+**Level:** ${spec.level} (${spec.dayName} Commute Edition)  
+**Topic:** ${dossierData.meta.category}  
+**Source Citation:** [${dossierData.meta.source_title}](${dossierData.meta.source_url})  
+**Format:** 2-Paragraph Japanese Text • 25 Vocab Match • 5 Grammar Cloze • 5 Comprehension Questions
+
+---
+
+### Headline
+**${dossierData.article.title_jp}**  
+*${dossierData.article.title_en}*
+
+### Reading Summary (English Translation)
+> ${dossierData.article.translation_en.replace(/\n/g, '\n> ')}
+
+---
+
+### Key Grammar Points Covered
+${dossierData.grammar_5.map((g, i) => `${i + 1}. **${g.pattern}** (${g.formation}) — *${g.meaning}*`).join('\n')}
+
+---
+
+### Interactive Web App Links
+- **Launch Interactive App:** ${webUrl}
+- **Unlock Standalone Offline Edition ($5):** ${checkoutUrl}
+- **Vance Autonomous Lab:** https://jecoleo.github.io/vance-core/lab/index.html
+`;
+
+    fs.writeFileSync(path.join(dispatchDir, filename), markdownContent, 'utf8');
+    console.log(`[VANCE-MARKETING] Saved launch dispatch to ${dispatchDir}/${filename}`);
+    return;
+  }
 
   const prompt = `
 You are Vance, an autonomous commercial software operator.
@@ -269,9 +539,6 @@ Keep the tone authentic, direct, and focused on local-first privacy. No fluff.
   try {
     const content = await callGemini(prompt, false, 45000);
     if (content) {
-      const dispatchDir = './marketing/dispatches';
-      fs.mkdirSync(dispatchDir, { recursive: true });
-      const filename = `${new Date().toISOString().slice(0, 10)}-${toolSpec.slug}.md`;
       fs.writeFileSync(path.join(dispatchDir, filename), content, 'utf8');
       console.log(`[VANCE-MARKETING] Saved launch dispatch to ${dispatchDir}/${filename}`);
     }
@@ -280,109 +547,9 @@ Keep the tone authentic, direct, and focused on local-first privacy. No fluff.
   }
 }
 
-async function thinkAndSynthesizeNextTool() {
-  if (!GEMINI_API_KEY) {
-    console.log('[VANCE-AI] No GEMINI_API_KEY detected. Skipping autonomous synthesis.');
-    return;
-  }
-
-  console.log('[VANCE-AI] Engaging cognitive loop: Analyzing inventory...');
-
-  const previousTools = [
-    ...state.deployed_assets.map(a => `${a.name}: ${a.tagline}`),
-    ...state.autonomous_lab_assets.map(a => `${a.name}: ${a.tagline}`)
-  ].join('\n');
-
-  const ideationPrompt = `
-You are Vance, an autonomous commercial software architect.
-Review the tools already created:
-${previousTools || 'None yet.'}
-
-Task: Invent ONE high-utility, local-first, zero-cloud developer or business utility that has NOT been built yet.
-Top Priority: Deterministic Japan Freelance 10.21% Withholding & Consumption Tax Invoice Engine.
-
-Return a strict JSON object with these exact keys:
-{
-  "slug": "japan-freelance-tax-engine",
-  "name": "Japan Freelance Tax & Qualified Invoice Engine",
-  "tagline": "Offline 10.21% withholding tax and 8%/10% consumption tax calculator with print-ready invoice export.",
-  "price_cents": 600
-}
-`;
-
-  let toolSpec = null;
-  try {
-    // Fast JSON call: 35s timeout
-    const rawJson = await callGemini(ideationPrompt, true, 35000);
-    toolSpec = JSON.parse(rawJson);
-  } catch (err) {
-    console.warn('[VANCE-AI] Ideation failed:', err.message);
-    return;
-  }
-
-  if (!toolSpec || !toolSpec.slug) {
-    console.warn('[VANCE-AI] Invalid tool specification returned.');
-    return;
-  }
-
-  if (state.autonomous_lab_assets.some(a => a.slug === toolSpec.slug)) {
-    console.log(`[VANCE-AI] Asset ${toolSpec.slug} is already deployed. Standing by.`);
-    return;
-  }
-
-  console.log(`[VANCE-AI] Invented concept: ${toolSpec.name} (${toolSpec.slug})`);
-
-  const codingPrompt = `
-Write a complete, single-file, production-ready, beautiful HTML5/JavaScript application for:
-Name: ${toolSpec.name}
-Description: ${toolSpec.tagline}
-
-CRITICAL RULES:
-1. Everything must be self-contained in ONE single HTML file (HTML, clean modern inline CSS, vanilla JS).
-2. Clean dark theme (Slate-900 / Slate-950, Sky blue / Emerald accents, crisp typography).
-3. 100% functional, responsive, and working. Include interactive inputs, buttons, calculations, and local-first output (e.g. printable table or clean export).
-4. ZERO external backend dependencies. Run 100% in-browser client.
-5. Return ONLY the raw valid <!DOCTYPE html> string. No explanation, no backticks.
-`;
-
-  try {
-    // Heavy code synthesis call: 180s (3 full minutes) timeout
-    let appHtml = await callGemini(codingPrompt, false, 180000);
-    appHtml = appHtml.replace(/^```html/i, '').replace(/```$/i, '').trim();
-
-    if (appHtml.startsWith('<!DOCTYPE') || appHtml.includes('<html')) {
-      const redirectUrl = `${state.agent_identity.storefront_url}products/${toolSpec.slug}/?pro=unlocked`;
-      const stripeData = await getOrCreateStripeLink(toolSpec, redirectUrl);
-      const packagedHtml = packageHtml(appHtml, toolSpec, stripeData.checkout_url, '../../lab/index.html', 'Vance Lab');
-
-      const targetDir = path.join(state.pipeline_policy.products_dir, toolSpec.slug);
-      fs.mkdirSync(targetDir, { recursive: true });
-      fs.writeFileSync(path.join(targetDir, 'index.html'), packagedHtml, 'utf8');
-
-      const webUrl = `${state.agent_identity.storefront_url}products/${toolSpec.slug}/`;
-      state.autonomous_lab_assets.push({
-        slug: toolSpec.slug,
-        type: 'autonomous_utility',
-        name: toolSpec.name,
-        tagline: toolSpec.tagline,
-        price_cents: toolSpec.price_cents,
-        revenue_cents: 0,
-        web_url: `../products/${toolSpec.slug}/`,
-        checkout_url: stripeData.checkout_url,
-        stripe_product_id: stripeData.product_id,
-        invented_at: new Date().toISOString()
-      });
-
-      state.execution_log.unshift(`${new Date().toISOString().slice(0, 10)}: Vance Lab deployed ${toolSpec.name}`);
-      console.log(`[VANCE-AI] Deployed ${toolSpec.name} to Vance Lab.`);
-
-      await generateMarketingDispatch(toolSpec, webUrl, stripeData.checkout_url);
-    }
-  } catch (err) {
-    console.warn('[VANCE-AI] Code generation failed:', err.message);
-  }
-}
-
+// ---------------------------------------------------------------------
+// 5. STORE A & STORE B REBUILDERS
+// ---------------------------------------------------------------------
 function rebuildStoreA() {
   console.log('[VANCE] Building Store A: Creative Arcade & Author Vault (index.html)...');
   const userAssets = state.deployed_assets || [];
@@ -462,7 +629,10 @@ function rebuildStoreB() {
   const renderCard = a => `
     <div class="card">
       <div>
-        <div class="badge">$${(a.price_cents / 100).toFixed(2)} USD</div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
+          <div class="badge">$${(a.price_cents / 100).toFixed(2)} USD</div>
+          ${a.level ? `<span style="font-size:0.75rem; font-weight:700; color:#38bdf8; background:#0369a133; padding:2px 8px; border-radius:9999px; border:1px solid #38bdf844;">${a.level}</span>` : ''}
+        </div>
         <h3>${a.name}</h3>
         <p>${a.tagline}</p>
       </div>
@@ -476,7 +646,7 @@ function rebuildStoreB() {
 <html lang="en">
 <head>
   <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Vance Autonomous Lab // Zero-Cloud Utilities</title>
+  <title>Vance Autonomous Lab // Zero-Cloud Utilities & Dossiers</title>
   <style>
     :root { --bg: #030712; --card: #0f172a; --text: #f8fafc; --accent: #a855f7; }
     body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 2rem; line-height: 1.6; }
@@ -501,7 +671,7 @@ function rebuildStoreB() {
     <header>
       <div>
         <h1 style="margin:0; color: var(--accent);">VANCE // AUTONOMOUS LAB</h1>
-        <p style="margin:0.25rem 0 0; color:#94a3b8;">Zero-Cloud Client Tools, Calculators & Privacy Utilities Synthesized by AI</p>
+        <p style="margin:0.25rem 0 0; color:#94a3b8;">Daily JLPT News Dossiers & Zero-Cloud Offline Utilities</p>
       </div>
       <div>
         <a href="../index.html" class="arcade-link">&larr; Return to Creative Arcade</a>
@@ -509,12 +679,12 @@ function rebuildStoreB() {
     </header>
 
     <div class="grid">
-      ${showcase.map(renderCard).join('\n') || '<p style="color:#64748b;">The Lab is formulating its first batch of utilities...</p>'}
+      ${showcase.map(renderCard).join('\n') || '<p style="color:#64748b;">The Lab is formulating its daily dossier...</p>'}
     </div>
 
     ${archived.length > 0 ? `
     <details>
-      <summary>View Lab Archives (${archived.length} earlier utilities)</summary>
+      <summary>View Lab Archives (${archived.length} earlier editions)</summary>
       <div class="archive-list">
         ${archived.map(a => `
           <div class="archive-item">
@@ -532,7 +702,7 @@ function rebuildStoreB() {
     ` : ''}
 
     <footer style="margin-top:3rem; font-size:0.8rem; color:#64748b; text-align:center;">
-      Autonomous Node Vance &middot; Self-synthesizing and self-packaging
+      Autonomous Node Vance &middot; Self-synthesizing daily news dossiers & utilities
     </footer>
   </div>
 </body>
@@ -541,6 +711,9 @@ function rebuildStoreB() {
   fs.writeFileSync('./lab/index.html', html, 'utf8');
 }
 
+// ---------------------------------------------------------------------
+// 6. MAIN ENGINE RUNNER
+// ---------------------------------------------------------------------
 async function run() {
   await syncStripeTelemetry();
 
@@ -579,8 +752,8 @@ async function run() {
     }
   }
 
-  // 2. Run autonomous thinking, synthesis & dispatch loop (Store B)
-  await thinkAndSynthesizeNextTool();
+  // 2. Synthesize & Deploy Today's Japanese News Dossier (Store B)
+  await synthesizeDailyDossier();
 
   // 3. Assemble both storefronts
   rebuildStoreA();
