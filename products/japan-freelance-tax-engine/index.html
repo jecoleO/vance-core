@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Japan Freelance Tax & Qualified Invoice Engine</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://cdn.jsdelivr.net/npm/lucide@latest/dist/umd/lucide.js"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        slate: {
+                            850: '#151f32',
+                            900: '#0f172a',
+                            950: '#020617',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        @media print {
+            body * {
+                visibility: hidden;
+            }
+            #invoice-print-area, #invoice-print-area * {
+                visibility: visible;
+            }
+            #invoice-print-area {
+                position: absolute;
+                left: 0;
+                top: 0;
+                width: 100%;
+                background: white !important;
+                color: black !important;
+                padding: 2rem;
+            }
+            .no-print {
+                display: none !important;
+            }
+        }
+        /* Custom scrollbar for clean dark mode */
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: #0f172a;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #334155;
+            border-radius: 4px;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #475569;
+        }
+    </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen font-sans antialiased selection:bg-sky-500 selection:text-white">
+
+<!-- [VANCE-MERCHANT-HARNESS: START] -->
+<div id="vance-header" style="background:#090d16;color:#e2e8f0;padding:10px 18px;font-family:system-ui,-apple-system,sans-serif;font-size:13px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #1e293b;position:sticky;top:0;z-index:999999;">
+  <div style="display:flex;align-items:center;gap:14px;">
+    <a href="../../lab/index.html" style="color:#38bdf8;text-decoration:none;font-weight:700;">&larr; Vance Lab</a>
+    <span style="color:#64748b;">|</span>
+    <span style="font-weight:600;">Japan Freelance Tax & Qualified Invoice Engine</span>
+  </div>
+  <div style="display:flex;align-items:center;gap:10px;">
+    <span id="vance-pro-badge" style="display:none;background:#10b98122;color:#10b981;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:700;border:1px solid #10b98144;">OFFLINE EDITION UNLOCKED</span>
+    <button id="vance-dl-btn" style="display:none;background:#10b981;color:#041f14;border:none;padding:5px 12px;border-radius:6px;font-weight:700;cursor:pointer;font-size:12px;">Download Offline .html</button>
+    <a id="vance-buy-btn" href="https://buy.stripe.com/4gM14o4T25gZca082R0Ny05" target="_blank" style="background:#38bdf8;color:#081726;padding:5px 12px;border-radius:6px;font-weight:700;text-decoration:none;font-size:12px;">
+      Unlock Pro Edition ($6)
+    </a>
+  </div>
+</div>
+<script>
+(function() {
+  const isUnlocked = window.location.search.includes('unlocked') || localStorage.getItem('vance_unlocked_japan-freelance-tax-engine') === 'true' || localStorage.getItem('vance_arcade_vault') === 'true';
+  if (isUnlocked) {
+    localStorage.setItem('vance_unlocked_japan-freelance-tax-engine', 'true');
+    const buyBtn = document.getElementById('vance-buy-btn');
+    const badge = document.getElementById('vance-pro-badge');
+    const dlBtn = document.getElementById('vance-dl-btn');
+    if (buyBtn) buyBtn.style.display = 'none';
+    if (badge) badge.style.display = 'inline-block';
+    if (dlBtn) {
+      dlBtn.style.display = 'inline-block';
+      dlBtn.onclick = function() {
+        const blob = new Blob([document.documentElement.outerHTML], { type: 'text/html' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'japan-freelance-tax-engine.offline.html';
+        a.click();
+      };
+    }
+  }
+})();
+</script>
+<!-- [VANCE-MERCHANT-HARNESS: END] -->
+
+
+    <!-- App Header -->
+    <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-40 no-print">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+                <div class="bg-gradient-to-tr from-sky-500 to-emerald-500 p-2 rounded-xl text-slate-950 shadow-lg shadow-sky-500/20">
+                    <i data-lucide="receipt" class="w-6 h-6 stroke-[2.5]"></i>
+                </div>
+                <div>
+                    <h1 class="font-bold text-lg tracking-tight bg-gradient-to-r from-white via-slate-200 to-sky-400 bg-clip-text text-transparent">
+                        NihonTax Engine
+                    </h1>
+                    <p class="text-xs text-slate-400">Japan Freelance Tax & Qualified Invoice System</p>
+                </div>
+            </div>
+            <div class="flex items-center space-x-3">
+                <button onclick="app.resetData()" class="px-3 py-1.5 text-xs font-medium text-slate-400 hover:text-white bg-slate-800 hover:bg-slate-700 rounded-lg transition flex items-center space-x-1.5">
+                    <i data-lucide="rotate-ccw" class="w-3.5 h-3.5"></i>
+                    <span>Reset Defaults</span>
+                </button>
+                <button onclick="window.print()" class="px-4 py-2 text-xs font-semibold text-slate-950 bg-sky-400 hover:bg-sky-300 rounded-lg transition shadow-lg shadow-sky-500/20 flex items-center space-x-2">
+                    <i data-lucide="printer" class="w-4 h-4"></i>
+                    <span>Print Invoice</span>
+                </button>
+            </div>
+        </div>
+    </header>
+
+    <!-- Main Grid Layout -->
+    <main class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <div class="grid grid-cols-1 lg:grid-cols-12 gap-8">
+            
+            <!-- LEFT COLUMN: Inputs & Line Items (Width: 7 cols) -->
+            <div class="lg:col-span-7 space-y-6 no-print">
+                
+                <!-- Section 1: Entities -->
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-sm font-semibold uppercase tracking-wider text-sky-400 flex items-center space-x-2">
+                            <i data-lucide="users" class="w-4 h-4"></i>
+                            <span>Entities & Registration</span>
+                        </h2>
+                        <span class="text-xs text-slate-500">Invoicer & Client Setup</span>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Issuer -->
+                        <div class="space-y-3">
+                            <label class="block text-xs font-medium text-slate-300">Freelancer (Issuer)</label>
+                            <input type="text" id="issuerName" value="Taro Yamada Design" oninput="app.update()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-sky-500 transition">
+                            <div class="relative">
+                                <span class="absolute inset-y-0 left-0 flex items-center pl-3 text-xs text-slate-500 font-mono">T</span>
+                                <input type="text" id="issuerRegNo" value="1234567890123" oninput="app.update()" placeholder="13 digits" maxlength="13" class="w-full bg-slate-950 border border-slate-800 rounded-xl pl-7 pr-3 py-2 text-sm font-mono focus:outline-none focus:border-sky-500 transition">
+                            </div>
+                            <p class="text-[10px] text-slate-500">Qualified Invoice Issuer Registration Number</p>
+                        </div>
+
+                        <!-- Client -->
+                        <div class="space-y-3">
+                            <label class="block text-xs font-medium text-slate-300">Client / Company</label>
+                            <input type="text" id="clientName" value="Kabushiki Kaisha Tokyo Tech" oninput="app.update()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-sky-500 transition">
+                            <input type="text" id="invoiceNumber" value="INV-2023-1104" oninput="app.update()" placeholder="Invoice No." class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm font-mono focus:outline-none focus:border-sky-500 transition">
+                            <input type="date" id="invoiceDate" oninput="app.update()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm text-slate-300 focus:outline-none focus:border-sky-500 transition">
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section 2: Tax Parameters -->
+                <div class="bg-slate-900 border border-slate-800 rounded-2xl p-6 shadow-xl">
+                    <div class="flex items-center justify-between mb-4">
+                        <h2 class="text-sm font-semibold uppercase tracking-wider text-emerald-400 flex items-center space-x-2">
+                            <i data-lucide="percent" class="w-4 h-4"></i>
+                            <span>Tax Parameters (Japan Law)</span>
+                        </h2>
+                        <span class="text-xs text-slate-500">Withholding & Consumption</span>
+                    </div>
+
+                    <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                        <!-- Consumption Tax Rate -->
+                        <div class="space-y-2">
+                            <label class="block text-xs font-medium text-slate-300">Consumption Tax (Shohizei)</label>
+                            <select id="consumptionRate" onchange="app.update()" class="w-full bg-slate-950 border border-slate-800 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-sky-500 transition">
+                                <option value="0.10" selected>10% Standard Rate</option>
+                                <option value="0.08">8% Reduced Rate (Food/Drink)</option>
+                                <option value="0">0% Tax Exempt / Export</option>
+                            </select>
+                        </div>
+
+                        <!-- Withholding Tax Toggle (Gensen-choshu) -->
+                        <div class="space-y-2">
+                            <label class="block text-xs font-medium text-slate-300">Withholding Tax (Gensen-choshu)</label>
+                            <div class="flex items-center space-x-3 bg-slate-950 border border-slate-800 rounded-xl p-2">
+                                <label class="relative inline-flex items-center cursor-pointer">
+                                    <input type="checkbox" id="applyWithholding" checked onchange="app.toggleWithholding()" class="sr-only peer">
+                                    <div class="w-9 h-5 bg-slate-800 peer-focus:outline-none rounded-full peer peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-[2px]
