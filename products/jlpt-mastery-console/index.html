@@ -1,0 +1,1419 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Joyo 5 & Grammar Forge — Day 1</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <style>
+    @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Noto+Sans+JP:wght@400;500;700&display=swap');
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    }
+    .font-jp {
+      font-family: 'Noto Sans JP', "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic", Meiryo, sans-serif;
+    }
+
+    /* Furigana Display States */
+    .furi-hover ruby rt {
+      opacity: 0;
+      transition: opacity 0.15s ease-in-out;
+    }
+    .furi-hover ruby:hover rt {
+      opacity: 1;
+    }
+    .furi-hidden ruby rt {
+      display: none;
+    }
+
+    /* Flip Card 3D effects */
+    .perspective-1000 {
+      perspective: 1000px;
+    }
+    .transform-style-3d {
+      transform-style: preserve-3d;
+    }
+    .backface-hidden {
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+    }
+    .rotate-y-180 {
+      transform: rotateY(180deg);
+    }
+    .flip-active {
+      transform: rotateY(180deg);
+    }
+  </style>
+</head>
+<body class="bg-slate-950 text-slate-100 min-h-screen flex flex-col antialiased selection:bg-sky-500 selection:text-white">
+
+<!-- [VANCE-MERCHANT-HARNESS: START] -->
+<div id="vance-header" style="background:#090d16;color:#e2e8f0;padding:10px 18px;font-family:system-ui,-apple-system,sans-serif;font-size:13px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #1e293b;position:sticky;top:0;z-index:999999;">
+  <div style="display:flex;align-items:center;gap:14px;">
+    <a href="../../index.html" style="color:#38bdf8;text-decoration:none;font-weight:700;">&larr; Vance // Forge</a>
+    <span style="color:#64748b;">|</span>
+    <span style="font-weight:600;">JLPT N5–N1 Complete Tactical Study Console</span>
+  </div>
+  <div style="display:flex;align-items:center;gap:10px;">
+    <span id="vance-pro-badge" style="display:none;background:#10b98122;color:#10b981;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:700;border:1px solid #10b98144;">OFFLINE EDITION UNLOCKED</span>
+    <button id="vance-dl-btn" style="display:none;background:#10b981;color:#041f14;border:none;padding:5px 12px;border-radius:6px;font-weight:700;cursor:pointer;font-size:12px;">Download Offline .html</button>
+    <a id="vance-buy-btn" href="https://buy.stripe.com/00w00kclugZHfmc5UJ0Ny04" target="_blank" style="background:#38bdf8;color:#081726;padding:5px 12px;border-radius:6px;font-weight:700;text-decoration:none;font-size:12px;">
+      Unlock Pro Edition ($8)
+    </a>
+    
+  </div>
+</div>
+<script>
+(function() {
+  const isUnlocked = window.location.search.includes('unlocked') || localStorage.getItem('vance_unlocked_jlpt-mastery-console') === 'true' || localStorage.getItem('vance_arcade_vault') === 'true';
+  if (isUnlocked) {
+    localStorage.setItem('vance_unlocked_jlpt-mastery-console', 'true');
+    const buyBtn = document.getElementById('vance-buy-btn');
+    const badge = document.getElementById('vance-pro-badge');
+    const dlBtn = document.getElementById('vance-dl-btn');
+    if (buyBtn) buyBtn.style.display = 'none';
+    if (badge) badge.style.display = 'inline-block';
+    if (dlBtn) {
+      dlBtn.style.display = 'inline-block';
+      dlBtn.onclick = function() {
+        const blob = new Blob([document.documentElement.outerHTML], { type: 'text/html' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'jlpt-mastery-console.offline.html';
+        a.click();
+      };
+    }
+  }
+})();
+</script>
+<!-- [VANCE-MERCHANT-HARNESS: END] -->
+
+
+  <header class="border-b border-slate-800 bg-slate-900/80 backdrop-blur sticky top-0 z-50 px-4 py-3 sm:px-6">
+    <div class="max-w-5xl mx-auto flex flex-wrap items-center justify-between gap-3">
+      <div class="flex items-center gap-3">
+        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-bold bg-sky-500/20 text-sky-400 border border-sky-500/30">
+          DAY 1 / 428
+        </span>
+        <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-500/20 text-emerald-400 border border-emerald-500/30">
+          Block 1 • Day 1 of 4 (Acquisition)
+        </span>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <div class="text-xs text-slate-400 hidden sm:block">Grammar: <strong class="text-slate-200">N5 Core Particles</strong></div>
+        <button id="btn-complete-day" onclick="toggleDayCompletion()" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 flex items-center gap-1.5 transition">
+          <span id="completion-icon">⚪</span> <span id="completion-text">Mark Day Complete</span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main class="max-w-5xl mx-auto w-full px-4 sm:px-6 py-6 flex-grow flex flex-col gap-6">
+    
+    <div class="flex flex-col sm:flex-row sm:items-end justify-between gap-4 border-b border-slate-800 pb-5">
+      <div>
+        <h1 class="text-2xl sm:text-3xl font-extrabold tracking-tight text-white flex items-center gap-2">
+          <span>毎日日本語</span>
+          <span class="text-sky-400 font-jp text-lg sm:text-xl font-normal">日 • 一 • 国 • 会 • 人</span>
+        </h1>
+        <p class="text-slate-400 text-sm mt-1">Joyo Grade 1 Basics &bull; 25 Flip Vocabulary &bull; 5 Sentence Flips &bull; JLPT Comprehension</p>
+      </div>
+
+      <!-- Tab Navigator -->
+      <nav class="flex p-1 bg-slate-900 border border-slate-800 rounded-xl overflow-x-auto gap-1 self-start sm:self-auto">
+        <button onclick="switchTab('kanji')" id="tab-btn-kanji" class="tab-btn px-3.5 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap bg-sky-600 text-white shadow-sm transition">
+          1. The Joyo 5
+        </button>
+        <button onclick="switchTab('vocab')" id="tab-btn-vocab" class="tab-btn px-3.5 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap text-slate-400 hover:text-slate-200 hover:bg-slate-800 transition">
+          2. Word Forge (25)
+        </button>
+        <button onclick="switchTab('grammar')" id="tab-btn-grammar" class="tab-btn px-3.5 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap text-slate-400 hover:text-slate-200 hover:bg-slate-800 transition">
+          3. N5 Grammar & Sentences
+        </button>
+        <button onclick="switchTab('reading')" id="tab-btn-reading" class="tab-btn px-3.5 py-1.5 rounded-lg text-xs font-semibold whitespace-nowrap text-slate-400 hover:text-slate-200 hover:bg-slate-800 transition">
+          4. Reading & Questions
+        </button>
+      </nav>
+    </div>
+
+    <!-- SECTION 1: KANJI -->
+    <section id="section-kanji" class="tab-pane block space-y-6">
+      <div class="flex items-center justify-between">
+        <div>
+          <h2 class="text-lg font-bold text-slate-100">The Daily 5 Kanji</h2>
+          <p class="text-xs text-slate-400">Front shows only the character. Flip the card to test your recall of the English meaning and On/Kun readings.</p>
+        </div>
+        <span class="text-xs font-mono text-slate-500">Tap 🔊 to hear audio</span>
+      </div>
+
+      <div class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4" id="kanji-grid">
+        <!-- Rendered via JS -->
+      </div>
+
+      <!-- Randomized Kanji Practice Quiz (Card Gauntlet Style) -->
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800 pb-3">
+          <div>
+            <h3 class="font-bold text-sm text-slate-200 flex items-center gap-2">
+              <span>🎯 5-Kanji Mastery Gauntlet</span>
+            </h3>
+            <p class="text-xs text-slate-400">Step-by-step card drill testing character recognition and recall. Final score out of 5.</p>
+          </div>
+          <div class="flex items-center gap-3">
+            <span class="text-xs font-mono text-sky-400 font-bold" id="kanji-quiz-score">Card: 1 / 5</span>
+            <button onclick="regenerateKanjiQuiz()" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded text-xs transition">
+              ↻ Restart Drill
+            </button>
+          </div>
+        </div>
+
+        <div id="kanji-quiz-container">
+          <!-- Rendered via JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 2: VOCABULARY -->
+    <section id="section-vocab" class="tab-pane hidden space-y-6">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+        <div>
+          <h2 class="text-lg font-bold text-slate-100">Word Forge (25 Essential Compounds)</h2>
+          <p class="text-xs text-slate-400">Flip cards to test reading & definition. Filter cards by their parent kanji.</p>
+        </div>
+        <!-- Filter Pills -->
+        <div class="flex items-center gap-1.5 overflow-x-auto pb-1" id="vocab-filters">
+          <!-- Rendered via JS -->
+        </div>
+      </div>
+
+      <!-- 25 Flip Cards -->
+      <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-5 gap-3.5" id="vocab-grid">
+        <!-- Rendered via JS -->
+      </div>
+
+      <!-- Randomized Vocab Practice Quiz -->
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800 pb-3">
+          <div>
+            <h3 class="font-bold text-sm text-slate-200 flex items-center gap-2">
+              <span>⚡ 25-Word Forge Mastery Gauntlet</span>
+            </h3>
+            <p class="text-xs text-slate-400">Step-by-step card drill across all 25 daily vocabulary words. Final score out of 25.</p>
+          </div>
+          <div class="flex items-center gap-3">
+            <span class="text-xs font-mono text-sky-400 font-bold" id="vocab-quiz-score">Card: 1 / 25</span>
+            <button onclick="regenerateVocabQuiz()" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded text-xs transition">
+              ↻ Restart Drill
+            </button>
+          </div>
+        </div>
+
+        <div id="vocab-quiz-container">
+          <!-- Rendered via JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 3: GRAMMAR & SENTENCE FLIPS -->
+    <section id="section-grammar" class="tab-pane hidden space-y-6">
+      <div>
+        <div class="flex items-center gap-2 mb-1">
+          <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-amber-500/20 text-amber-400 border border-amber-500/30">N5 Foundation</span>
+          <span class="text-xs text-slate-400 font-medium">Speed Master Grammar Block 1 • Lesson 1 of 4</span>
+        </div>
+        <h2 class="text-lg font-bold text-slate-100">Speed Master Patterns & Sentence Flip Challenge</h2>
+        <p class="text-xs text-slate-400">Review the pattern rules, flip each sentence card to verify reading and nuance, then complete the particle check.</p>
+      </div>
+
+      <!-- 5 Grammar Patterns with Flip Cards -->
+      <div class="grid grid-cols-1 gap-5" id="grammar-list">
+        <!-- Rendered via JS -->
+      </div>
+
+      <!-- Interactive Particle Check Gauntlet Quiz -->
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800 pb-3">
+          <div>
+            <h3 class="font-bold text-sm text-slate-200 flex items-center gap-2">
+              <span>✏️ N5 Particle Check Gauntlet</span>
+            </h3>
+            <p class="text-xs text-slate-400">Step-by-step cloze drill testing essential N5 particles. Final score out of 5.</p>
+          </div>
+          <div class="flex items-center gap-3">
+            <span class="text-xs font-mono text-sky-400 font-bold" id="grammar-quiz-score">Card: 1 / 5</span>
+            <button onclick="regenerateGrammarQuiz()" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded text-xs transition">
+              ↻ Restart Drill
+            </button>
+          </div>
+        </div>
+        <div id="grammar-quiz-container">
+          <!-- Rendered via JS -->
+        </div>
+      </div>
+    </section>
+
+    <!-- SECTION 4: READING & JLPT COMPREHENSION -->
+    <section id="section-reading" class="tab-pane hidden space-y-6">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 bg-slate-900 p-4 rounded-xl border border-slate-800">
+        <div>
+          <h2 class="text-base font-bold text-slate-100">Day 1 Dossier: 日曜日の一日 (A Sunday's Day)</h2>
+          <p class="text-xs text-slate-400">Contextual story incorporating today's 5 kanji, target vocabulary, and 5 N5 grammar patterns.</p>
+        </div>
+
+        <!-- Furigana Switch & Audio Controls -->
+        <div class="flex items-center gap-2">
+          <div class="inline-flex p-1 bg-slate-950 border border-slate-800 rounded-lg text-xs">
+            <button onclick="setFuriganaMode('all')" id="furi-btn-all" class="px-2.5 py-1 rounded font-medium bg-sky-600 text-white transition">All</button>
+            <button onclick="setFuriganaMode('hover')" id="furi-btn-hover" class="px-2.5 py-1 rounded font-medium text-slate-400 hover:text-slate-200 transition">Hover</button>
+            <button onclick="setFuriganaMode('hidden')" id="furi-btn-hidden" class="px-2.5 py-1 rounded font-medium text-slate-400 hover:text-slate-200 transition">Off</button>
+          </div>
+          <button onclick="readStoryAloud()" class="px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-sky-400 border border-slate-700 flex items-center gap-1.5 transition">
+            🔊 Read Story
+          </button>
+        </div>
+      </div>
+
+      <!-- Story Reader Canvas -->
+      <div class="bg-slate-900/90 border border-slate-800 rounded-2xl p-6 sm:p-8 space-y-6">
+        <div id="story-container" class="font-jp text-lg sm:text-xl leading-loose sm:leading-[2.6] tracking-wide text-slate-200 furi-all">
+          <!-- Story injected via JS with <ruby> tags -->
+        </div>
+
+        <div class="border-t border-slate-800 pt-4">
+          <button onclick="toggleTranslation()" id="trans-toggle-btn" class="text-xs font-semibold text-sky-400 hover:text-sky-300 flex items-center gap-1.5">
+            <span>👁️</span> <span id="trans-toggle-text">Show English Translation</span>
+          </button>
+          <div id="story-translation" class="hidden mt-3 text-sm text-slate-400 leading-relaxed bg-slate-950/70 p-4 rounded-xl border border-slate-800/80">
+            <!-- English translation -->
+          </div>
+        </div>
+      </div>
+
+      <!-- Vocab Encountered Check -->
+      <div class="bg-slate-900/50 border border-slate-800 rounded-xl p-4">
+        <h4 class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-2">Day 1 Words Utilized in Story</h4>
+        <div class="flex flex-wrap gap-2" id="story-vocab-chips">
+          <!-- Filled by JS -->
+        </div>
+      </div>
+
+      <!-- JLPT N5 Reading Comprehension Section (Card Gauntlet Style) -->
+      <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 sm:p-6 space-y-4">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-2 border-b border-slate-800 pb-3">
+          <div>
+            <div class="flex items-center gap-2">
+              <span class="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-sky-500/20 text-sky-400 border border-sky-500/30">JLPT N5 Format</span>
+              <h3 class="font-bold text-sm text-slate-200">読解 (Reading Comprehension Gauntlet)</h3>
+            </div>
+            <p class="text-xs text-slate-400 mt-0.5">Card-by-card reading questions based on the text. Final score out of 3.</p>
+          </div>
+          <div class="flex items-center gap-3">
+            <span class="text-xs font-mono text-emerald-400 font-bold" id="rc-score-badge">Card: 1 / 3</span>
+            <button onclick="regenerateRCQuiz()" class="px-2.5 py-1 bg-slate-800 hover:bg-slate-700 text-slate-300 rounded text-xs transition">
+              ↻ Restart Drill
+            </button>
+          </div>
+        </div>
+
+        <div id="rc-questions-container">
+          <!-- Rendered via JS -->
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer class="border-t border-slate-800/80 bg-slate-950 px-4 py-4 text-center text-xs text-slate-500">
+    Joyo 5 &bull; Speed Master Grammar System &bull; 100% Offline with Speech Synthesis
+  </footer>
+
+  <!-- Notification Toast -->
+  <div id="toast" class="fixed bottom-5 right-5 bg-slate-900 border border-sky-500/50 text-slate-100 text-xs px-4 py-2.5 rounded-xl shadow-2xl opacity-0 transition-opacity duration-200 pointer-events-none flex items-center gap-2 z-50">
+    <span id="toast-icon">✨</span>
+    <span id="toast-msg">Notification</span>
+  </div>
+
+  <script>
+    const DAY_CURRICULUM = {
+      day: 1,
+      blockNumber: 1,
+      blockDay: 1,
+      level: "N5",
+      kanji: [
+        {
+          id: "k1",
+          char: "日",
+          meaning: "Day, Sun",
+          strokes: 4,
+          grade: 1,
+          on: "ニチ、ジツ",
+          kun: "ひ、-び、-か",
+          mnemonic: "A picture of the sun with an energetic solar flare / line across its center.",
+          sampleCompounds: ["今日 (きょう)", "毎日 (まいにち)", "休日 (きゅうじつ)"]
+        },
+        {
+          id: "k2",
+          char: "一",
+          meaning: "One",
+          strokes: 1,
+          grade: 1,
+          on: "イチ、イツ",
+          kun: "ひと-、ひと.つ",
+          mnemonic: "A single index finger held horizontal to indicate 'one'.",
+          sampleCompounds: ["一つ (ひとつ)", "一人 (ひとり)", "一日 (いちにち)"]
+        },
+        {
+          id: "k3",
+          char: "国",
+          meaning: "Country, Nation",
+          strokes: 8,
+          grade: 2,
+          on: "コク",
+          kun: "くに",
+          mnemonic: "A precious jade jewel (玉) surrounded by defensive national borders (口).",
+          sampleCompounds: ["外国 (がいこく)", "国内 (こくない)", "外国人 (がいこくじん)"]
+        },
+        {
+          id: "k4",
+          char: "会",
+          meaning: "Meet, Society, Gather",
+          strokes: 6,
+          grade: 2,
+          on: "カイ、エ",
+          kun: "あ.う",
+          mnemonic: "People gathering together under one sheltering roof.",
+          sampleCompounds: ["会社 (かいしゃ)", "会話 (かいわ)", "会う (あう)"]
+        },
+        {
+          id: "k5",
+          char: "人",
+          meaning: "Person, Human",
+          strokes: 2,
+          grade: 1,
+          on: "ジン、ニン",
+          kun: "ひと",
+          mnemonic: "A side silhouette of a person standing firmly and taking a step forward.",
+          sampleCompounds: ["日本人 (にほんじん)", "大人 (おとな)", "人気 (にんき)"]
+        }
+      ],
+      vocab: [
+        // 5 words for 日
+        { id: "v1", parent: "日", word: "今日", kana: "きょう", en: "Today", type: "Noun / Adv" },
+        { id: "v2", parent: "日", word: "毎日", kana: "まいにち", en: "Every day", type: "Adv Noun" },
+        { id: "v3", parent: "日", word: "日曜日", kana: "にちようび", en: "Sunday", type: "Noun" },
+        { id: "v4", parent: "日", word: "日光", kana: "にっこう", en: "Sunlight", type: "Noun" },
+        { id: "v5", parent: "日", word: "休日", kana: "きゅうじつ", en: "Holiday, day off", type: "Noun" },
+
+        // 5 words for 一
+        { id: "v6", parent: "一", word: "一つ", kana: "ひとつ", en: "One thing (counter)", type: "Numeric" },
+        { id: "v7", parent: "一", word: "一人", kana: "ひとり", en: "One person, alone", type: "Noun" },
+        { id: "v8", parent: "一", word: "一日", kana: "いちにち", en: "One day (duration)", type: "Noun" },
+        { id: "v9", parent: "一", word: "一番", kana: "いちばん", en: "Number one, best", type: "Adverb" },
+        { id: "v10", parent: "一", word: "一緒", kana: "いっしょ", en: "Together", type: "Noun" },
+
+        // 5 words for 国
+        { id: "v11", parent: "国", word: "外国", kana: "がいこく", en: "Foreign country", type: "Noun" },
+        { id: "v12", parent: "国", word: "外国人", kana: "がいこくじん", en: "Foreigner", type: "Noun" },
+        { id: "v13", parent: "国", word: "国内", kana: "こくない", en: "Domestic, inside country", type: "Noun" },
+        { id: "v14", parent: "国", word: "国語", kana: "こくご", en: "National language", type: "Noun" },
+        { id: "v15", parent: "国", word: "中国", kana: "ちゅうごく", en: "China", type: "Proper Noun" },
+
+        // 5 words for 会
+        { id: "v16", parent: "会", word: "会う", kana: "あう", en: "To meet", type: "Verb (u-verb)" },
+        { id: "v17", parent: "会", word: "会社", kana: "かいしゃ", en: "Company, workplace", type: "Noun" },
+        { id: "v18", parent: "会", word: "会話", kana: "かいわ", en: "Conversation", type: "Noun" },
+        { id: "v19", parent: "会", word: "会議", kana: "かいぎ", en: "Meeting, conference", type: "Noun" },
+        { id: "v20", parent: "会", word: "社会", kana: "しゃかい", en: "Society", type: "Noun" },
+
+        // 5 words for 人
+        { id: "v21", parent: "人", word: "日本人", kana: "にほんじん", en: "Japanese person", type: "Noun" },
+        { id: "v22", parent: "人", word: "大人", kana: "おとな", en: "Adult", type: "Noun" },
+        { id: "v23", parent: "人", word: "人々", kana: "ひとびと", en: "People", type: "Noun" },
+        { id: "v24", parent: "人", word: "人気", kana: "にんき", en: "Popularity", type: "Noun" },
+        { id: "v25", parent: "人", word: "人生", kana: "じんせい", en: "Human life", type: "Noun" }
+      ],
+      grammar: [
+        {
+          id: "g1",
+          pattern: "〜は〜です",
+          formation: "Noun 1 + は + Noun 2 + です",
+          meaning: "N1 is N2 (Topic marker + polite state-of-being)",
+          nuance: "は (wa) establishes the mutual context; です makes it a polite identification.",
+          exampleJp: "今日は会社の休日です。",
+          exampleFuri: "<ruby>今日<rt>きょう</rt></ruby>は<ruby>会社<rt>かいしゃ</rt></ruby>の<ruby>休日<rt>きゅうじつ</rt></ruby>です。",
+          exampleEn: "Today is a holiday for the company.",
+          breakdown: "今日 (Topic) + は + 会社 (Company) + の (Possessive) + 休日 (Holiday) + です"
+        },
+        {
+          id: "g2",
+          pattern: "〜で (場所・手段)",
+          formation: "Noun (Place / Means) + で",
+          meaning: "At (action location) / By means of (language, vehicle, tool)",
+          nuance: "Denotes where an event happens or what tool/medium is used for an action.",
+          exampleJp: "カフェで外国人と日本語で会話をします。",
+          exampleFuri: "カフェで<ruby>外国人<rt>がいこくじん</rt></ruby>と<ruby>日本語<rt>にほんご</rt></ruby>で<ruby>会話<rt>かいわ</rt></ruby>をします。",
+          exampleEn: "I converse with a foreigner at the cafe in Japanese.",
+          breakdown: "カフェ (Action Place) で + 外国人と + 日本語 (Medium/Language) で + 会話をします"
+        },
+        {
+          id: "g3",
+          pattern: "〜に (時間・着地点・相手)",
+          formation: "Specific Time / Destination / Target Person + に",
+          meaning: "At (specific time) / To (target destination) / With (person you meet)",
+          nuance: "Marks precise time numbers or the specific target partner of 会う (to meet).",
+          exampleJp: "日曜日の一時に友人に会います。",
+          exampleFuri: "<ruby>日曜日<rt>にちようび</rt></ruby>の<ruby>一時<rt>いちじ</rt></ruby>に<ruby>友人<rt>ゆうじん</rt></ruby>に<ruby>会<rt>あ</rt></ruby>います。",
+          exampleEn: "I will meet a friend at one o'clock on Sunday.",
+          breakdown: "日曜日の一時 (Specific Time) に + 友人 (Target partner) に + 会います"
+        },
+        {
+          id: "g4",
+          pattern: "〜と（一緒に）",
+          formation: "Noun (Person) + と + (いっしょに)",
+          meaning: "Together with (a companion)",
+          nuance: "Signifies mutual accompaniment. 一緒に (together) strengthens the phrase.",
+          exampleJp: "外国人の大人と一緒に本を読みます。",
+          exampleFuri: "<ruby>外国人<rt>がいこくじん</rt></ruby>の<ruby>大人<rt>おとな</rt></ruby>と<ruby>一緒<rt>いっしょ</rt></ruby>に<ruby>本<rt>ほん</rt></ruby>を<ruby>読<rt>よ</rt></ruby>みます。",
+          exampleEn: "I read a book together with a foreign adult.",
+          breakdown: "外国人の大人 + と (with) + 一緒に (together) + 本を読みます"
+        },
+        {
+          id: "g5",
+          pattern: "〜も",
+          formation: "Noun + も (Replaces は, が, を)",
+          meaning: "Also, too, as well",
+          nuance: "Completely replaces topic and object particles to indicate inclusion of another entity.",
+          exampleJp: "この町には日本人も外国人もたくさんいます。",
+          exampleFuri: "この<ruby>町<rt>まち</rt></ruby>には<ruby>日本人<rt>にほんじん</rt></ruby>も<ruby>外国人<rt>がいこくじん</rt></ruby>もたくさんいます。",
+          exampleEn: "In this town, there are many Japanese people and also foreigners.",
+          breakdown: "日本人も (Japanese people too) + 外国人も (Foreigners too) + たくさんいます"
+        }
+      ],
+      grammarQuiz: [
+        {
+          id: 1,
+          prompt: "今日 [ ? ] 日曜日です。",
+          translation: "Today is Sunday.",
+          options: ["は", "で", "を", "に"],
+          correct: "は",
+          explanation: "は marks 'Today' (今日) as the primary topic."
+        },
+        {
+          id: 2,
+          prompt: "カフェ [ ? ] 会話をしました。",
+          translation: "We had a conversation at the cafe.",
+          options: ["で", "に", "と", "も"],
+          correct: "で",
+          explanation: "で marks the physical venue where an active event takes place."
+        },
+        {
+          id: 3,
+          prompt: "午後一時 [ ? ] 友人に会いました。",
+          translation: "I met my friend at 1:00 PM.",
+          options: ["に", "で", "を", "も"],
+          correct: "に",
+          explanation: "に marks specific numerical time landmarks."
+        },
+        {
+          id: 4,
+          prompt: "友だち [ ? ] 一緒に歩きました。",
+          translation: "I walked together with my friend.",
+          options: ["と", "で", "は", "に"],
+          correct: "と",
+          explanation: "〜と一緒に marks joint accompaniment."
+        },
+        {
+          id: 5,
+          prompt: "会社には大人 [ ? ] たくさんいます。",
+          translation: "In the company, there are also many adults.",
+          options: ["も", "へ", "と", "で"],
+          correct: "も",
+          explanation: "も expresses inclusion ('also/too')."
+        }
+      ],
+      reading: {
+        title: "日曜日の一日 (A Sunday's Day)",
+        rawText: "今日は日曜日で、会社の休日です。一人で静かな町を歩きました。日光がとても暖かいです。午後、外国人の友人と一緒にカフェで会いました。そのカフェは大人の人にとても人気があります。私たちは日本語で楽しく会話をしました。日本人も外国人もみんな笑顔でした。今日はとても素晴らしい一日でした。",
+        furiHtml: `<ruby>今日<rt>きょう</rt></ruby>は<ruby>日曜日<rt>にちようび</rt></ruby>で、<ruby>会社<rt>かいしゃ</rt></ruby>の<ruby>休日<rt>きゅうじつ</rt></ruby>です。<ruby>一人<rt>ひとり</rt></ruby>で<ruby>静<rt>しず</rt></ruby>かな<ruby>町<rt>まち</rt></ruby>を<ruby>歩<rt>ある</rt></ruby>きました。<ruby>日光<rt>にっこう</rt></ruby>がとても<ruby>暖<rt>あたた</rt></ruby>かいです。<ruby>午後<rt>ごご</rt></ruby>、<ruby>外国人<rt>がいこくじん</rt></ruby>の<ruby>友人<rt>ゆうじん</rt></ruby>と<ruby>一緒<rt>いっしょ</rt></ruby>にカフェで<ruby>会<rt>あ</rt></ruby>いました。そのカフェは<ruby>大人<rt>おとな</rt></ruby>の<ruby>人<rt>ひと</rt></ruby>にとても<ruby>人気<rt>にんき</rt></ruby>があります。<ruby>私<rt>わたし</rt></ruby>たちは<ruby>日本語<rt>にほんご</rt></ruby>で<ruby>楽<rt>たの</rt></ruby>しく<ruby>会話<rt>かいわ</rt></ruby>をしました。<ruby>日本人<rt>にほんじん</rt></ruby>も<ruby>外国人<rt>がいこくじん</rt></ruby>もみんな<ruby>笑顔<rt>えがお</rt></ruby>でした。<ruby>今日<rt>きょう</rt></ruby>はとても<ruby>素晴<rt>すば</rt></ruby>らしい<ruby>一日<rt>いちにち</rt></ruby>でした。`,
+        translation: "Today is Sunday, and a holiday from work. I took a walk alone through the quiet town. The sunlight was very warm. In the afternoon, I met together with a foreign friend at a cafe. That cafe is very popular with adults. We had an enjoyable conversation in Japanese. Both the Japanese people and the foreigners were all smiles. Today was a truly wonderful day.",
+        usedVocab: ["今日", "日曜日", "会社", "休日", "一人", "日光", "外国人", "一緒", "会う", "大人", "人気", "日本語", "会話", "日本人", "一日"],
+        comprehension: [
+          {
+            id: "rc1",
+            question: "どうして主人公（わたし）は仕事に行きませんでしたか。",
+            questionEn: "Why did the narrator not go to work?",
+            options: [
+              "病気だったから",
+              "日曜日で会社の休日だったから",
+              "外国人の友達が来たから",
+              "天気が悪かったから"
+            ],
+            correct: 1,
+            explanation: "「今日は日曜日で、会社の休日です」と書いてあります。(It is written that today is Sunday and a company holiday.)"
+          },
+          {
+            id: "rc2",
+            question: "カフェで友達と何語で話しましたか。",
+            questionEn: "In what language did the narrator converse with the friend at the cafe?",
+            options: [
+              "英語 (English)",
+              "中国語 (Chinese)",
+              "日本語 (Japanese)",
+              "話さなかった (Did not converse)"
+            ],
+            correct: 2,
+            explanation: "「私たちは日本語で楽しく会話をしました」とあります。(Text states they conversed enjoyably in Japanese.)"
+          },
+          {
+            id: "rc3",
+            question: "本文の内容と合っているものはどれですか。",
+            questionEn: "Which statement matches the content of the passage?",
+            options: [
+              "カフェには外国人は一人もいなかった。",
+              "主人公は朝から友達と一緒に町を歩いた。",
+              "カフェは大人の人にとても人気がある。",
+              "日曜日の日光はとても冷たかった。"
+            ],
+            correct: 2,
+            explanation: "「そのカフェは大人の人にとても人気があります」と一致します。(Matches the statement that the cafe is popular among adults.)"
+          }
+        ]
+      }
+    };
+
+    let currentVocabFilter = "ALL";
+    let furiganaState = "all";
+    let isTranslationVisible = false;
+
+    // Kanji Quiz Gauntlet State
+    let kanjiQuizQuestions = [];
+    let kanjiQuizCurrentIndex = 0;
+    let kanjiQuizScore = 0;
+    let kanjiQuizIsFinished = false;
+    let kanjiQuizHistory = [];
+
+    // Vocab Quiz Gauntlet State
+    let vocabQuizQuestions = [];
+    let vocabQuizCurrentIndex = 0;
+    let vocabQuizScore = 0;
+    let vocabQuizIsFinished = false;
+    let vocabQuizHistory = [];
+
+    // Grammar Quiz Gauntlet State
+    let grammarQuizQuestions = [];
+    let grammarQuizCurrentIndex = 0;
+    let grammarQuizScore = 0;
+    let grammarQuizIsFinished = false;
+    let grammarQuizHistory = [];
+
+    // Reading Comprehension Gauntlet State
+    let rcQuestions = [];
+    let rcCurrentIndex = 0;
+    let rcScore = 0;
+    let rcIsFinished = false;
+    let rcHistory = [];
+
+    function initStorage() {
+      const isCompleted = localStorage.getItem("day_1_completed") === "true";
+      updateCompletionBadge(isCompleted);
+    }
+
+    function toggleDayCompletion() {
+      const current = localStorage.getItem("day_1_completed") === "true";
+      const next = !current;
+      localStorage.setItem("day_1_completed", String(next));
+      updateCompletionBadge(next);
+      showToast(next ? "🎉 Day 1 marked as Complete!" : "Marked Day 1 as in progress.");
+    }
+
+    function updateCompletionBadge(completed) {
+      const icon = document.getElementById("completion-icon");
+      const text = document.getElementById("completion-text");
+      const btn = document.getElementById("btn-complete-day");
+
+      if (completed) {
+        icon.textContent = "✅";
+        text.textContent = "Day Completed";
+        btn.classList.add("border-emerald-500/50", "text-emerald-300", "bg-emerald-950/40");
+      } else {
+        icon.textContent = "⚪";
+        text.textContent = "Mark Day Complete";
+        btn.classList.remove("border-emerald-500/50", "text-emerald-300", "bg-emerald-950/40");
+      }
+    }
+
+    function showToast(msg) {
+      const toast = document.getElementById("toast");
+      document.getElementById("toast-msg").textContent = msg;
+      toast.classList.remove("opacity-0");
+      toast.classList.add("opacity-100");
+      setTimeout(() => {
+        toast.classList.remove("opacity-100");
+        toast.classList.add("opacity-0");
+      }, 2400);
+    }
+
+    function speak(text, rate = 0.85) {
+      if (!('speechSynthesis' in window)) {
+        showToast("Speech Synthesis is not supported in this browser.");
+        return;
+      }
+      window.speechSynthesis.cancel();
+      const utterance = new SpeechSynthesisUtterance(text);
+      utterance.lang = 'ja-JP';
+      utterance.rate = rate;
+      window.speechSynthesis.speak(utterance);
+    }
+
+    function readStoryAloud() {
+      speak(DAY_CURRICULUM.reading.rawText, 0.9);
+      showToast("🔊 Reading story aloud...");
+    }
+
+    function renderKanji() {
+      const container = document.getElementById("kanji-grid");
+      container.innerHTML = DAY_CURRICULUM.kanji.map((k, index) => `
+        <div class="perspective-1000 h-72 cursor-pointer select-none" onclick="flipCard('kanji-flipper-${index}')">
+          <div id="kanji-flipper-${index}" class="relative w-full h-full transform-style-3d transition-transform duration-500 rounded-2xl">
+            
+            <!-- FRONT: Character + Stroke count only (No meaning) -->
+            <div class="absolute inset-0 backface-hidden bg-slate-900 border border-slate-800 hover:border-sky-500/50 rounded-2xl p-4 flex flex-col justify-between items-center text-center shadow-lg transition">
+              <div class="w-full flex justify-between items-center text-[11px] text-slate-500 font-mono">
+                <span>#${index + 1} Joyo</span>
+                <span>${k.strokes} Strokes</span>
+              </div>
+              <div class="font-jp text-6xl font-bold text-white tracking-wide my-auto">${k.char}</div>
+              <div>
+                <span class="inline-block px-2 py-0.5 rounded text-[11px] font-medium bg-slate-800 text-sky-400">
+                  Tap to flip &bull; Meaning & Readings
+                </span>
+              </div>
+              <button onclick="event.stopPropagation(); speak('${k.char}')" class="px-2.5 py-1 rounded bg-slate-800 hover:bg-slate-700 text-sky-300 text-xs flex items-center gap-1 transition">
+                🔊 Pronounce
+              </button>
+            </div>
+
+            <!-- BACK: Meaning, On/Kun Readings, Mnemonic, Compounds -->
+            <div class="absolute inset-0 backface-hidden rotate-y-180 bg-slate-900 border border-sky-500/40 rounded-2xl p-4 flex flex-col justify-between text-left text-xs shadow-xl">
+              <div>
+                <div class="flex justify-between items-baseline border-b border-slate-800 pb-1.5 mb-2">
+                  <span class="font-jp font-bold text-xl text-white">${k.char}</span>
+                  <span class="text-sky-300 font-bold text-sm">${k.meaning}</span>
+                </div>
+                <div class="space-y-1 font-jp">
+                  <div><strong class="text-slate-400 font-sans text-[10px] uppercase">音 (On):</strong> <span class="text-slate-200">${k.on}</span></div>
+                  <div><strong class="text-slate-400 font-sans text-[10px] uppercase">訓 (Kun):</strong> <span class="text-slate-200">${k.kun}</span></div>
+                </div>
+                <div class="mt-2 text-slate-400 text-[11px] leading-snug">
+                  <strong class="text-slate-300 font-sans">Mnemonic:</strong> ${k.mnemonic}
+                </div>
+              </div>
+
+              <div class="border-t border-slate-800/80 pt-2">
+                <span class="text-[10px] text-slate-500 uppercase tracking-wider block mb-1">Key Compounds:</span>
+                <div class="font-jp text-[11px] text-sky-300/90 space-y-0.5">
+                  ${k.sampleCompounds.map(c => `<div>&bull; ${c}</div>`).join('')}
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function flipCard(elementId) {
+      const flipper = document.getElementById(elementId);
+      if (flipper) flipper.classList.toggle("flip-active");
+    }
+
+    function regenerateKanjiQuiz() {
+      kanjiQuizCurrentIndex = 0;
+      kanjiQuizScore = 0;
+      kanjiQuizIsFinished = false;
+      kanjiQuizHistory = [];
+
+      const shuffled = [...DAY_CURRICULUM.kanji].sort(() => 0.5 - Math.random());
+      kanjiQuizQuestions = shuffled.map(item => {
+        const others = DAY_CURRICULUM.kanji.filter(k => k.id !== item.id);
+        const distractors = others.sort(() => 0.5 - Math.random()).slice(0, 3);
+        const options = [
+          { char: item.char, isCorrect: true, readings: `${item.on} / ${item.kun}` },
+          ...distractors.map(d => ({ char: d.char, isCorrect: false, readings: `${d.on} / ${d.kun}` }))
+        ].sort(() => 0.5 - Math.random());
+
+        return {
+          id: item.id,
+          targetMeaning: item.meaning,
+          correctChar: item.char,
+          strokes: item.strokes,
+          mnemonic: item.mnemonic,
+          options
+        };
+      });
+
+      renderKanjiQuiz();
+    }
+
+    function renderKanjiQuiz() {
+      const container = document.getElementById("kanji-quiz-container");
+      const scoreBadge = document.getElementById("kanji-quiz-score");
+
+      if (kanjiQuizIsFinished) {
+        scoreBadge.textContent = `Completed! ${kanjiQuizScore} / 5`;
+        container.innerHTML = `
+          <div class="bg-slate-950/70 border border-slate-800 rounded-2xl p-6 text-center space-y-4 max-w-xl mx-auto">
+            <div class="text-3xl">${kanjiQuizScore === 5 ? '🌟' : kanjiQuizScore >= 3 ? '👍' : '💪'}</div>
+            <h4 class="text-lg font-bold text-white">Kanji Drill Completed!</h4>
+            <div class="font-mono text-2xl font-extrabold ${kanjiQuizScore === 5 ? 'text-emerald-400' : kanjiQuizScore >= 3 ? 'text-sky-400' : 'text-amber-400'}">
+              Score: ${kanjiQuizScore} / 5
+            </div>
+            <p class="text-xs text-slate-400 max-w-md mx-auto">
+              ${kanjiQuizScore === 5 ? 'Flawless recall! You identified all 5 Joyo characters without hesitation.' : 'Review any missed kanji below and restart the drill whenever ready.'}
+            </p>
+            <div class="pt-2 flex justify-center gap-3">
+              <button onclick="regenerateKanjiQuiz()" class="px-4 py-2 bg-sky-600 hover:bg-sky-500 text-white rounded-xl text-xs font-bold transition">
+                ↻ Drill Again (Shuffled)
+              </button>
+            </div>
+
+            <div class="mt-6 border-t border-slate-800/80 pt-4 text-left">
+              <div class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">Review of All 5 Kanji Cards:</div>
+              <div class="space-y-2">
+                ${kanjiQuizHistory.map((h, i) => `
+                  <div class="p-3 rounded-lg border text-xs flex justify-between items-center ${h.correct ? 'bg-emerald-950/20 border-emerald-500/40 text-emerald-300' : 'bg-rose-950/20 border-rose-500/40 text-rose-300'}">
+                    <div class="flex items-center gap-3">
+                      <span class="font-mono text-[11px] opacity-60">#${i + 1}</span>
+                      <span class="font-jp text-2xl font-bold text-white">${h.char}</span>
+                      <div>
+                        <strong class="text-slate-200 text-xs">${h.meaning}</strong>
+                        <span class="text-[11px] block text-slate-400 font-jp">${h.readings}</span>
+                      </div>
+                    </div>
+                    <span class="font-bold text-sm">${h.correct ? '✓' : '✗'}</span>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          </div>
+        `;
+        return;
+      }
+
+      const currentQ = kanjiQuizQuestions[kanjiQuizCurrentIndex];
+      scoreBadge.textContent = `Card: ${kanjiQuizCurrentIndex + 1} / 5 (Score: ${kanjiQuizScore})`;
+
+      container.innerHTML = `
+        <div class="bg-slate-950/70 border border-slate-800/90 rounded-xl p-5 space-y-4 max-w-xl mx-auto shadow-lg">
+          <div class="flex items-center justify-between text-xs text-slate-400 border-b border-slate-800/80 pb-2">
+            <span>Target Meaning</span>
+            <span class="font-mono">Card ${kanjiQuizCurrentIndex + 1} of 5</span>
+          </div>
+
+          <div class="text-center py-4 bg-slate-900/60 rounded-xl border border-slate-800/60">
+            <span class="text-xs uppercase tracking-wider text-sky-400 font-bold block mb-1">Find the kanji for:</span>
+            <div class="text-2xl sm:text-3xl font-extrabold text-white tracking-wide">${currentQ.targetMeaning}</div>
+            <span class="text-[11px] text-slate-500 block mt-1">${currentQ.strokes} strokes</span>
+          </div>
+
+          <div class="text-xs text-slate-400 text-center font-medium">Tap the corresponding character:</div>
+
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+            ${currentQ.options.map((opt, oIdx) => `
+              <button onclick="handleKanjiAnswer(${oIdx})" class="p-4 rounded-xl border border-slate-800 bg-slate-900 hover:bg-slate-800 hover:border-sky-500/50 text-center transition active:scale-[0.98]">
+                <span class="font-jp text-3xl font-bold text-white block mb-1">${opt.char}</span>
+                <span class="font-jp text-[10px] text-slate-400 line-clamp-1">${opt.readings}</span>
+              </button>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    function handleKanjiAnswer(choiceIndex) {
+      if (kanjiQuizIsFinished) return;
+      const currentQ = kanjiQuizQuestions[kanjiQuizCurrentIndex];
+      const selected = currentQ.options[choiceIndex];
+      const isCorrect = selected.isCorrect;
+
+      if (isCorrect) kanjiQuizScore++;
+
+      kanjiQuizHistory.push({
+        char: currentQ.correctChar,
+        meaning: currentQ.targetMeaning,
+        readings: `${DAY_CURRICULUM.kanji.find(k => k.char === currentQ.correctChar).on} / ${DAY_CURRICULUM.kanji.find(k => k.char === currentQ.correctChar).kun}`,
+        correct: isCorrect
+      });
+
+      if (kanjiQuizCurrentIndex + 1 < kanjiQuizQuestions.length) {
+        kanjiQuizCurrentIndex++;
+      } else {
+        kanjiQuizIsFinished = true;
+      }
+
+      renderKanjiQuiz();
+    }
+
+    function renderVocabFilters() {
+      const container = document.getElementById("vocab-filters");
+      const filters = ["ALL", ...DAY_CURRICULUM.kanji.map(k => k.char)];
+      container.innerHTML = filters.map(f => `
+        <button onclick="setVocabFilter('${f}')" class="px-2.5 py-1 rounded-lg text-xs font-semibold whitespace-nowrap transition ${currentVocabFilter === f ? 'bg-sky-600 text-white' : 'bg-slate-900 border border-slate-800 text-slate-400 hover:text-slate-200'}">
+          ${f === 'ALL' ? 'All (25)' : f}
+        </button>
+      `).join('');
+    }
+
+    function setVocabFilter(char) {
+      currentVocabFilter = char;
+      renderVocabFilters();
+      renderVocabGrid();
+    }
+
+    function renderVocabGrid() {
+      const container = document.getElementById("vocab-grid");
+      const filtered = currentVocabFilter === "ALL"
+        ? DAY_CURRICULUM.vocab
+        : DAY_CURRICULUM.vocab.filter(v => v.parent === currentVocabFilter);
+
+      container.innerHTML = filtered.map((v, i) => `
+        <div class="perspective-1000 h-44 cursor-pointer select-none" onclick="flipCard('vocab-flipper-${v.id}')">
+          <div id="vocab-flipper-${v.id}" class="relative w-full h-full transform-style-3d transition-transform duration-500 rounded-xl">
+            
+            <!-- FRONT: Compound Word + Parent Kanji Pill -->
+            <div class="absolute inset-0 backface-hidden bg-slate-900/90 border border-slate-800 hover:border-sky-500/50 rounded-xl p-3 flex flex-col justify-between items-center text-center shadow transition">
+              <div class="w-full flex justify-between items-center text-[10px] text-slate-500">
+                <span class="px-1.5 py-0.5 rounded bg-slate-800 text-sky-400 font-bold">${v.parent}</span>
+                <span>${v.type}</span>
+              </div>
+              <div class="font-jp text-2xl font-bold text-white tracking-wide">${v.word}</div>
+              <div class="text-[10px] text-slate-400 flex items-center gap-1">
+                <span>🔄 Flip for kana & meaning</span>
+              </div>
+              <button onclick="event.stopPropagation(); speak('${v.word}')" class="px-2 py-0.5 rounded bg-slate-800 hover:bg-slate-700 text-slate-300 text-xs flex items-center gap-1 transition">
+                🔊 Listen
+              </button>
+            </div>
+
+            <!-- BACK: Reading, Definition, Part of Speech -->
+            <div class="absolute inset-0 backface-hidden rotate-y-180 bg-slate-900 border border-sky-500/40 rounded-xl p-3 flex flex-col justify-between text-center shadow-lg">
+              <div class="text-left border-b border-slate-800 pb-1 flex justify-between items-center">
+                <span class="font-jp text-xs text-sky-400 font-bold">${v.kana}</span>
+                <span class="text-[10px] text-slate-500">${v.type}</span>
+              </div>
+              <div class="my-auto">
+                <div class="font-jp text-lg font-bold text-slate-100">${v.word}</div>
+                <div class="text-xs font-semibold text-sky-300 mt-1">${v.en}</div>
+              </div>
+              <button onclick="event.stopPropagation(); speak('${v.word}')" class="w-full py-1 rounded bg-slate-800 hover:bg-slate-700 text-sky-300 text-xs transition">
+                🔊 Pronounce
+              </button>
+            </div>
+
+          </div>
+        </div>
+      `).join('');
+    }
+
+    // Randomized Vocab Quiz
+    function regenerateVocabQuiz() {
+      vocabQuizCurrentIndex = 0;
+      vocabQuizScore = 0;
+      vocabQuizIsFinished = false;
+      vocabQuizHistory = [];
+
+      // Shuffle all 25 words
+      const shuffledAll = [...DAY_CURRICULUM.vocab].sort(() => 0.5 - Math.random());
+
+      vocabQuizQuestions = shuffledAll.map(item => {
+        const others = DAY_CURRICULUM.vocab.filter(v => v.id !== item.id);
+        const distractors = others.sort(() => 0.5 - Math.random()).slice(0, 3);
+        const options = [
+          { kana: item.kana, en: item.en, isCorrect: true },
+          ...distractors.map(d => ({ kana: d.kana, en: d.en, isCorrect: false }))
+        ].sort(() => 0.5 - Math.random());
+
+        return {
+          id: item.id,
+          targetWord: item.word,
+          correctKana: item.kana,
+          correctEn: item.en,
+          parent: item.parent,
+          options: options
+        };
+      });
+
+      renderVocabQuiz();
+    }
+
+    function renderVocabQuiz() {
+      const container = document.getElementById("vocab-quiz-container");
+      const scoreBadge = document.getElementById("vocab-quiz-score");
+
+      if (vocabQuizIsFinished) {
+        scoreBadge.textContent = `Completed! ${vocabQuizScore} / 25`;
+        container.innerHTML = `
+          <div class="bg-slate-950/70 border border-slate-800 rounded-2xl p-6 text-center space-y-4 max-w-xl mx-auto">
+            <div class="text-3xl">${vocabQuizScore >= 20 ? '🌟' : vocabQuizScore >= 13 ? '👍' : '💪'}</div>
+            <h4 class="text-lg font-bold text-white">Vocabulary Drill Completed!</h4>
+            <div class="font-mono text-2xl font-extrabold ${vocabQuizScore >= 20 ? 'text-emerald-400' : vocabQuizScore >= 13 ? 'text-sky-400' : 'text-amber-400'}">
+              Score: ${vocabQuizScore} / 25
+            </div>
+            <p class="text-xs text-slate-400 max-w-md mx-auto">
+              ${vocabQuizScore === 25 ? 'Perfect mastery! Every single compound recognized instantly.' : 'Review any missed compounds below and restart the drill whenever ready.'}
+            </p>
+            <div class="pt-2 flex justify-center gap-3">
+              <button onclick="regenerateVocabQuiz()" class="px-4 py-2 bg-sky-600 hover:bg-sky-500 text-white rounded-xl text-xs font-bold transition">
+                ↻ Drill Again (Shuffled)
+              </button>
+            </div>
+
+            <div class="mt-6 border-t border-slate-800/80 pt-4 text-left">
+              <div class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">Review of All 25 Cards:</div>
+              <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                ${vocabQuizHistory.map((h, i) => `
+                  <div class="p-2.5 rounded-lg border text-xs flex justify-between items-center ${h.correct ? 'bg-emerald-950/20 border-emerald-500/40 text-emerald-300' : 'bg-rose-950/20 border-rose-500/40 text-rose-300'}">
+                    <div>
+                      <span class="font-mono text-[10px] opacity-60 mr-1">#${i + 1}</span>
+                      <strong class="font-jp text-sm text-white">${h.word}</strong>
+                      <span class="text-[11px] block text-slate-400">${h.kana} &bull; ${h.en}</span>
+                    </div>
+                    <span>${h.correct ? '✓' : '✗'}</span>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          </div>
+        `;
+        return;
+      }
+
+      const currentQ = vocabQuizQuestions[vocabQuizCurrentIndex];
+      scoreBadge.textContent = `Card: ${vocabQuizCurrentIndex + 1} / 25 (Score: ${vocabQuizScore})`;
+
+      container.innerHTML = `
+        <div class="bg-slate-950/70 border border-slate-800/90 rounded-xl p-5 space-y-4 max-w-xl mx-auto shadow-lg">
+          <div class="flex items-center justify-between text-xs text-slate-400 border-b border-slate-800/80 pb-2">
+            <span>Parent Kanji: <strong class="text-sky-400 font-jp">${currentQ.parent}</strong></span>
+            <span class="font-mono">Progress: ${vocabQuizCurrentIndex + 1} of 25</span>
+          </div>
+
+          <div class="text-center py-4 bg-slate-900/60 rounded-xl border border-slate-800/60">
+            <div class="font-jp text-3xl sm:text-4xl font-extrabold text-white tracking-wide">${currentQ.targetWord}</div>
+            <button onclick="speak('${currentQ.targetWord}')" class="mt-2 text-xs text-sky-400 hover:text-sky-300 inline-flex items-center gap-1">
+              🔊 Pronounce
+            </button>
+          </div>
+
+          <div class="text-xs text-slate-400 text-center font-medium">Select the correct reading and definition:</div>
+
+          <div class="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+            ${currentQ.options.map((opt, oIdx) => `
+              <button onclick="handleVocabAnswer(${oIdx})" class="p-3 rounded-xl border border-slate-800 bg-slate-900 hover:bg-slate-800 hover:border-sky-500/50 text-left transition flex flex-col gap-0.5 active:scale-[0.99]">
+                <span class="font-jp text-sm font-bold text-sky-300">${opt.kana}</span>
+                <span class="text-xs text-slate-300">${opt.en}</span>
+              </button>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    function handleVocabAnswer(choiceIndex) {
+      if (vocabQuizIsFinished) return;
+      const currentQ = vocabQuizQuestions[vocabQuizCurrentIndex];
+      const selected = currentQ.options[choiceIndex];
+      const isCorrect = selected.isCorrect;
+
+      if (isCorrect) vocabQuizScore++;
+
+      vocabQuizHistory.push({
+        word: currentQ.targetWord,
+        kana: currentQ.correctKana,
+        en: currentQ.correctEn,
+        correct: isCorrect
+      });
+
+      if (vocabQuizCurrentIndex + 1 < vocabQuizQuestions.length) {
+        vocabQuizCurrentIndex++;
+      } else {
+        vocabQuizIsFinished = true;
+      }
+
+      renderVocabQuiz();
+    }
+
+    function renderGrammar() {
+      const container = document.getElementById("grammar-list");
+      container.innerHTML = DAY_CURRICULUM.grammar.map((g, i) => `
+        <div class="bg-slate-900 border border-slate-800 rounded-2xl p-5 space-y-4">
+          <div class="flex flex-wrap items-baseline justify-between gap-2 border-b border-slate-800 pb-2.5">
+            <div class="flex items-center gap-2">
+              <span class="font-mono text-xs text-sky-400 font-bold">#${i + 1}</span>
+              <h3 class="text-base font-bold text-white font-jp">${g.pattern}</h3>
+            </div>
+            <span class="text-xs font-mono px-2 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700">
+              ${g.formation}
+            </span>
+          </div>
+
+          <p class="text-xs sm:text-sm text-slate-300">${g.meaning} &bull; <span class="text-slate-400">${g.nuance}</span></p>
+
+          <!-- Sentence Flip Card -->
+          <div class="perspective-1000 h-36 cursor-pointer select-none" onclick="flipCard('sentence-flipper-${g.id}')">
+            <div id="sentence-flipper-${g.id}" class="relative w-full h-full transform-style-3d transition-transform duration-500 rounded-xl">
+              
+              <!-- Front: Japanese Only -->
+              <div class="absolute inset-0 backface-hidden bg-slate-950 border border-slate-800 hover:border-sky-500/50 rounded-xl p-4 flex flex-col justify-between shadow transition">
+                <div class="flex justify-between items-center text-[10px] text-slate-500">
+                  <span class="uppercase tracking-wider font-semibold text-sky-400">Sentence Challenge #${i + 1}</span>
+                  <span>Tap to flip &bull; Translation</span>
+                </div>
+                <div class="font-jp text-base sm:text-lg text-slate-100 font-medium my-auto">${g.exampleJp}</div>
+                <div class="flex justify-between items-center">
+                  <span class="text-[11px] text-slate-400">Can you translate and analyze this structure?</span>
+                  <button onclick="event.stopPropagation(); speak('${g.exampleJp}')" class="px-2 py-1 bg-slate-900 hover:bg-slate-800 border border-slate-700 rounded text-xs text-sky-300">
+                    🔊 Listen
+                  </button>
+                </div>
+              </div>
+
+              <!-- Back: Furigana, Translation & Breakdown -->
+              <div class="absolute inset-0 backface-hidden rotate-y-180 bg-slate-950 border border-sky-500/40 rounded-xl p-4 flex flex-col justify-between text-xs shadow-lg">
+                <div class="flex justify-between items-baseline border-b border-slate-800 pb-1">
+                  <div class="font-jp text-sm text-sky-300">${g.exampleFuri}</div>
+                  <button onclick="event.stopPropagation(); speak('${g.exampleJp}')" class="text-xs text-sky-400 hover:text-sky-300">🔊</button>
+                </div>
+                <div class="text-xs text-slate-300 italic">${g.exampleEn}</div>
+                <div class="text-[11px] text-slate-400 font-mono bg-slate-900 p-1.5 rounded border border-slate-800">
+                  ${g.breakdown}
+                </div>
+              </div>
+
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function regenerateGrammarQuiz() {
+      grammarQuizCurrentIndex = 0;
+      grammarQuizScore = 0;
+      grammarQuizIsFinished = false;
+      grammarQuizHistory = [];
+
+      const shuffled = [...DAY_CURRICULUM.grammarQuiz].sort(() => 0.5 - Math.random());
+      grammarQuizQuestions = shuffled.map(q => {
+        const shuffledOptions = [...q.options].sort(() => 0.5 - Math.random());
+        return {
+          ...q,
+          shuffledOptions
+        };
+      });
+
+      renderGrammarQuiz();
+    }
+
+    function renderGrammarQuiz() {
+      const container = document.getElementById("grammar-quiz-container");
+      const scoreBadge = document.getElementById("grammar-quiz-score");
+
+      if (grammarQuizIsFinished) {
+        scoreBadge.textContent = `Completed! ${grammarQuizScore} / 5`;
+        container.innerHTML = `
+          <div class="bg-slate-950/70 border border-slate-800 rounded-2xl p-6 text-center space-y-4 max-w-xl mx-auto">
+            <div class="text-3xl">${grammarQuizScore === 5 ? '🌟' : grammarQuizScore >= 3 ? '👍' : '💪'}</div>
+            <h4 class="text-lg font-bold text-white">N5 Particle Drill Completed!</h4>
+            <div class="font-mono text-2xl font-extrabold ${grammarQuizScore === 5 ? 'text-emerald-400' : grammarQuizScore >= 3 ? 'text-sky-400' : 'text-amber-400'}">
+              Score: ${grammarQuizScore} / 5
+            </div>
+            <p class="text-xs text-slate-400 max-w-md mx-auto">
+              ${grammarQuizScore === 5 ? 'Mastery demonstrated! All core N5 particle slots identified accurately.' : 'Review the explanations below and restart anytime to solidify particle usage.'}
+            </p>
+            <div class="pt-2 flex justify-center gap-3">
+              <button onclick="regenerateGrammarQuiz()" class="px-4 py-2 bg-sky-600 hover:bg-sky-500 text-white rounded-xl text-xs font-bold transition">
+                ↻ Drill Again (Shuffled)
+              </button>
+            </div>
+
+            <div class="mt-6 border-t border-slate-800/80 pt-4 text-left">
+              <div class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">Review of All 5 Particle Questions:</div>
+              <div class="space-y-2.5">
+                ${grammarQuizHistory.map((h, i) => `
+                  <div class="p-3 rounded-lg border text-xs ${h.correct ? 'bg-emerald-950/20 border-emerald-500/40 text-emerald-300' : 'bg-rose-950/20 border-rose-500/40 text-rose-300'}">
+                    <div class="flex justify-between items-start mb-1">
+                      <div class="font-jp text-sm font-bold text-white">${h.prompt.replace('[ ? ]', `[ ${h.correctParticle} ]`)}</div>
+                      <span class="font-bold text-sm ml-2">${h.correct ? '✓' : '✗'}</span>
+                    </div>
+                    <div class="text-slate-300 text-[11px] mb-1 italic">${h.translation}</div>
+                    <div class="text-slate-400 text-[11px] border-t border-slate-800/80 pt-1">
+                      ${h.explanation}
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          </div>
+        `;
+        return;
+      }
+
+      const currentQ = grammarQuizQuestions[grammarQuizCurrentIndex];
+      scoreBadge.textContent = `Card: ${grammarQuizCurrentIndex + 1} / 5 (Score: ${grammarQuizScore})`;
+
+      container.innerHTML = `
+        <div class="bg-slate-950/70 border border-slate-800/90 rounded-xl p-5 space-y-4 max-w-xl mx-auto shadow-lg">
+          <div class="flex items-center justify-between text-xs text-slate-400 border-b border-slate-800/80 pb-2">
+            <span>Cloze Particle Fill</span>
+            <span class="font-mono">Progress: ${grammarQuizCurrentIndex + 1} of 5</span>
+          </div>
+
+          <div class="text-center py-5 bg-slate-900/60 rounded-xl border border-slate-800/60">
+            <div class="font-jp text-2xl sm:text-3xl font-extrabold text-white tracking-wide mb-2">${currentQ.prompt}</div>
+            <div class="text-xs text-slate-400 italic">${currentQ.translation}</div>
+          </div>
+
+          <div class="text-xs text-slate-400 text-center font-medium">Select the missing particle:</div>
+
+          <div class="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+            ${currentQ.shuffledOptions.map((opt) => `
+              <button onclick="handleGrammarAnswer('${opt}')" class="py-3.5 px-2 rounded-xl border border-slate-800 bg-slate-900 hover:bg-slate-800 hover:border-sky-500/50 text-center transition active:scale-[0.98]">
+                <span class="font-jp text-2xl font-bold text-sky-300 block">${opt}</span>
+              </button>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    function handleGrammarAnswer(chosen) {
+      if (grammarQuizIsFinished) return;
+      const currentQ = grammarQuizQuestions[grammarQuizCurrentIndex];
+      const isCorrect = chosen === currentQ.correct;
+
+      if (isCorrect) grammarQuizScore++;
+
+      grammarQuizHistory.push({
+        prompt: currentQ.prompt,
+        translation: currentQ.translation,
+        chosenParticle: chosen,
+        correctParticle: currentQ.correct,
+        explanation: currentQ.explanation,
+        correct: isCorrect
+      });
+
+      if (grammarQuizCurrentIndex + 1 < grammarQuizQuestions.length) {
+        grammarQuizCurrentIndex++;
+      } else {
+        grammarQuizIsFinished = true;
+      }
+
+      renderGrammarQuiz();
+    }
+
+    function renderReading() {
+      const storyContainer = document.getElementById("story-container");
+      storyContainer.innerHTML = DAY_CURRICULUM.reading.furiHtml;
+      document.getElementById("story-translation").textContent = DAY_CURRICULUM.reading.translation;
+
+      const vocabChips = document.getElementById("story-vocab-chips");
+      vocabChips.innerHTML = DAY_CURRICULUM.reading.usedVocab.map(w => `
+        <span onclick="speak('${w}')" class="cursor-pointer px-2 py-1 rounded-md bg-slate-800 hover:bg-slate-700 border border-slate-700 text-xs font-jp text-sky-300 flex items-center gap-1 transition">
+          ${w} 🔊
+        </span>
+      `).join('');
+
+      regenerateRCQuiz();
+    }
+
+    function regenerateRCQuiz() {
+      rcCurrentIndex = 0;
+      rcScore = 0;
+      rcIsFinished = false;
+      rcHistory = [];
+
+      rcQuestions = DAY_CURRICULUM.reading.comprehension.map(q => {
+        // Map original options with their indices
+        const optionsWithIdx = q.options.map((text, idx) => ({
+          text,
+          isCorrect: idx === q.correct
+        }));
+        // Shuffle options
+        const shuffled = [...optionsWithIdx].sort(() => 0.5 - Math.random());
+        return {
+          id: q.id,
+          question: q.question,
+          questionEn: q.questionEn,
+          explanation: q.explanation,
+          shuffledOptions: shuffled
+        };
+      });
+
+      renderReadingComprehension();
+    }
+
+    function renderReadingComprehension() {
+      const container = document.getElementById("rc-questions-container");
+      const scoreBadge = document.getElementById("rc-score-badge");
+
+      if (rcIsFinished) {
+        scoreBadge.textContent = `Completed! ${rcScore} / 3`;
+        container.innerHTML = `
+          <div class="bg-slate-950/70 border border-slate-800 rounded-2xl p-6 text-center space-y-4 max-w-xl mx-auto">
+            <div class="text-3xl">${rcScore === 3 ? '🌟' : rcScore >= 2 ? '👍' : '💪'}</div>
+            <h4 class="text-lg font-bold text-white">Reading Comprehension Completed!</h4>
+            <div class="font-mono text-2xl font-extrabold ${rcScore === 3 ? 'text-emerald-400' : rcScore >= 2 ? 'text-sky-400' : 'text-amber-400'}">
+              Score: ${rcScore} / 3
+            </div>
+            <p class="text-xs text-slate-400 max-w-md mx-auto">
+              ${rcScore === 3 ? 'Outstanding! Full comprehension of the narrative and nuance.' : 'Review the passage details and explanations below to improve comprehension.'}
+            </p>
+            <div class="pt-2 flex justify-center gap-3">
+              <button onclick="regenerateRCQuiz()" class="px-4 py-2 bg-sky-600 hover:bg-sky-500 text-white rounded-xl text-xs font-bold transition">
+                ↻ Drill Again (Shuffled)
+              </button>
+            </div>
+
+            <div class="mt-6 border-t border-slate-800/80 pt-4 text-left">
+              <div class="text-xs font-bold uppercase tracking-wider text-slate-400 mb-3">Review of All 3 Questions:</div>
+              <div class="space-y-3">
+                ${rcHistory.map((h, i) => `
+                  <div class="p-3 rounded-lg border text-xs ${h.correct ? 'bg-emerald-950/20 border-emerald-500/40 text-emerald-300' : 'bg-rose-950/20 border-rose-500/40 text-rose-300'}">
+                    <div class="flex justify-between items-start mb-1">
+                      <div>
+                        <span class="font-mono text-[10px] opacity-60 mr-1">問 ${i + 1}</span>
+                        <strong class="font-jp text-sm text-white">${h.question}</strong>
+                      </div>
+                      <span class="font-bold text-sm ml-2">${h.correct ? '✓' : '✗'}</span>
+                    </div>
+                    <div class="text-slate-300 text-[11px] mb-1 italic">${h.questionEn}</div>
+                    <div class="text-[11px] border-t border-slate-800/80 pt-1 text-slate-300">
+                      <div><strong class="text-slate-400">Your choice:</strong> ${h.selectedText}</div>
+                      <div><strong class="text-emerald-400">Correct:</strong> ${h.correctText}</div>
+                      <div class="text-slate-400 mt-1">${h.explanation}</div>
+                    </div>
+                  </div>
+                `).join('')}
+              </div>
+            </div>
+          </div>
+        `;
+        return;
+      }
+
+      const currentQ = rcQuestions[rcCurrentIndex];
+      scoreBadge.textContent = `Card: ${rcCurrentIndex + 1} / 3 (Score: ${rcScore})`;
+
+      container.innerHTML = `
+        <div class="bg-slate-950/70 border border-slate-800/90 rounded-xl p-5 space-y-4 max-w-xl mx-auto shadow-lg">
+          <div class="flex items-center justify-between text-xs text-slate-400 border-b border-slate-800/80 pb-2">
+            <span>JLPT N5 Reading Question</span>
+            <span class="font-mono">問 ${rcCurrentIndex + 1} of 3</span>
+          </div>
+
+          <div class="py-4 px-4 bg-slate-900/60 rounded-xl border border-slate-800/60 text-left">
+            <div class="font-jp text-base sm:text-lg font-bold text-white tracking-wide mb-1">${currentQ.question}</div>
+            <div class="text-xs text-slate-400 italic">${currentQ.questionEn}</div>
+          </div>
+
+          <div class="text-xs text-slate-400 text-center font-medium">Select the best answer based on the passage:</div>
+
+          <div class="grid grid-cols-1 gap-2.5">
+            ${currentQ.shuffledOptions.map((opt, oIdx) => `
+              <button onclick="handleRCAnswer(${oIdx})" class="p-3.5 rounded-xl border border-slate-800 bg-slate-900 hover:bg-slate-800 hover:border-sky-500/50 text-left transition flex items-center gap-3 active:scale-[0.99]">
+                <span class="w-6 h-6 rounded-full bg-slate-800 border border-slate-700 text-xs flex items-center justify-center shrink-0 font-mono font-bold text-sky-300">${oIdx + 1}</span>
+                <span class="font-jp text-sm text-slate-200">${opt.text}</span>
+              </button>
+            `).join('')}
+          </div>
+        </div>
+      `;
+    }
+
+    function handleRCAnswer(choiceIndex) {
+      if (rcIsFinished) return;
+      const currentQ = rcQuestions[rcCurrentIndex];
+      const selected = currentQ.shuffledOptions[choiceIndex];
+      const correctOpt = currentQ.shuffledOptions.find(o => o.isCorrect);
+      const isCorrect = selected.isCorrect;
+
+      if (isCorrect) rcScore++;
+
+      rcHistory.push({
+        question: currentQ.question,
+        questionEn: currentQ.questionEn,
+        selectedText: selected.text,
+        correctText: correctOpt.text,
+        explanation: currentQ.explanation,
+        correct: isCorrect
+      });
+
+      if (rcCurrentIndex + 1 < rcQuestions.length) {
+        rcCurrentIndex++;
+      } else {
+        rcIsFinished = true;
+      }
+
+      renderReadingComprehension();
+    }
+
+    function setFuriganaMode(mode) {
+      furiganaState = mode;
+      const container = document.getElementById("story-container");
+      container.classList.remove("furi-all", "furi-hover", "furi-hidden");
+
+      document.querySelectorAll("[id^='furi-btn-']").forEach(btn => {
+        btn.classList.remove("bg-sky-600", "text-white");
+        btn.classList.add("text-slate-400");
+      });
+
+      const activeBtn = document.getElementById(`furi-btn-${mode}`);
+      activeBtn.classList.add("bg-sky-600", "text-white");
+      activeBtn.classList.remove("text-slate-400");
+
+      if (mode === "hover") container.classList.add("furi-hover");
+      if (mode === "hidden") container.classList.add("furi-hidden");
+    }
+
+    function toggleTranslation() {
+      isTranslationVisible = !isTranslationVisible;
+      const box = document.getElementById("story-translation");
+      const txt = document.getElementById("trans-toggle-text");
+      if (isTranslationVisible) {
+        box.classList.remove("hidden");
+        txt.textContent = "Hide English Translation";
+      } else {
+        box.classList.add("hidden");
+        txt.textContent = "Show English Translation";
+      }
+    }
+
+    function switchTab(tabName) {
+      document.querySelectorAll(".tab-pane").forEach(pane => pane.classList.add("hidden"));
+      document.querySelectorAll(".tab-btn").forEach(btn => {
+        btn.classList.remove("bg-sky-600", "text-white");
+        btn.classList.add("text-slate-400");
+      });
+
+      document.getElementById(`section-${tabName}`).classList.remove("hidden");
+      const activeBtn = document.getElementById(`tab-btn-${tabName}`);
+      activeBtn.classList.add("bg-sky-600", "text-white");
+      activeBtn.classList.remove("text-slate-400");
+    }
+
+    window.addEventListener("DOMContentLoaded", () => {
+      initStorage();
+      renderKanji();
+      regenerateKanjiQuiz();
+      renderVocabFilters();
+      renderVocabGrid();
+      regenerateVocabQuiz();
+      renderGrammar();
+      regenerateGrammarQuiz();
+      renderReading();
+    });
+  </script>
+</body>
+</html>

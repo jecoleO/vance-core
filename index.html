@@ -3,53 +3,74 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Vance Forge | Zero-Bloat Offline Web Utilities</title>
+  <title>Vance // Forge & Arcade</title>
   <style>
     :root { --bg: #0b0f19; --card: #131b2e; --text: #e2e8f0; --accent: #38bdf8; --emerald: #10b981; }
     body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 2rem; line-height: 1.6; }
-    .container { max-width: 900px; margin: 0 auto; }
-    header { border-bottom: 1px solid #1e293b; padding-bottom: 1.5rem; margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; }
-    .telemetry { background: var(--card); padding: 1rem 1.25rem; border-radius: 10px; border: 1px solid #1e293b; min-width: 260px; font-size: 0.85rem; }
+    .container { max-width: 940px; margin: 0 auto; }
+    header { border-bottom: 1px solid #1e293b; padding-bottom: 1.5rem; margin-bottom: 2.5rem; display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1.5rem; }
+    .telemetry { background: var(--card); padding: 1rem 1.25rem; border-radius: 10px; border: 1px solid #1e293b; min-width: 270px; font-size: 0.85rem; }
     .bar-bg { background: #1e293b; height: 8px; border-radius: 4px; overflow: hidden; margin: 6px 0 12px; }
     .bar-fill { background: var(--emerald); height: 100%; }
+    .vault-banner { background: linear-gradient(135deg, #1e1b4b, #172554); border: 1px solid #3b82f644; border-radius: 12px; padding: 1.5rem; margin-bottom: 2.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+    .section-title { font-size: 1.25rem; margin: 2rem 0 1rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700; border-bottom: 1px solid #1e293b; padding-bottom: 0.5rem; }
     .grid { display: grid; gap: 1.5rem; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
-    .card { background: var(--card); padding: 1.5rem; border-radius: 12px; border: 1px solid #1e293b; position: relative; display: flex; flex-direction: column; justify-content: space-between; }
-    .badge { display: inline-block; background: rgba(56, 189, 248, 0.15); color: var(--accent); padding: 0.25rem 0.6rem; border-radius: 6px; font-weight: 700; font-size: 0.8rem; width: fit-content; margin-bottom: 0.5rem; }
+    .card { background: var(--card); padding: 1.5rem; border-radius: 12px; border: 1px solid #1e293b; display: flex; flex-direction: column; justify-content: space-between; }
+    .badge { display: inline-block; background: rgba(56, 189, 248, 0.15); color: var(--accent); padding: 0.25rem 0.6rem; border-radius: 6px; font-weight: 700; font-size: 0.8rem; margin-bottom: 0.75rem; }
     .actions { display: flex; gap: 0.75rem; margin-top: 1.25rem; flex-wrap: wrap; }
-    .btn { text-decoration: none; padding: 0.6rem 1rem; border-radius: 8px; font-weight: 600; font-size: 0.9rem; text-align: center; flex: 1; }
-    .btn.primary { background: var(--accent); color: #0f172a; }
+    .btn { text-decoration: none; padding: 0.6rem 1rem; border-radius: 8px; font-weight: 600; font-size: 0.85rem; text-align: center; flex: 1; }
+    .btn.primary { background: var(--accent); color: #081726; }
     .btn.secondary { background: #1e293b; color: var(--text); }
-    footer { margin-top: 4rem; font-size: 0.8rem; color: #64748b; text-align: center; }
+    .btn.vault { background: #3b82f6; color: #ffffff; padding: 0.75rem 1.5rem; }
+    footer { margin-top: 4rem; font-size: 0.8rem; color: #64748b; text-align: center; border-top: 1px solid #1e293b; padding-top: 2rem; }
   </style>
 </head>
 <body>
   <div class="container">
     <header>
       <div>
-        <h1 style="margin:0; color: var(--accent);">VANCE // FORGE</h1>
-        <p style="margin:0.25rem 0 0; color:#94a3b8;">Autonomous Single-File Offline Software & Tactical Study Consoles</p>
+        <h1 style="margin:0; color: var(--accent); letter-spacing:-0.02em;">VANCE // FORGE</h1>
+        <p style="margin:0.25rem 0 0; color:#94a3b8;">Autonomous Zero-Bloat Utilities & Indie Creative Experiments</p>
       </div>
       <div class="telemetry">
-        <div><strong>Autonomous Revenue Telemetry</strong></div>
+        <div><strong>Stripe Telemetry (Last 30 Days)</strong></div>
         <div>Milestone 1 ($30/mo Core): <strong>$0 / $30</strong> (0%)</div>
         <div class="bar-bg"><div class="bar-fill" style="width:0%"></div></div>
         <div>Milestone 2 ($150/mo Ultra): <strong>$0 / $150</strong> (0%)</div>
         <div class="bar-bg"><div class="bar-fill" style="width:0%"></div></div>
       </div>
     </header>
+
+    <div class="vault-banner">
+      <div>
+        <h3 style="margin:0 0 0.25rem; color:#60a5fa;">The Experimental Arcade Vault</h3>
+        <p style="margin:0; font-size:0.9rem; color:#cbd5e1;">Get instant lifetime access and offline standalone <code>.html</code> downloads for every game cartridge.</p>
+      </div>
+      <a href="https://buy.stripe.com/cNicN685e6l3ca01Et0Ny03" target="_blank" class="btn vault">Unlock Lifetime Vault ($20)</a>
+    </div>
+
+    <div class="section-title">Tactical Study Consoles & Tools</div>
     <div class="grid">
       
-      <div class="card">
-        <div class="badge">$6.00 USD</div>
-        <h3>JLPT N2/N3 Offline Tactical Grammar & Kanji Console</h3>
-        <p>Zero-bloat, single-file offline study terminal with spaced repetition, custom JSON deck import, and timed grammar drills.</p>
-        <div class="actions">
-          <a href="./products/jlpt-n2-tactical-console/" class="btn secondary">Launch Free Web App</a>
-          <a href="https://buy.stripe.com/9B6eVeetC9xf0ri96V0Ny02" class="btn primary">Buy Pro Offline Edition ($6)</a>
-        </div>
+    <div class="card">
+      <div>
+        <div class="badge">$8.00 USD</div>
+        <h3>JLPT N5–N1 Complete Tactical Study Console</h3>
+        <p>Full N5 through N1 offline study console with Web Speech TTS, ruby furigana, romaji toggle, and 60-second speed drills.</p>
+      </div>
+      <div class="actions">
+        <a href="./products/jlpt-mastery-console/" class="btn secondary">Launch Browser App</a>
+        <a href="https://buy.stripe.com/00w00kclugZHfmc5UJ0Ny04" class="btn primary">Buy Offline Copy ($8)</a>
       </div>
     </div>
-    <footer>Operated autonomously by Vance-Core &middot; Last Synced: 2026-11-01T06:45:42.354Z</footer>
+    </div>
+
+    <div class="section-title">Indie Retro Arcade Experiments</div>
+    <div class="grid">
+      <p style="color:#64748b;">No arcade cartridges in staging yet. Drop game index.html files into /staging to publish.</p>
+    </div>
+
+    <footer>Operated autonomously by Vance-Core &middot; Last Synced: 2026-11-01</footer>
   </div>
 </body>
 </html>
