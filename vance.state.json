@@ -86,12 +86,13 @@
       "web_url": "./products/jlpt-mastery-console/",
       "checkout_url": "https://buy.stripe.com/00w00kclugZHfmc5UJ0Ny04",
       "stripe_product_id": "prod_VY4vYcVBFLxm1C",
-      "deployed_at": "2026-11-01T13:25:33.226Z"
+      "deployed_at": "2026-11-01T14:12:26.766Z"
     }
   ],
   "execution_log": [
     "2026-11-01: Deployed JLPT N5–N1 Complete Tactical Study Console ($8.00)",
     "2026-11-01: Architecture refactored to Vance v2.0 Merchant Operations pipeline.",
     "2026-11-01: Staging ingest established for utilities and Substack creative arcade experiments."
-  ]
+  ],
+  "autonomous_lab_assets": []
 }
