@@ -41,8 +41,5 @@ jobs:
             git pull --rebase origin main
             git push origin main
           else
-            console.log("No state changes or new assets to commit.")
+            echo "No state changes or new assets to commit."
           fi
-          git add .
-          git diff --staged --quiet || git commit -m "Vance Autonomous Cycle: Telemetry + Asset Build"
-          git push
