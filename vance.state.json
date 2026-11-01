@@ -86,10 +86,11 @@
       "web_url": "./products/jlpt-mastery-console/",
       "checkout_url": "https://buy.stripe.com/00w00kclugZHfmc5UJ0Ny04",
       "stripe_product_id": "prod_VY4vYcVBFLxm1C",
-      "deployed_at": "2026-11-01T22:41:19.930Z"
+      "deployed_at": "2026-11-01T23:07:28.242Z"
     }
   ],
   "execution_log": [
+    "2026-11-01: Vance Lab deployed World News Japanese: New Hokuriku Shinkansen Extension Opens (N5)",
     "2026-11-01: Vance Lab deployed World News Japanese: New Ocean Robot Cleans Up Trash (N5)",
     "2026-11-01: Vance Lab deployed World News Japanese: New solar power creates the next era (N5)",
     "2026-11-02: Synchronized state to Vance v2.1 Merchant Operations pipeline.",
@@ -137,6 +138,19 @@
       "checkout_url": "https://buy.stripe.com/7sY6oI3OYbFn1vmerf0Ny07",
       "stripe_product_id": "prod_VYDtCbKSeZ8L5t",
       "invented_at": "2026-11-01T22:41:30.305Z"
+    },
+    {
+      "slug": "news-n5-hokuriku-shinkansen-extension",
+      "type": "news_dossier",
+      "level": "N5",
+      "name": "World News Japanese: New Hokuriku Shinkansen Extension Opens (N5)",
+      "tagline": "Monday Commute Edition &bull; 25-Word Match, 5 Grammar Cloze & Reading Check.",
+      "price_cents": 500,
+      "revenue_cents": 0,
+      "web_url": "../products/news-n5-hokuriku-shinkansen-extension/",
+      "checkout_url": "https://buy.stripe.com/14A7sMfxG38R0ri6YN0Ny08",
+      "stripe_product_id": "prod_VYEJV7Hz7CYhSs",
+      "invented_at": "2026-11-01T23:07:39.038Z"
     }
   ]
 }
