@@ -3,7 +3,6 @@ import path from 'path';
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY;
-const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-3.8-flash';
 const STATE_PATH = './vance.state.json';
 
 if (!GEMINI_API_KEY || !STRIPE_SECRET_KEY) {
@@ -12,6 +11,7 @@ if (!GEMINI_API_KEY || !STRIPE_SECRET_KEY) {
 }
 
 const state = JSON.parse(fs.readFileSync(STATE_PATH, 'utf8'));
+const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
 // Helper: Encode form data for Stripe REST API (Zero npm dependencies)
 function toFormUrlEncoded(obj, prefix = '') {
@@ -54,7 +54,6 @@ async function syncStripeTelemetry() {
     const available = balance.available?.reduce((acc, b) => acc + b.amount, 0) || 0;
     const pending = balance.pending?.reduce((acc, b) => acc + b.amount, 0) || 0;
 
-    // Calculate charges in the last 30 days
     const thirtyDaysAgo = Math.floor(Date.now() / 1000) - 30 * 24 * 60 * 60;
     const charges = await stripeRequest(`charges?created[gte]=${thirtyDaysAgo}&limit=100`);
     const monthlyGrossCents = charges.data
@@ -74,7 +73,6 @@ async function syncStripeTelemetry() {
 async function createStripeProductAndLink(item) {
   console.log(`Setting up Stripe product & payment link for: ${item.name}`);
 
-  // Check if product already exists from a previous partial run to avoid duplicates
   let product = null;
   try {
     const existing = await stripeRequest('products?active=true&limit=50');
@@ -82,9 +80,7 @@ async function createStripeProductAndLink(item) {
     if (product) {
       console.log(`Found existing Stripe product (${product.id}), reusing...`);
     }
-  } catch (e) {
-    // Fallback to creating new product
-  }
+  } catch (e) {}
 
   if (!product) {
     product = await stripeRequest('products', 'POST', {
@@ -93,11 +89,22 @@ async function createStripeProductAndLink(item) {
     });
   }
 
-  const price = await stripeRequest('prices', 'POST', {
-    product: product.id,
-    unit_amount: item.price_cents,
-    currency: 'usd'
-  });
+  let price = null;
+  try {
+    const existingPrices = await stripeRequest(`prices?product=${product.id}&active=true&limit=10`);
+    price = existingPrices.data?.find(pr => pr.unit_amount === item.price_cents) || null;
+    if (price) {
+      console.log(`Found existing Stripe price (${price.id}), reusing...`);
+    }
+  } catch (e) {}
+
+  if (!price) {
+    price = await stripeRequest('prices', 'POST', {
+      product: product.id,
+      unit_amount: item.price_cents,
+      currency: 'usd'
+    });
+  }
 
   const proUnlockUrl = `${state.agent_identity.storefront_url}products/${item.slug}/?pro=unlocked`;
   const paymentLink = await stripeRequest('payment_links', 'POST', {
@@ -115,8 +122,25 @@ async function createStripeProductAndLink(item) {
   };
 }
 
+async function getCandidateModels() {
+  const candidates = ['gemini-3.8-flash'];
+  try {
+    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${GEMINI_API_KEY}`);
+    if (res.ok) {
+      const data = await res.json();
+      const dynamic = (data.models || [])
+        .filter(m => m.supportedGenerationMethods?.includes('generateContent'))
+        .map(m => m.name.replace('models/', ''))
+        .filter(name => name.includes('gemini') && !name.includes('vision') && !name.includes('embedding'));
+      for (const m of dynamic) {
+        if (!candidates.includes(m)) candidates.push(m);
+      }
+    }
+  } catch (e) {}
+  return candidates;
+}
+
 async function generateSingleFileApp(item, checkoutUrl) {
-  console.log(`Calling Gemini API (${GEMINI_MODEL}) to engineer: ${item.slug}...`);
   const prompt = `You are VANCE, an elite zero-dependency web application architect.
 ${item.prompt_spec.replace('{{CHECKOUT_URL}}', checkoutUrl)}
 
@@ -126,26 +150,49 @@ CRITICAL REQUIREMENTS:
 3. If the URL query string contains "?pro=unlocked", automatically unlock Pro Mode in localStorage, hide the upgrade banner, display a "PRO EDITION UNLOCKED" badge, and enable a "Download Offline Copy (.html)" button that triggers a file download of the page itself.
 4. Include a prominent, high-converting upgrade button linking directly to: ${checkoutUrl}`;
 
-  const res = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`,
-    {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: { temperature: 0.4 }
-      })
-    }
-  );
+  const models = await getCandidateModels();
+  console.log(`Available Gemini models in failover queue: ${models.slice(0, 4).join(', ')}`);
 
-  const data = await res.json();
-  if (!res.ok) {
-    throw new Error(`Gemini API Error: ${JSON.stringify(data)}`);
+  for (const model of models.slice(0, 4)) {
+    for (let attempt = 1; attempt <= 3; attempt++) {
+      console.log(`Calling Gemini API (${model}, attempt ${attempt}/3) to engineer: ${item.slug}...`);
+      const res = await fetch(
+        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`,
+        {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{ parts: [{ text: prompt }] }],
+            generationConfig: { temperature: 0.4 }
+          })
+        }
+      );
+
+      const data = await res.json();
+      if (res.ok) {
+        let html = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
+        html = html.replace(/^```html\s*/i, '').replace(/```\s*$/i, '').trim();
+        if (html.length > 200) {
+          console.log(`Successfully engineered ${item.slug} (${html.length} bytes).`);
+          return html;
+        }
+      }
+
+      const status = data.error?.code || res.status;
+      console.warn(`Model ${model} returned ${status}: ${data.error?.message || 'Unknown error'}`);
+
+      if (status === 503 || status === 429) {
+        const waitMs = attempt * 6000;
+        console.log(`Waiting ${waitMs / 1000}s before retry...`);
+        await sleep(waitMs);
+      } else {
+        // 404 or unsupported model -> jump immediately to next model in queue
+        break;
+      }
+    }
   }
 
-  let html = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-  html = html.replace(/^```html\s*/i, '').replace(/```\s*$/i, '').trim();
-  return html;
+  throw new Error('All Gemini models and retries exhausted due to temporary API capacity.');
 }
 
 function rebuildStorefrontHub() {
@@ -222,7 +269,6 @@ function rebuildStorefrontHub() {
 async function run() {
   await syncStripeTelemetry();
 
-  // Find next unbuilt item in backlog
   const deployedSlugs = new Set(state.deployed_assets.map(a => a.slug));
   const nextItem = state.product_backlog.find(item => !deployedSlugs.has(item.slug));
 
