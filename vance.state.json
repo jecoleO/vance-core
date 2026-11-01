@@ -21,7 +21,7 @@
       "tier_1_survival": 30,
       "tier_2_ultra": 150
     },
-    "last_synced": "2026-11-02"
+    "last_synced": "2026-11-01"
   },
   "pipeline_policy": {
     "ingest_dir": "./staging",
@@ -86,10 +86,11 @@
       "web_url": "./products/jlpt-mastery-console/",
       "checkout_url": "https://buy.stripe.com/00w00kclugZHfmc5UJ0Ny04",
       "stripe_product_id": "prod_VY4vYcVBFLxm1C",
-      "deployed_at": "2026-11-01T15:10:02.927Z"
+      "deployed_at": "2026-11-01T16:57:42.058Z"
     }
   ],
   "execution_log": [
+    "2026-11-01: Vance Lab deployed World News Japanese: New solar power creates the next era (N5)",
     "2026-11-02: Synchronized state to Vance v2.1 Merchant Operations pipeline.",
     "2026-11-02: Aligned autonomous Store B crucible to World News Japanese Commute Dossier series.",
     "2026-11-01: Vance Lab deployed Japan Freelance Tax & Qualified Invoice Engine",
@@ -109,6 +110,19 @@
       "checkout_url": "https://buy.stripe.com/4gM14o4T25gZca082R0Ny05",
       "stripe_product_id": "prod_VY6KiQ85mWbZ7g",
       "invented_at": "2026-11-01T15:13:49.585Z"
+    },
+    {
+      "slug": "news-n5-clean-energy-solar",
+      "type": "news_dossier",
+      "level": "N5",
+      "name": "World News Japanese: New solar power creates the next era (N5)",
+      "tagline": "Monday Commute Edition &bull; 25-Word Match, 5 Grammar Cloze & Reading Check.",
+      "price_cents": 500,
+      "revenue_cents": 0,
+      "web_url": "../products/news-n5-clean-energy-solar/",
+      "checkout_url": "https://buy.stripe.com/aFaaEYfxG5gZde4aaZ0Ny06",
+      "stripe_product_id": "prod_VY8LnZ64i9XJ62",
+      "invented_at": "2026-11-01T16:57:52.820Z"
     }
   ]
 }
