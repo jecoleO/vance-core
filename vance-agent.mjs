@@ -176,38 +176,56 @@ function packageHtml(rawHtml, item, checkoutUrl, hubUrl = '../../index.html', hu
 }
 
 async function callGemini(prompt, isJson = false) {
-  const model = 'gemini-3.8-flash';
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`;
+  const models = ['gemini-3.8-flash', 'gemini-2.5-flash', 'gemini-2.0-flash'];
 
-  const body = {
-    contents: [{ parts: [{ text: prompt }] }],
-    generationConfig: {
-      temperature: isJson ? 0.3 : 0.2
+  for (const model of models) {
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`;
+
+    const body = {
+      contents: [{ parts: [{ text: prompt }] }],
+      generationConfig: {
+        temperature: isJson ? 0.3 : 0.2
+      }
+    };
+
+    if (isJson) {
+      body.generationConfig.response_mime_type = 'application/json';
     }
-  };
 
-  if (isJson) {
-    body.generationConfig.response_mime_type = 'application/json';
+    // Attempt up to 2 tries per model if 503 or 429 occurs
+    for (let attempt = 1; attempt <= 2; attempt++) {
+      try {
+        const res = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(body),
+          signal: AbortSignal.timeout(45000)
+        });
+
+        const raw = await res.text();
+
+        if (res.status === 503 || res.status === 429) {
+          console.warn(`[VANCE-AI] ${model} returned HTTP ${res.status} (attempt ${attempt}/2). Pausing 4s...`);
+          await new Promise(r => setTimeout(r, 4000));
+          continue;
+        }
+
+        if (!res.ok) {
+          console.warn(`[VANCE-AI] ${model} error (${res.status}): ${raw.slice(0, 120)}...`);
+          break; // Move to next fallback model
+        }
+
+        const data = JSON.parse(raw);
+        const text = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || '';
+        if (text) return text;
+      } catch (err) {
+        console.warn(`[VANCE-AI] Network/timeout error on ${model} (attempt ${attempt}): ${err.message}`);
+        await new Promise(r => setTimeout(r, 2000));
+      }
+    }
   }
 
-  const res = await fetch(url, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(body),
-    signal: AbortSignal.timeout(45000)
-  });
-
-  const raw = await res.text();
-  if (!res.ok) {
-    throw new Error(`Gemini API HTTP ${res.status}: ${raw}`);
-  }
-
-  const data = JSON.parse(raw);
-  const text = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || '';
-  if (!text) {
-    throw new Error(`Gemini returned empty candidate content: ${raw}`);
-  }
-  return text;
+  throw new Error('All Gemini model endpoints and retry attempts were exhausted due to high traffic.');
 }
 
 async function generateMarketingDispatch(toolSpec, webUrl, checkoutUrl) {
