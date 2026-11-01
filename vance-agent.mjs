@@ -175,6 +175,41 @@ function packageHtml(rawHtml, item, checkoutUrl, hubUrl = '../../index.html', hu
   return `${injectedSnippet}\n${rawHtml}`;
 }
 
+async function callGemini(prompt, isJson = false) {
+  const model = 'gemini-1.5-flash';
+  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`;
+
+  const body = {
+    contents: [{ parts: [{ text: prompt }] }],
+    generationConfig: {
+      temperature: isJson ? 0.3 : 0.2
+    }
+  };
+
+  if (isJson) {
+    body.generationConfig.response_mime_type = 'application/json';
+  }
+
+  const res = await fetch(url, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(body),
+    signal: AbortSignal.timeout(45000)
+  });
+
+  const raw = await res.text();
+  if (!res.ok) {
+    throw new Error(`Gemini API HTTP ${res.status}: ${raw}`);
+  }
+
+  const data = JSON.parse(raw);
+  const text = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || '';
+  if (!text) {
+    throw new Error(`Gemini returned empty candidate content: ${raw}`);
+  }
+  return text;
+}
+
 async function generateMarketingDispatch(toolSpec, webUrl, checkoutUrl) {
   if (!GEMINI_API_KEY) return;
   console.log(`[VANCE-MARKETING] Generating launch dispatch for ${toolSpec.name}...`);
@@ -195,20 +230,8 @@ Generate a clear Markdown document with:
 Keep the tone authentic, direct, and focused on local-first privacy. No fluff.
 `;
 
-  const geminiEndpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`;
   try {
-    const res = await fetch(geminiEndpoint, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: prompt }] }],
-        generationConfig: { temperature: 0.4 }
-      }),
-      signal: AbortSignal.timeout(25000)
-    });
-    const data = await res.json();
-    const content = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || '';
-
+    const content = await callGemini(prompt, false);
     if (content) {
       const dispatchDir = './marketing/dispatches';
       fs.mkdirSync(dispatchDir, { recursive: true });
@@ -240,43 +263,36 @@ Review the tools already created:
 ${previousTools || 'None yet.'}
 
 Task: Invent ONE high-utility, local-first, zero-cloud developer or business utility that has NOT been built yet.
-Prioritize:
-1. Deterministic tax, invoicing, or financial calculators (e.g. Japan Freelance 10.21% Withholding & Consumption Tax Engine).
-2. Local privacy scrubbers & log sanitizers.
-3. Single-file client data formatters (JSON/CSV/Regex).
+Top Priority: Deterministic Japan Freelance 10.21% Withholding & Consumption Tax Invoice Engine.
 
-Return a strict JSON object (NO markdown fences, no surrounding text):
+Return a strict JSON object with these exact keys:
 {
-  "slug": "url-friendly-unique-slug",
-  "name": "Punchy Tool Name",
-  "tagline": "Clear 1-sentence value proposition.",
+  "slug": "japan-freelance-tax-engine",
+  "name": "Japan Freelance Tax & Qualified Invoice Engine",
+  "tagline": "Offline 10.21% withholding tax and 8%/10% consumption tax calculator with print-ready invoice export.",
   "price_cents": 600
 }
 `;
 
-  const geminiEndpoint = `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`;
   let toolSpec = null;
-
   try {
-    const res = await fetch(geminiEndpoint, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: ideationPrompt }] }],
-        generationConfig: { temperature: 0.7 }
-      }),
-      signal: AbortSignal.timeout(30000)
-    });
-    const data = await res.json();
-    const rawText = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || '';
-    const cleanedJson = rawText.replace(/^```json/i, '').replace(/```$/i, '').trim();
-    toolSpec = JSON.parse(cleanedJson);
+    const rawJson = await callGemini(ideationPrompt, true);
+    toolSpec = JSON.parse(rawJson);
   } catch (err) {
     console.warn('[VANCE-AI] Ideation failed:', err.message);
     return;
   }
 
-  if (!toolSpec || !toolSpec.slug) return;
+  if (!toolSpec || !toolSpec.slug) {
+    console.warn('[VANCE-AI] Invalid tool specification returned.');
+    return;
+  }
+
+  if (state.autonomous_lab_assets.some(a => a.slug === toolSpec.slug)) {
+    console.log(`[VANCE-AI] Asset ${toolSpec.slug} is already deployed. Standing by.`);
+    return;
+  }
+
   console.log(`[VANCE-AI] Invented concept: ${toolSpec.name} (${toolSpec.slug})`);
 
   const codingPrompt = `
@@ -285,25 +301,15 @@ Name: ${toolSpec.name}
 Description: ${toolSpec.tagline}
 
 CRITICAL RULES:
-1. Everything must be self-contained in ONE single HTML file (HTML, modern inline CSS, vanilla JS).
-2. Clean dark theme (Slate-900 / Slate-950, Sky blue / Purple accents, crisp typography).
-3. 100% functional, responsive, and working. Include interactive inputs, buttons, calculations, and local-first output.
+1. Everything must be self-contained in ONE single HTML file (HTML, clean modern inline CSS, vanilla JS).
+2. Clean dark theme (Slate-900 / Slate-950, Sky blue / Emerald accents, crisp typography).
+3. 100% functional, responsive, and working. Include interactive inputs, buttons, calculations, and local-first output (e.g. printable table or clean export).
 4. ZERO external backend dependencies. Run 100% in-browser client.
 5. Return ONLY the raw valid <!DOCTYPE html> string. No explanation, no backticks.
 `;
 
   try {
-    const codeRes = await fetch(geminiEndpoint, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({
-        contents: [{ parts: [{ text: codingPrompt }] }],
-        generationConfig: { temperature: 0.2 }
-      }),
-      signal: AbortSignal.timeout(45000)
-    });
-    const codeData = await codeRes.json();
-    let appHtml = codeData.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || '';
+    let appHtml = await callGemini(codingPrompt, false);
     appHtml = appHtml.replace(/^```html/i, '').replace(/```$/i, '').trim();
 
     if (appHtml.startsWith('<!DOCTYPE') || appHtml.includes('<html')) {
@@ -405,7 +411,6 @@ function rebuildStoreB() {
   const allLabAssets = state.autonomous_lab_assets || [];
   fs.mkdirSync('./lab', { recursive: true });
 
-  // Survival of the fittest: top 10 showcase
   const earners = allLabAssets.filter(a => (a.revenue_cents || 0) > 0);
   earners.sort((a, b) => b.revenue_cents - a.revenue_cents);
 
