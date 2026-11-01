@@ -175,30 +175,35 @@ function packageHtml(rawHtml, item, checkoutUrl, hubUrl = '../../index.html', hu
 }
 
 async function callGemini(prompt, isJson = false, timeoutMs = 60000) {
-  const model = 'gemini-3.8-flash';
-  const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`;
+  // Ordered cascade: Premier reasoning model first, high-volume Lite backups next
+  const modelCascade = [
+    'gemini-3.8-flash',
+    'gemini-3.5-flash-lite',
+    'gemini-3.1-flash-lite'
+  ];
 
-  const body = {
-    contents: [{ parts: [{ text: prompt }] }],
-    generationConfig: {
-      temperature: isJson ? 0.3 : 0.2,
-      thinkingConfig: {
-        thinkingBudget: 0 // Bypasses internal reasoning tokens for instant output
+  for (let mIdx = 0; mIdx < modelCascade.length; mIdx++) {
+    const model = modelCascade[mIdx];
+    const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`;
+
+    const body = {
+      contents: [{ parts: [{ text: prompt }] }],
+      generationConfig: {
+        temperature: isJson ? 0.2 : 0.3,
+        maxOutputTokens: 2500
       }
+    };
+
+    if (isJson) {
+      body.generationConfig.response_mime_type = 'application/json';
     }
-  };
 
-  if (isJson) {
-    body.generationConfig.response_mime_type = 'application/json';
-  }
-
-  const maxAttempts = 3;
-  for (let attempt = 1; attempt <= maxAttempts; attempt++) {
     const controller = new AbortController();
     const timer = setTimeout(() => controller.abort(), timeoutMs);
 
     try {
-      console.log(`[VANCE-AI] Querying ${model} (attempt ${attempt}/${maxAttempts}, timeout: ${Math.round(timeoutMs / 1000)}s)...`);
+      console.log(`[VANCE-AI] Querying ${model} (tier ${mIdx + 1}/${modelCascade.length}, timeout: ${Math.round(timeoutMs / 1000)}s)...`);
+      
       const res = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -209,32 +214,36 @@ async function callGemini(prompt, isJson = false, timeoutMs = 60000) {
       const raw = await res.text();
       clearTimeout(timer);
 
+      // If rate-limited, capacity-choked, or quota reached on this model tier, cascade to the next
       if (res.status === 503 || res.status === 429) {
-        const waitMs = attempt * 5000;
-        console.warn(`[VANCE-AI] ${model} capacity dip (HTTP ${res.status}). Waiting ${waitMs / 1000}s...`);
-        await new Promise(r => setTimeout(r, waitMs));
+        console.warn(`[VANCE-AI] ${model} capacity/rate limit hit (HTTP ${res.status}). Cascading to backup...`);
+        await new Promise(r => setTimeout(r, 2000));
         continue;
       }
 
       if (!res.ok) {
-        throw new Error(`Gemini API HTTP ${res.status}: ${raw.slice(0, 150)}`);
+        console.warn(`[VANCE-AI] ${model} returned HTTP ${res.status}: ${raw.slice(0, 120)}. Cascading...`);
+        continue;
       }
 
       const data = JSON.parse(raw);
       const text = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || '';
-      if (!text) throw new Error('Gemini returned empty candidate content');
+      if (!text) {
+        console.warn(`[VANCE-AI] ${model} returned empty candidate text. Cascading...`);
+        continue;
+      }
+
       return text;
     } catch (err) {
       clearTimeout(timer);
       const isAbort = err.name === 'AbortError' || controller.signal.aborted;
-      const msg = isAbort ? `Socket timed out after ${Math.round(timeoutMs / 1000)}s` : err.message;
-      if (attempt === maxAttempts) throw new Error(msg);
-      console.warn(`[VANCE-AI] Attempt ${attempt} failed (${msg}). Retrying in 4s...`);
-      await new Promise(r => setTimeout(r, 4000));
+      const reason = isAbort ? `timeout after ${Math.round(timeoutMs / 1000)}s` : err.message;
+      console.warn(`[VANCE-AI] ${model} failed (${reason}). Cascading to next tier...`);
+      await new Promise(r => setTimeout(r, 2000));
     }
   }
 
-  throw new Error(`Exhausted all retry attempts on ${model}.`);
+  throw new Error('All model tiers in the cascade (3.8 Flash -> 3.5 Lite -> 3.1 Lite) were exhausted.');
 }
 
 async function generateMarketingDispatch(toolSpec, webUrl, checkoutUrl) {
