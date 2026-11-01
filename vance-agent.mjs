@@ -12,7 +12,6 @@ if (!STRIPE_SECRET_KEY) {
 
 const state = JSON.parse(fs.readFileSync(STATE_PATH, 'utf8'));
 
-// Defensive array checks
 state.deployed_assets = Array.isArray(state.deployed_assets) ? state.deployed_assets : [];
 state.catalog_manifest = Array.isArray(state.catalog_manifest) ? state.catalog_manifest : [];
 state.autonomous_lab_assets = Array.isArray(state.autonomous_lab_assets) ? state.autonomous_lab_assets : [];
@@ -175,7 +174,7 @@ function packageHtml(rawHtml, item, checkoutUrl, hubUrl = '../../index.html', hu
   return `${injectedSnippet}\n${rawHtml}`;
 }
 
-async function callGemini(prompt, isJson = false) {
+async function callGemini(prompt, isJson = false, timeoutMs = 60000) {
   const model = 'gemini-3.8-flash';
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`;
 
@@ -193,19 +192,19 @@ async function callGemini(prompt, isJson = false) {
   const maxAttempts = 3;
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
     try {
-      console.log(`[VANCE-AI] Querying ${model} (attempt ${attempt}/${maxAttempts})...`);
+      console.log(`[VANCE-AI] Querying ${model} (attempt ${attempt}/${maxAttempts}, timeout: ${Math.round(timeoutMs / 1000)}s)...`);
       const res = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
-        signal: AbortSignal.timeout(90000)
+        signal: AbortSignal.timeout(timeoutMs)
       });
 
       const raw = await res.text();
 
       if (res.status === 503 || res.status === 429) {
-        const waitMs = attempt * 5000;
-        console.warn(`[VANCE-AI] ${model} capacity dip (HTTP ${res.status}). Waiting ${waitMs / 1000}s before retry...`);
+        const waitMs = attempt * 6000;
+        console.warn(`[VANCE-AI] ${model} capacity dip (HTTP ${res.status}). Waiting ${waitMs / 1000}s...`);
         await new Promise(r => setTimeout(r, waitMs));
         continue;
       }
@@ -250,7 +249,7 @@ Keep the tone authentic, direct, and focused on local-first privacy. No fluff.
 `;
 
   try {
-    const content = await callGemini(prompt, false);
+    const content = await callGemini(prompt, false, 45000);
     if (content) {
       const dispatchDir = './marketing/dispatches';
       fs.mkdirSync(dispatchDir, { recursive: true });
@@ -295,7 +294,8 @@ Return a strict JSON object with these exact keys:
 
   let toolSpec = null;
   try {
-    const rawJson = await callGemini(ideationPrompt, true);
+    // Fast JSON call: 35s timeout
+    const rawJson = await callGemini(ideationPrompt, true, 35000);
     toolSpec = JSON.parse(rawJson);
   } catch (err) {
     console.warn('[VANCE-AI] Ideation failed:', err.message);
@@ -328,7 +328,8 @@ CRITICAL RULES:
 `;
 
   try {
-    let appHtml = await callGemini(codingPrompt, false);
+    // Heavy code synthesis call: 180s (3 full minutes) timeout
+    let appHtml = await callGemini(codingPrompt, false, 180000);
     appHtml = appHtml.replace(/^```html/i, '').replace(/```$/i, '').trim();
 
     if (appHtml.startsWith('<!DOCTYPE') || appHtml.includes('<html')) {
