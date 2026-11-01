@@ -1,0 +1,2202 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>JLPT MASTER CLASS // N2 & N3 SRS + SPEED DRILL</title>
+  <style>
+    :root {
+      --bg-dark: #0a0d14;
+      --bg-card: #121826;
+      --bg-card-hover: #1a2337;
+      --border: #26334d;
+      --accent-cyan: #06b6d4;
+      --accent-indigo: #6366f1;
+      --accent-rose: #f43f5e;
+      --accent-amber: #f59e0b;
+      --accent-emerald: #10b981;
+      --text-main: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-sub: #cbd5e1;
+      --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+      --font-jp: "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      font-family: var(--font-jp);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      overflow-x: hidden;
+    }
+
+    /* Stripe Top Banner */
+    #upgrade-banner {
+      background: linear-gradient(90deg, #4f46e5, #0891b2, #9333ea);
+      background-size: 200% 200%;
+      animation: bannerGlow 8s ease infinite;
+      color: #ffffff;
+      padding: 10px 16px;
+      text-align: center;
+      font-size: 0.88rem;
+      font-weight: 600;
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 14px;
+      flex-wrap: wrap;
+    }
+
+    @keyframes bannerGlow {
+      0% { background-position: 0% 50%; }
+      50% { background-position: 100% 50%; }
+      100% { background-position: 0% 50%; }
+    }
+
+    .banner-btn {
+      background: #ffffff;
+      color: #0f172a;
+      text-decoration: none;
+      padding: 5px 14px;
+      border-radius: 9999px;
+      font-size: 0.78rem;
+      font-weight: 800;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      box-shadow: 0 2px 10px rgba(0, 0, 0, 0.25);
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .banner-btn:hover {
+      transform: scale(1.05);
+      background: #f8fafc;
+      box-shadow: 0 4px 14px rgba(255, 255, 255, 0.3);
+    }
+
+    /* Pro Status Bar (Shown when Pro is unlocked) */
+    #pro-status-bar {
+      display: none;
+      background: #0f172a;
+      border-bottom: 1px solid var(--accent-emerald);
+      padding: 8px 16px;
+      font-size: 0.8rem;
+      color: var(--accent-emerald);
+      font-weight: 700;
+      letter-spacing: 0.05em;
+      text-align: center;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+    }
+
+    /* Header */
+    header {
+      background: rgba(18, 24, 38, 0.85);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border);
+      padding: 16px 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .brand-wrap {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+    }
+
+    .logo-badge {
+      background: linear-gradient(135deg, var(--accent-indigo), var(--accent-cyan));
+      color: white;
+      font-weight: 900;
+      font-size: 1.1rem;
+      padding: 6px 12px;
+      border-radius: 8px;
+      letter-spacing: 0.05em;
+      box-shadow: 0 0 15px rgba(99, 102, 241, 0.4);
+    }
+
+    .brand-title {
+      font-size: 1.25rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+    }
+
+    .brand-subtitle {
+      font-size: 0.75rem;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+    }
+
+    .header-actions {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .badge-pro {
+      display: none;
+      background: linear-gradient(135deg, #059669, #10b981);
+      color: white;
+      font-size: 0.72rem;
+      font-weight: 800;
+      padding: 4px 10px;
+      border-radius: 6px;
+      letter-spacing: 0.05em;
+      text-transform: uppercase;
+      box-shadow: 0 0 12px rgba(16, 185, 129, 0.4);
+    }
+
+    .btn-offline-dl {
+      display: none;
+      background: #1e293b;
+      border: 1px solid var(--accent-emerald);
+      color: var(--accent-emerald);
+      padding: 6px 12px;
+      border-radius: 6px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+    .btn-offline-dl:hover {
+      background: var(--accent-emerald);
+      color: #0f172a;
+    }
+
+    /* Navigation Tabs */
+    .tabs-nav {
+      display: flex;
+      justify-content: center;
+      background: #0d121e;
+      border-bottom: 1px solid var(--border);
+      padding: 8px 12px;
+      gap: 8px;
+      overflow-x: auto;
+    }
+
+    .tab-btn {
+      background: transparent;
+      border: 1px solid transparent;
+      color: var(--text-muted);
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+
+    .tab-btn:hover {
+      color: var(--text-main);
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    .tab-btn.active {
+      background: var(--bg-card);
+      color: var(--accent-cyan);
+      border-color: var(--border);
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.25);
+    }
+
+    /* Main Container */
+    main {
+      flex: 1;
+      max-width: 1040px;
+      width: 100%;
+      margin: 0 auto;
+      padding: 24px 16px 60px;
+    }
+
+    .tab-content {
+      display: none;
+      animation: fadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .tab-content.active {
+      display: block;
+    }
+
+    @keyframes fadeIn {
+      from { opacity: 0; transform: translateY(6px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    /* SRS Stats Dashboard */
+    .srs-dashboard {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+      gap: 12px;
+      margin-bottom: 24px;
+    }
+
+    .stat-tile {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 12px 14px;
+      text-align: center;
+    }
+
+    .stat-num {
+      font-size: 1.4rem;
+      font-weight: 800;
+      font-family: var(--font-mono);
+      color: var(--text-main);
+    }
+
+    .stat-label {
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-top: 2px;
+    }
+
+    /* Flashcard Console */
+    .flashcard-stage {
+      perspective: 1200px;
+      max-width: 640px;
+      margin: 0 auto 20px;
+      min-height: 380px;
+    }
+
+    .card-flipper {
+      width: 100%;
+      min-height: 380px;
+      position: relative;
+      transform-style: preserve-3d;
+      transition: transform 0.5s cubic-bezier(0.4, 0, 0.2, 1);
+      cursor: pointer;
+    }
+
+    .card-flipper.flipped {
+      transform: rotateY(180deg);
+    }
+
+    .card-face {
+      position: absolute;
+      width: 100%;
+      min-height: 380px;
+      top: 0;
+      left: 0;
+      backface-visibility: hidden;
+      border-radius: 20px;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      padding: 30px 24px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      box-shadow: 0 12px 30px rgba(0, 0, 0, 0.35);
+      box-sizing: border-box;
+    }
+
+    .card-back {
+      transform: rotateY(180deg);
+      background: #141c2e;
+      border-color: #2b3a55;
+    }
+
+    .card-top-meta {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 12px;
+    }
+
+    .tag-level {
+      font-size: 0.7rem;
+      font-weight: 800;
+      font-family: var(--font-mono);
+      padding: 3px 8px;
+      border-radius: 6px;
+      background: rgba(99, 102, 241, 0.15);
+      color: var(--accent-indigo);
+      border: 1px solid rgba(99, 102, 241, 0.3);
+    }
+
+    .tag-type {
+      font-size: 0.7rem;
+      font-weight: 700;
+      padding: 3px 8px;
+      border-radius: 6px;
+      background: rgba(6, 182, 212, 0.15);
+      color: var(--accent-cyan);
+      border: 1px solid rgba(6, 182, 212, 0.3);
+      text-transform: uppercase;
+    }
+
+    .card-center {
+      text-align: center;
+      margin: auto 0;
+      padding: 10px 0;
+    }
+
+    .card-prompt-jp {
+      font-size: 2.8rem;
+      font-weight: 900;
+      letter-spacing: -0.01em;
+      line-height: 1.25;
+      margin-bottom: 8px;
+    }
+
+    ruby {
+      ruby-position: over;
+    }
+
+    rt {
+      font-size: 0.42em;
+      color: var(--accent-cyan);
+      font-weight: 600;
+      transform: translateY(-2px);
+    }
+
+    .card-subtext {
+      color: var(--text-muted);
+      font-size: 0.95rem;
+    }
+
+    .card-tap-hint {
+      text-align: center;
+      font-size: 0.72rem;
+      color: var(--text-muted);
+      letter-spacing: 0.05em;
+      font-family: var(--font-mono);
+      opacity: 0.8;
+    }
+
+    .card-meaning {
+      font-size: 1.35rem;
+      font-weight: 800;
+      color: #38bdf8;
+      margin-bottom: 12px;
+    }
+
+    .card-nuance {
+      font-size: 0.88rem;
+      color: #fed7aa;
+      background: rgba(245, 158, 11, 0.1);
+      border-left: 3px solid var(--accent-amber);
+      padding: 8px 12px;
+      border-radius: 0 6px 6px 0;
+      text-align: left;
+      margin-bottom: 16px;
+      line-height: 1.4;
+    }
+
+    .card-example-box {
+      background: rgba(0, 0, 0, 0.25);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 12px 14px;
+      text-align: left;
+      font-size: 0.9rem;
+      line-height: 1.5;
+    }
+
+    .example-jp {
+      font-weight: 600;
+      color: #f1f5f9;
+      margin-bottom: 4px;
+    }
+
+    .example-en {
+      color: var(--text-muted);
+      font-size: 0.82rem;
+    }
+
+    /* SRS Grade Controls */
+    .srs-controls {
+      max-width: 640px;
+      margin: 0 auto;
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 10px;
+    }
+
+    .btn-srs {
+      padding: 12px 8px;
+      border: 1px solid transparent;
+      border-radius: 10px;
+      background: var(--bg-card);
+      font-size: 0.85rem;
+      font-weight: 700;
+      cursor: pointer;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 3px;
+      transition: all 0.15s ease;
+      color: var(--text-main);
+    }
+
+    .btn-srs span.sub {
+      font-size: 0.65rem;
+      font-weight: 500;
+      color: var(--text-muted);
+      font-family: var(--font-mono);
+    }
+
+    .btn-srs.again { border-color: rgba(244, 63, 94, 0.4); }
+    .btn-srs.again:hover { background: rgba(244, 63, 94, 0.15); color: var(--accent-rose); }
+
+    .btn-srs.hard { border-color: rgba(245, 158, 11, 0.4); }
+    .btn-srs.hard:hover { background: rgba(245, 158, 11, 0.15); color: var(--accent-amber); }
+
+    .btn-srs.good { border-color: rgba(6, 182, 212, 0.4); }
+    .btn-srs.good:hover { background: rgba(6, 182, 212, 0.15); color: var(--accent-cyan); }
+
+    .btn-srs.easy { border-color: rgba(16, 185, 129, 0.4); }
+    .btn-srs.easy:hover { background: rgba(16, 185, 129, 0.15); color: var(--accent-emerald); }
+
+    /* Speed Drill */
+    .drill-container {
+      max-width: 640px;
+      margin: 0 auto;
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 28px 24px;
+      text-align: center;
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.3);
+    }
+
+    .drill-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+      padding-bottom: 14px;
+      border-bottom: 1px solid var(--border);
+    }
+
+    .drill-timer-box {
+      font-size: 1.8rem;
+      font-weight: 900;
+      font-family: var(--font-mono);
+      color: var(--accent-cyan);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .drill-timer-box.urgent {
+      color: var(--accent-rose);
+      animation: pulse 0.6s infinite alternate;
+    }
+
+    @keyframes pulse {
+      from { transform: scale(1); }
+      to { transform: scale(1.08); }
+    }
+
+    .drill-score-box {
+      font-family: var(--font-mono);
+      font-size: 0.95rem;
+      text-align: right;
+    }
+
+    .drill-prompt-box {
+      min-height: 120px;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      margin-bottom: 24px;
+    }
+
+    .drill-target {
+      font-size: 2.4rem;
+      font-weight: 900;
+      margin-bottom: 6px;
+    }
+
+    .drill-sub {
+      color: var(--text-muted);
+      font-size: 0.88rem;
+    }
+
+    .drill-options {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 12px;
+      margin-bottom: 20px;
+    }
+
+    .drill-opt-btn {
+      background: #192237;
+      border: 1px solid var(--border);
+      color: #f1f5f9;
+      padding: 16px 12px;
+      border-radius: 12px;
+      font-size: 0.95rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s ease;
+      min-height: 64px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .drill-opt-btn:hover:not(:disabled) {
+      background: #23304c;
+      border-color: var(--accent-indigo);
+      transform: translateY(-2px);
+    }
+
+    .drill-opt-btn.correct {
+      background: rgba(16, 185, 129, 0.3) !important;
+      border-color: var(--accent-emerald) !important;
+      color: #34d399 !important;
+    }
+
+    .drill-opt-btn.wrong {
+      background: rgba(244, 63, 94, 0.3) !important;
+      border-color: var(--accent-rose) !important;
+      color: #fb7185 !important;
+    }
+
+    .btn-action-primary {
+      background: linear-gradient(135deg, var(--accent-indigo), #4f46e5);
+      color: white;
+      border: none;
+      padding: 14px 28px;
+      border-radius: 12px;
+      font-size: 1rem;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+      cursor: pointer;
+      box-shadow: 0 4px 18px rgba(99, 102, 241, 0.4);
+      transition: all 0.2s;
+    }
+
+    .btn-action-primary:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 6px 24px rgba(99, 102, 241, 0.5);
+    }
+
+    /* Deck Manager & Custom JSON */
+    .manager-section {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 20px;
+      margin-bottom: 24px;
+    }
+
+    .manager-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 16px;
+      flex-wrap: wrap;
+      gap: 12px;
+    }
+
+    .search-input {
+      background: #0d121e;
+      border: 1px solid var(--border);
+      color: white;
+      padding: 8px 14px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      min-width: 220px;
+    }
+
+    .search-input:focus {
+      outline: none;
+      border-color: var(--accent-cyan);
+    }
+
+    .cards-table-wrap {
+      overflow-x: auto;
+      max-height: 400px;
+      border: 1px solid var(--border);
+      border-radius: 8px;
+    }
+
+    table.cards-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.85rem;
+      text-align: left;
+    }
+
+    table.cards-table th {
+      background: #0d121e;
+      padding: 10px 12px;
+      font-weight: 700;
+      color: var(--text-muted);
+      border-bottom: 1px solid var(--border);
+      position: sticky;
+      top: 0;
+      z-index: 2;
+    }
+
+    table.cards-table td {
+      padding: 10px 12px;
+      border-bottom: 1px solid rgba(38, 51, 77, 0.6);
+      color: var(--text-sub);
+    }
+
+    table.cards-table tr:hover td {
+      background: rgba(255, 255, 255, 0.02);
+    }
+
+    .btn-sm-danger {
+      background: transparent;
+      border: 1px solid rgba(244, 63, 94, 0.5);
+      color: var(--accent-rose);
+      padding: 4px 8px;
+      border-radius: 4px;
+      font-size: 0.72rem;
+      cursor: pointer;
+    }
+
+    .btn-sm-danger:hover {
+      background: var(--accent-rose);
+      color: white;
+    }
+
+    .io-actions {
+      display: flex;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-top: 16px;
+    }
+
+    .btn-secondary {
+      background: #1e293b;
+      border: 1px solid var(--border);
+      color: #e2e8f0;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      cursor: pointer;
+      transition: all 0.15s;
+    }
+
+    .btn-secondary:hover {
+      background: #2d3b55;
+      border-color: var(--text-muted);
+    }
+
+    /* Pro Showcase Section */
+    .pro-upsell-box {
+      background: linear-gradient(135deg, rgba(30, 41, 59, 0.9), rgba(15, 23, 42, 0.95));
+      border: 2px solid var(--accent-indigo);
+      border-radius: 20px;
+      padding: 32px 24px;
+      text-align: center;
+      position: relative;
+      overflow: hidden;
+      box-shadow: 0 10px 35px rgba(99, 102, 241, 0.2);
+    }
+
+    .pro-upsell-box::before {
+      content: "";
+      position: absolute;
+      top: -50px;
+      right: -50px;
+      width: 140px;
+      height: 140px;
+      background: radial-gradient(circle, rgba(99, 102, 241, 0.3) 0%, transparent 70%);
+      border-radius: 50%;
+    }
+
+    .pro-upsell-title {
+      font-size: 1.8rem;
+      font-weight: 900;
+      margin-bottom: 8px;
+      background: linear-gradient(90deg, #fff, #93c5fd);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+    }
+
+    .pro-price-tag {
+      font-size: 2.2rem;
+      font-weight: 900;
+      font-family: var(--font-mono);
+      color: var(--accent-cyan);
+      margin: 12px 0;
+    }
+
+    .pro-feature-list {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 12px;
+      text-align: left;
+      max-width: 720px;
+      margin: 20px auto 26px;
+    }
+
+    .pro-feature-item {
+      background: rgba(255, 255, 255, 0.03);
+      border: 1px solid var(--border);
+      padding: 10px 14px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      display: flex;
+      align-items: center;
+      gap: 10px;
+    }
+
+    .pro-feature-item svg {
+      color: var(--accent-emerald);
+      flex-shrink: 0;
+    }
+
+    .btn-buy-full {
+      background: linear-gradient(135deg, #10b981, #059669);
+      color: white;
+      text-decoration: none;
+      font-size: 1.05rem;
+      font-weight: 800;
+      padding: 14px 34px;
+      border-radius: 12px;
+      display: inline-flex;
+      align-items: center;
+      gap: 10px;
+      box-shadow: 0 6px 20px rgba(16, 185, 129, 0.35);
+      transition: all 0.2s ease;
+    }
+
+    .btn-buy-full:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 26px rgba(16, 185, 129, 0.5);
+    }
+
+    /* Modal */
+    .modal-backdrop {
+      display: none;
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.7);
+      backdrop-filter: blur(4px);
+      z-index: 1000;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .modal-box {
+      background: var(--bg-card);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      width: 100%;
+      max-width: 480px;
+      padding: 24px;
+      box-shadow: 0 20px 40px rgba(0, 0, 0, 0.5);
+    }
+
+    .modal-box h3 {
+      font-size: 1.25rem;
+      margin-bottom: 12px;
+    }
+
+    .form-group {
+      margin-bottom: 12px;
+    }
+
+    .form-group label {
+      display: block;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      margin-bottom: 4px;
+      text-transform: uppercase;
+    }
+
+    .form-group input, .form-group textarea, .form-group select {
+      width: 100%;
+      background: #0d121e;
+      border: 1px solid var(--border);
+      color: white;
+      padding: 8px 12px;
+      border-radius: 6px;
+      font-size: 0.85rem;
+    }
+
+    .form-group input:focus, .form-group textarea:focus, .form-group select:focus {
+      outline: none;
+      border-color: var(--accent-cyan);
+    }
+
+    .modal-actions {
+      display: flex;
+      justify-content: flex-end;
+      gap: 10px;
+      margin-top: 18px;
+    }
+
+    @media (max-width: 600px) {
+      .card-prompt-jp { font-size: 2.2rem; }
+      .drill-options { grid-template-columns: 1fr; }
+      .srs-controls { grid-template-columns: 1fr 1fr; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Top Sticky Upgrade Banner -->
+  <div id="upgrade-banner">
+    <span>🚀 <strong>JLPT N2/N3 Pro Offline Pack:</strong> 500+ Deep Exam Items, Printable Audio-synced Cheatsheets &amp; Zero Cloud Lag!</span>
+    <a href="https://buy.stripe.com/9B6eVeetC9xf0ri96V0Ny02" target="_blank" rel="noopener noreferrer" class="banner-btn">
+      <span>Unlock Pro ($6)</span>
+      <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+    </a>
+  </div>
+
+  <!-- Unlocked Status Banner -->
+  <div id="pro-status-bar">
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg>
+    <span>PRO EDITION UNLOCKED — Unlimited Local Offline Access Activated</span>
+  </div>
+
+  <!-- Header -->
+  <header>
+    <div class="brand-wrap">
+      <div class="logo-badge">JLPT // PRO</div>
+      <div>
+        <div class="brand-title">SHIN-SRS &amp; DRILL LAB</div>
+        <div class="brand-subtitle">N2/N3 GRAMMAR &amp; KANJI ENGINE</div>
+      </div>
+    </div>
+    <div class="header-actions">
+      <span id="pro-header-badge" class="badge-pro">PRO UNLOCKED</span>
+      <button id="btn-download-offline" class="btn-offline-dl" onclick="downloadOfflineCopy()">
+        <svg width="14" height="14" style="vertical-align:middle;margin-right:4px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+        Download Offline Copy (.html)
+      </button>
+      <a id="header-upgrade-btn" href="https://buy.stripe.com/9B6eVeetC9xf0ri96V0Ny02" target="_blank" rel="noopener noreferrer" class="banner-btn" style="background:var(--accent-indigo);color:#fff;">
+        Upgrade ($6)
+      </a>
+    </div>
+  </header>
+
+  <!-- Navigation Tabs -->
+  <nav class="tabs-nav">
+    <button class="tab-btn active" onclick="switchTab('srs')">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="2" y="7" width="20" height="14" rx="2" ry="2"></rect><path d="M16 21V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v16"></path></svg>
+      SRS Flashcards
+    </button>
+    <button class="tab-btn" onclick="switchTab('drill')">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+      60s Speed Drill
+    </button>
+    <button class="tab-btn" onclick="switchTab('manager')">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
+      Deck Manager (<span id="tab-deck-count">0</span>)
+    </button>
+    <button class="tab-btn" onclick="switchTab('pro')">
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"></polygon></svg>
+      Pro Offline &amp; Cheatsheets
+    </button>
+  </nav>
+
+  <!-- Main Body Content -->
+  <main>
+
+    <!-- TAB 1: SRS FLASHCARDS -->
+    <section id="tab-srs" class="tab-content active">
+      <div class="srs-dashboard">
+        <div class="stat-tile">
+          <div class="stat-num" id="srs-due-count">0</div>
+          <div class="stat-label">Cards Due</div>
+        </div>
+        <div class="stat-tile">
+          <div class="stat-num" id="srs-learned-count">0</div>
+          <div class="stat-label">In Review</div>
+        </div>
+        <div class="stat-tile">
+          <div class="stat-num" id="srs-mastered-count">0</div>
+          <div class="stat-label">Mastered (EF&gt;2.6)</div>
+        </div>
+        <div class="stat-tile">
+          <div class="stat-num" id="drill-high-score">0</div>
+          <div class="stat-label">Drill Record</div>
+        </div>
+      </div>
+
+      <div class="flashcard-stage">
+        <div id="card-flipper" class="card-flipper" onclick="flipCard()">
+          <!-- FRONT -->
+          <div class="card-face card-front">
+            <div class="card-top-meta">
+              <span class="tag-level" id="card-level-tag">JLPT N2</span>
+              <span class="tag-type" id="card-type-tag">GRAMMAR</span>
+            </div>
+            <div class="card-center">
+              <div class="card-prompt-jp" id="card-front-text">～に際して</div>
+              <div class="card-subtext" id="card-front-sub">Click anywhere to flip</div>
+            </div>
+            <div class="card-tap-hint">SPACE or CLICK TO REVEAL ANSWER</div>
+          </div>
+          <!-- BACK -->
+          <div class="card-face card-back">
+            <div class="card-top-meta">
+              <span class="tag-level" id="card-back-level-tag">JLPT N2</span>
+              <span class="tag-type" id="card-back-type-tag">GRAMMAR</span>
+            </div>
+            <div>
+              <div class="card-meaning" id="card-back-meaning">On the occasion of; at the time of</div>
+              <div class="card-nuance" id="card-back-nuance">Used in formal speeches or public notices when taking an important life step or starting an official event.</div>
+              <div class="card-example-box">
+                <div class="example-jp" id="card-back-ex-jp">新年度の開始<ruby>に際して<rt>にさいして</rt></ruby>、社長から挨拶があった。</div>
+                <div class="example-en" id="card-back-ex-en">On the occasion of beginning the new fiscal year, the president gave an address.</div>
+              </div>
+            </div>
+            <div class="card-tap-hint">RATE YOUR RECALL TO SCHEDULE NEXT INTERVAL</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="srs-controls">
+        <button class="btn-srs again" onclick="rateCard(1)">
+          <span>AGAIN</span>
+          <span class="sub">&lt; 1 min</span>
+        </button>
+        <button class="btn-srs hard" onclick="rateCard(2)">
+          <span>HARD</span>
+          <span class="sub" id="hard-interval-lbl">1 day</span>
+        </button>
+        <button class="btn-srs good" onclick="rateCard(3)">
+          <span>GOOD</span>
+          <span class="sub" id="good-interval-lbl">3 days</span>
+        </button>
+        <button class="btn-srs easy" onclick="rateCard(4)">
+          <span>EASY</span>
+          <span class="sub" id="easy-interval-lbl">7 days</span>
+        </button>
+      </div>
+    </section>
+
+    <!-- TAB 2: SPEED DRILL -->
+    <section id="tab-drill" class="tab-content">
+      <div class="drill-container">
+        <div class="drill-header">
+          <div class="drill-timer-box" id="drill-timer-display">
+            <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"></circle><polyline points="12 6 12 12 16 14"></polyline></svg>
+            <span id="drill-timer-seconds">60</span>s
+          </div>
+          <div class="drill-score-box">
+            <div>SCORE: <strong id="drill-score" style="color:var(--accent-cyan); font-size:1.2rem;">0</strong></div>
+            <div style="color:var(--text-muted); font-size:0.75rem;">STREAK: <span id="drill-streak">0</span>x 🔥</div>
+          </div>
+        </div>
+
+        <div id="drill-start-screen">
+          <h2 style="font-size:1.8rem; margin-bottom:12px;">60-Second Blitz Drill</h2>
+          <p style="color:var(--text-sub); font-size:0.95rem; margin-bottom:24px; line-height:1.6;">
+            Rapid-fire comprehension test for N2/N3 Kanji compounds and grammar patterns. Rack up streak multipliers before the 60-second buzzer sounds!
+          </p>
+          <button class="btn-action-primary" onclick="startSpeedDrill()">START DRILL NOW</button>
+        </div>
+
+        <div id="drill-play-screen" style="display:none;">
+          <div class="drill-prompt-box">
+            <div class="drill-target" id="drill-question-term">把握</div>
+            <div class="drill-sub" id="drill-question-hint">What is the correct reading / meaning?</div>
+          </div>
+          <div class="drill-options" id="drill-options-grid">
+            <!-- 4 Options rendered by JS -->
+          </div>
+        </div>
+
+        <div id="drill-gameover-screen" style="display:none;">
+          <h2 style="font-size:1.8rem; color:var(--accent-rose); margin-bottom:8px;">TIME IS UP!</h2>
+          <div style="font-size:3rem; font-weight:900; font-family:var(--font-mono); color:var(--accent-cyan);" id="drill-final-score">0</div>
+          <p style="color:var(--text-muted); margin-bottom:18px;" id="drill-record-msg">Personal Best: 0</p>
+          <button class="btn-action-primary" onclick="startSpeedDrill()">TRY AGAIN</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 3: DECK MANAGER -->
+    <section id="tab-manager" class="tab-content">
+      <div class="manager-section">
+        <div class="manager-header">
+          <div>
+            <h3>Active SRS Deck Inventory</h3>
+            <p style="font-size:0.8rem; color:var(--text-muted);">Manage built-in cards or inject your custom JLPT vocab lists.</p>
+          </div>
+          <div style="display:flex; gap:8px;">
+            <input type="text" id="deck-search" class="search-input" placeholder="Search kanji, grammar..." oninput="renderDeckTable()">
+            <button class="btn-secondary" onclick="openAddCardModal()">+ Add Card</button>
+          </div>
+        </div>
+
+        <div class="cards-table-wrap">
+          <table class="cards-table">
+            <thead>
+              <tr>
+                <th>Level</th>
+                <th>Type</th>
+                <th>Prompt / Target</th>
+                <th>Reading / Meaning</th>
+                <th>Interval</th>
+                <th>Action</th>
+              </tr>
+            </thead>
+            <tbody id="deck-table-body">
+              <!-- Dynamically populated -->
+            </tbody>
+          </table>
+        </div>
+
+        <div class="io-actions">
+          <button class="btn-secondary" onclick="exportDeckJSON()">
+            <svg width="14" height="14" style="vertical-align:middle;margin-right:4px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>
+            Export Deck (JSON)
+          </button>
+          <label class="btn-secondary" style="display:inline-flex; align-items:center; cursor:pointer;">
+            <svg width="14" height="14" style="vertical-align:middle;margin-right:4px;" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21 15v4a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2v-4M17 8l-5-5-5 5M12 3v12"/></svg>
+            Import JSON Deck
+            <input type="file" id="import-json-file" accept=".json" style="display:none;" onchange="importDeckJSON(event)">
+          </label>
+          <button class="btn-secondary" onclick="resetDefaultDeck()" style="margin-left:auto; color:var(--accent-rose); border-color:rgba(244,63,94,0.3);">
+            Reset to Standard 35 Cards
+          </button>
+        </div>
+      </div>
+    </section>
+
+    <!-- TAB 4: PRO UPGRADE & CHEATSHEET -->
+    <section id="tab-pro" class="tab-content">
+      <div class="pro-upsell-box">
+        <h2 class="pro-upsell-title">JLPT N2/N3 Master Suite &amp; Cheatsheets</h2>
+        <p style="color:var(--text-sub); max-width:620px; margin:0 auto; font-size:0.95rem; line-height:1.6;">
+          Everything you need to guarantee your pass mark on test day. Zero subscriptions. One-click instant offline access forever.
+        </p>
+
+        <div class="pro-price-tag">$6 <span style="font-size:1rem; color:var(--text-muted); font-weight:400;">one-time payment</span></div>
+
+        <div class="pro-feature-list">
+          <div class="pro-feature-item">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <span><strong>500+ Curated Cards</strong> (Kanji, Grammar, Audio nuance)</span>
+          </div>
+          <div class="pro-feature-item">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <span><strong>Printable PDF Quick Sheets</strong> with stroke orders</span>
+          </div>
+          <div class="pro-feature-item">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <span><strong>100% Offline Single-File Engine</strong> (No app store needed)</span>
+          </div>
+          <div class="pro-feature-item">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"></polyline></svg>
+            <span><strong>High-Frequency Exam Trap</strong> Annotations &amp; Pitfalls</span>
+          </div>
+        </div>
+
+        <div style="margin-top:20px;">
+          <a href="https://buy.stripe.com/9B6eVeetC9xf0ri96V0Ny02" target="_blank" rel="noopener noreferrer" class="btn-buy-full">
+            <span>GET THE FULL PRO PACK NOW ($6)</span>
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+          </a>
+        </div>
+      </div>
+
+      <!-- Quick Reference Grammar Cheat Sheet -->
+      <div style="margin-top:30px;">
+        <h3 style="margin-bottom:14px; font-size:1.1rem; color:var(--accent-cyan);">⚡ N2 High-Yield Grammar Quick Cheatsheet (Preview)</h3>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(280px, 1fr)); gap:12px;">
+          <div style="background:var(--bg-card); border:1px solid var(--border); padding:14px; border-radius:10px;">
+            <div style="font-weight:700; color:#fff; font-size:1rem;">～をめぐって (o megutte)</div>
+            <div style="color:var(--accent-amber); font-size:0.8rem; margin:4px 0;">Controversy / debate surrounding...</div>
+            <div style="font-size:0.82rem; color:var(--text-muted);">Formula: Noun + をめぐって. Always implies dispute or conflicting positions among multiple parties.</div>
+          </div>
+          <div style="background:var(--bg-card); border:1px solid var(--border); padding:14px; border-radius:10px;">
+            <div style="font-weight:700; color:#fff; font-size:1rem;">～ざるを得ない (zaru o enai)</div>
+            <div style="color:var(--accent-amber); font-size:0.8rem; margin:4px 0;">Have no choice but to...</div>
+            <div style="font-size:0.82rem; color:var(--text-muted);">Formula: V-nai stem + ざるを得ない (する &rarr; せざるを得ない). Reluctant action forced by circumstance.</div>
+          </div>
+          <div style="background:var(--bg-card); border:1px solid var(--border); padding:14px; border-radius:10px;">
+            <div style="font-weight:700; color:#fff; font-size:1rem;">～にほかならない (ni hoka naranai)</div>
+            <div style="color:var(--accent-amber); font-size:0.8rem; margin:4px 0;">Nothing other than; precisely because...</div>
+            <div style="font-size:0.82rem; color:var(--text-muted);">Formula: Noun / から + にほかならない. Emphatically states the single root reason or true nature.</div>
+          </div>
+          <div style="background:var(--bg-card); border:1px solid var(--border); padding:14px; border-radius:10px;">
+            <div style="font-weight:700; color:#fff; font-size:1rem;">～ものなら (mono nara)</div>
+            <div style="color:var(--accent-amber); font-size:0.8rem; margin:4px 0;">If it were possible (unlikely hope) / If you dare...</div>
+            <div style="font-size:0.82rem; color:var(--text-muted);">Formula: Potential verb + ものなら. Expresses a wish for something nearly impossible or high consequence.</div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+  </main>
+
+  <!-- Modal: Add Custom Card -->
+  <div id="card-modal" class="modal-backdrop">
+    <div class="modal-box">
+      <h3>Add Card to Local SRS Deck</h3>
+      <div class="form-group">
+        <label>Level</label>
+        <select id="modal-level">
+          <option value="N2">JLPT N2</option>
+          <option value="N3">JLPT N3</option>
+          <option value="N1">JLPT N1</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Type</label>
+        <select id="modal-type">
+          <option value="grammar">Grammar Pattern</option>
+          <option value="kanji">Kanji Compound</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>Front / Expression</label>
+        <input type="text" id="modal-front" placeholder="e.g. ～げ or 把握">
+      </div>
+      <div class="form-group">
+        <label>Furigana / Reading (Kanji only)</label>
+        <input type="text" id="modal-furigana" placeholder="e.g. はあく">
+      </div>
+      <div class="form-group">
+        <label>Meaning</label>
+        <input type="text" id="modal-meaning" placeholder="e.g. Grasp; complete understanding">
+      </div>
+      <div class="form-group">
+        <label>Exam Nuance / Warning</label>
+        <textarea id="modal-nuance" rows="2" placeholder="e.g. Focuses on mental comprehension, not physical grip."></textarea>
+      </div>
+      <div class="form-group">
+        <label>Example Japanese</label>
+        <input type="text" id="modal-ex-jp" placeholder="状況を正確に把握する。">
+      </div>
+      <div class="form-group">
+        <label>Example English</label>
+        <input type="text" id="modal-ex-en" placeholder="Accurately grasp the situation.">
+      </div>
+      <div class="modal-actions">
+        <button class="btn-secondary" onclick="closeAddCardModal()">Cancel</button>
+        <button class="btn-action-primary" style="padding:8px 18px; font-size:0.85rem;" onclick="saveCustomCard()">Save Card</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* ==========================================================================
+       1. CORE SEED DATA (15 High-Frequency N2 Grammar + 20 N2 Kanji Compounds)
+       ========================================================================== */
+    const DEFAULT_DECK = [
+      // 15 High-frequency N2 Grammar
+      {
+        id: "g-01",
+        type: "grammar",
+        level: "N2",
+        front: "～に際して",
+        furigana: "にさいして",
+        meaning: "On the occasion of; at the time of",
+        nuance: "Formal register. Used in speeches, contracts, and ceremonies when taking an important action.",
+        exampleJp: "新年度の開始に際して、社長から挨拶があった。",
+        exampleEn: "On the occasion of beginning the new fiscal year, the president gave an address.",
+        interval: 0, repetitions: 0, easeFactor: 2.5, dueDate: 0
+      },
+      {
+        id: "g-02",
+        type: "grammar",
+        level: "N2",
+        front: "～をめぐって",
+        furigana: "をめぐって",
+        meaning: "Concerning; regarding (a dispute or debate)",
+        nuance: "Follows a noun describing a contested topic. Multiple people or parties must hold differing views.",
+        exampleJp: "遺産の配分をめぐって、兄弟の間で激しい議論が続いた。",
+        exampleEn: "A heated argument continued between the brothers concerning the division of the inheritance.",
+        interval: 0, repetitions: 0, easeFactor: 2.5, dueDate: 0
+      },
+      {
+        id: "g-03",
+        type: "grammar",
+        level: "N2",
+        front: "～ざるを得ない",
+        furigana: "ざるをえない",
+        meaning: "Cannot help but; forced to do",
+        nuance: "Attached to Nai-stem (する becomes せざるを得ない). Conveys having no other choice under circumstance.",
+        exampleJp: "これだけの証拠を突きつけられては、認めざるを得ない。",
+        exampleEn: "Confronted with this much evidence, I have no choice but to admit it.",
+        interval: 0, repetitions: 0, easeFactor: 2.5, dueDate: 0
+      },
+      {
+        id: "g-04",
+        type: "grammar",
+        level: "N2",
+        front: "～につけ",
+        furigana: "につけ",
+        meaning: "Every time; whenever something happens",
+        nuance: "Often paired with verbs of perception (見るにつけ, 聞くにつけ) to indicate an inevitable emotional reaction.",
+        exampleJp: "高校時代のアルバムを見るにつけ、当時の仲間を思い出す。",
+        exampleEn: "Every time I look at my high school yearbook, I remember my friends from back then.",
+        interval: 0, repetitions: 0, easeFactor: 2.5, dueDate: 0
+      },
+      {
+        id: "g-05",
+        type: "grammar",
+        level: "N2",
+        front: "～に相違ない",
+        furigana: "にそういない",
+        meaning: "There is no doubt that; must be",
+        nuance: "Formal, assertive deduction based on solid logical evidence.",
+        exampleJp: "指紋が一致した以上、彼が犯人に相違ない。",
+        exampleEn: "Since the fingerprints match, he is without a doubt the culprit.",
+        interval: 0, repetitions: 0, easeFactor: 2.5, dueDate: 0
+      },
+      {
+        id: "g-06",
+        type: "grammar",
+        level: "N2",
+        front: "～一方だ",
+        furigana: "いっぽうだ",
+        meaning: "Keeps on (changing in one direction)",
+        nuance: "Attached to dictionary form change-verbs. Expresses an accelerating trend, often negative.",
+        exampleJp: "物価の上昇に伴い、国民の生活費の負担は増える一方だ。",
+        exampleEn: "With rising consumer prices, the burden of living expenses continues to climb unceasingly.",
+        interval: 0, repetitions: 0, easeFactor: 2.5, dueDate: 0
+      },
+      {
+        id: "g-07",
+        type: "grammar",
+        level: "N2",
+        front: "～にほかならない",
+        furigana: "にほかならない",
+        meaning: "Is none other than; strictly because of",
+        nuance: "Strong, definitive assertion identifying the single sole reason or essence.",
+        exampleJp: "今回のプロジェクトの成功は、チーム全員の努力の結果にほかならない。",
+        exampleEn: "The success of this project is nothing other than the result of the entire team's diligent efforts.",
+        interval: 0, repetitions: 0, easeFactor: 2.5, dueDate: 0
+      },
+      {
+        id: "g-08",
+        type: "grammar",
+        level: "N2",
+        front: "～げ",
+        furigana: "げ",
+        meaning: "Seeming; giving an outward impression of",
+        nuance: "Attaches to adjective stems (自慢げ, 寂しげ, 悲しげ). Describes an observable appearance from outside.",
+        exampleJp: "彼は試験に合格したことを、とても誇らしげに家族へ報告した。",
+        exampleEn: "He reported passing the examination to his family with an extremely proud look.",
+        interval: 0, repetitions: 0, easeFactor: 2.5, dueDate: 0
+      },
+      {
+        id: "g-09",
+        type: "grammar",
+        level: "N2",
+        front: "～にすぎない",
+        furigana: "にすぎない",
+        meaning: "Merely; no more than; just",
+        nuance: "Downplays importance or scale. Conveys that something does not exceed a minimal benchmark.",
+        exampleJp: "私は上司の指示に従って事務作業を処理したにすぎません。",
+        exampleEn: "I merely processed the paperwork in accordance with my supervisor's instructions.",
+        interval: 0, repetitions: 0, easeFactor: 2.5, dueDate: 0
+      },
+      {
+        id: "g-10",
+        type: "grammar",
+        level: "N2",
+        front: "～つつある",
+        furigana: "つつある",
+        meaning: "Gradually in the process of; currently changing",
+        nuance: "Attached to Masu-stem. Marks a continuous, ongoing transformation over time.",
+        exampleJp: "景気は長年の低迷期を脱し、ようやく回復しつつある。",
+        exampleEn: "The economy has exited its prolonged slump and is finally in the process of recovering.",
+        interval: 0, repetitions: 0, easeFactor: 2.5, dueDate: 0
+      },
+      {
+        id: "g-11",
+        type: "grammar",
+        level: "N2",
+        front: "～からといって",
+        furigana: "からといって",
+        meaning: "Just because... (doesn't necessarily mean)",
+        nuance: "Often followed by negative endings like ～とは限らない or ～わけではない.",
+        exampleJp: "日本に何年住んでいるからといって、敬語を完璧に話せるわけではない。",
+        exampleEn: "Just because you have lived in Japan for years does not mean you can speak keigo flawlessly.",
+        interval: 0, repetitions: 0, easeFactor: 2.5, dueDate: 0
+      },
+      {
+        id: "g-12",
+        type: "grammar",
+        level: "N2",
+        front: "～ぬきで / ～ぬきにして",
+        furigana: "ぬきで",
+        meaning: "Without; leaving aside; omitting",
+        nuance: "Follows nouns. Indicates dispensing with formalities, lunch, or pretexts.",
+        exampleJp: "今日は挨拶ぬきで、早速本題に入りましょう。",
+        exampleEn: "Leaving aside pleasantries today, let us jump straight to the main topic.",
+        interval: 0, repetitions: 0, easeFactor: 2.5, dueDate: 0
+      },
+      {
+        id: "g-13",
+        type: "grammar",
+        level: "N2",
+        front: "～反面",
+        furigana: "はんめん",
+        meaning: "On the other hand; but simultaneously",
+        nuance: "Used to show dual contrasting aspects of the exact same object or reality.",
+        exampleJp: "この薬は即効性がある反面、眠気などの副作用も強い。",
+        exampleEn: "While this medicine works quickly, on the other hand its side effects like drowsiness are strong.",
+        interval: 0, repetitions: 0, easeFactor: 2.5, dueDate: 0
+      },
+      {
+        id: "g-14",
+        type: "grammar",
+        level: "N2",
+        front: "～ものなら",
+        furigana: "ものなら",
+        meaning: "If one could (virtually impossible wish); If you dare",
+        nuance: "Paired with potential verbs. Used when hoping for something that has very low probability.",
+        exampleJp: "やり直せるものなら、人生の選択をもう一度選び直したい。",
+        exampleEn: "If it were actually possible to do over, I would love to reconsider my life choices.",
+        interval: 0, repetitions: 0, easeFactor: 2.5, dueDate: 0
+      },
+      {
+        id: "g-15",
+        type: "grammar",
+        level: "N2",
+        front: "～わけにはいかない",
+        furigana: "わけにはいかない",
+        meaning: "Cannot afford to; impossible due to morals/social reasons",
+        nuance: "Not physical inability, but psychological, moral, or societal inhibition.",
+        exampleJp: "大事なプレゼンがあるため、風邪を引いていても休むわけにはいかない。",
+        exampleEn: "Because I have a crucial presentation, I simply cannot afford to take the day off even with a cold.",
+        interval: 0, repetitions: 0, easeFactor: 2.5, dueDate: 0
+      },
+
+      // 20 High-frequency N2 Kanji Compounds
+      {
+        id: "k-01",
+        type: "kanji",
+        level: "N2",
+        front: "把握",
+        furigana: "はあく",
+        meaning: "Grasp, comprehension, mastery of details",
+        nuance: "Not holding with hands; mental hold of complex situations, numbers, or facts.",
+        exampleJp: "現場の最新状況を正確に把握してください。",
+        exampleEn: "Please accurately grasp the latest conditions on the ground.",
+        interval: 0, repetitions: 0, easeFactor: 2.5, dueDate: 0
+      },
+      {
+        id: "k-02",
+        type: "kanji",
+        level: "N2",
+        front: "妥協",
+        furigana: "だきょう",
+        meaning: "Compromise, concession",
+        nuance: "Mutual concessions reached through negotiations when both parties surrender points.",
+        exampleJp: "双方が歩み寄ることで、ようやく妥協点を見出すことができた。",
+        exampleEn: "By both sides yielding slightly, we were finally able to locate a point of compromise.",
+        interval: 0, repetitions: 0, easeFactor: 2.5, dueDate: 0
+      },
+      {
+        id: "k-03",
+        type: "kanji",
+        level: "N2",
+        front: "契機",
+        furigana: "けいき",
+        meaning: "Opportunity, turning point, catalyst",
+        nuance: "Formal equivalent of きっかけ. The pivotal event that sparks an extensive transformation.",
+        exampleJp: "海外留学を契機に、彼女の物事に対する価値観は大きく変わった。",
+        exampleEn: "With her study abroad as a catalyst, her fundamental outlook changed dramatically.",
+        interval: 0, repetitions: 0, easeFactor: 2.5, dueDate: 0
+      },
+      {
+        id: "k-04",
+        type: "kanji",
+        level: "N2",
+        front: "考慮",
+        furigana: "こうりょ",
+        meaning: "Consideration, taking factors into account",
+        nuance: "Deliberately factoring in specific constraints before issuing a final decision.",
+        exampleJp: "初心者の学習負荷を考慮して、教材のカリキュラムを再編した。",
+        exampleEn: "Taking beginners' study loads into consideration, we reorganized the curriculum.",
+        interval: 0, repetitions: 0, easeFactor: 2.5, dueDate: 0
+      },
+      {
+        id: "k-05",
+        type: "kanji",
+        level: "N2",
+        front: "矛盾",
+        furigana: "むじゅん",
+        meaning: "Contradiction, inconsistency",
+        nuance: "Originates from Chinese spear/shield parable. Statements or facts that cancel each other out.",
+        exampleJp: "彼のこれまでの供述には、明らかな矛盾が含まれている。",
+        exampleEn: "There are clear contradictions contained in his prior statements.",
+        interval: 0, repetitions: 0, easeFactor: 2.5, dueDate: 0
+      },
+      {
+        id: "k-06",
+        type: "kanji",
+        level: "N2",
+        front: "緩和",
+        furigana: "かんわ",
+        meaning: "Easing, mitigation, relaxation of regulations",
+        nuance: "Softening of tension, pain, or administrative regulations (e.g., 規制緩和).",
+        exampleJp: "政府は慢性的な渋滞を緩和するため、バイパス道路を新設した。",
+        exampleEn: "The government constructed a new bypass road to ease chronic traffic congestion.",
+        interval: 0, repetitions: 0, easeFactor: 2.5, dueDate: 0
+      },
+      {
+        id: "k-07",
+        type: "kanji",
+        level: "N2",
+        front: "措置",
+        furigana: "そち",
+        meaning: "Measure, official action, countermeasure",
+        nuance: "Formal bureaucratic or managerial steps taken to handle a problem (措置を講じる).",
+        exampleJp: "情報流出の再発を防ぐため、厳重なセキュリティ措置を講じた。",
+        exampleEn: "To prevent recurrent data leaks, we implemented strict security measures.",
+        interval: 0, repetitions: 0, easeFactor: 2.5, dueDate: 0
+      },
+      {
+        id: "k-08",
+        type: "kanji",
+        level: "N2",
+        front: "推進",
+        furigana: "すいしん",
+        meaning: "Promotion, driving forward, propeling",
+        nuance: "Actively backing and pushing forward an initiative or nationwide policy.",
+        exampleJp: "環境保全を目的とした再生可能エネルギーの推進が叫ばれている。",
+        exampleEn: "The promotion of renewable energy aimed at environmental conservation is widely urged.",
+        interval: 0, repetitions: 0, easeFactor: 2.5, dueDate: 0
+      },
+      {
+        id: "k-09",
+        type: "kanji",
+        level: "N2",
+        front: "謙遜",
+        furigana: "けんそん",
+        meaning: "Modesty, humility",
+        nuance: "Cultural Japanese trait of deflecting praise to preserve harmony and respect others.",
+        exampleJp: "彼は多大な成果を挙げたにもかかわらず、終始謙遜した態度を崩さなかった。",
+        exampleEn: "Despite achieving enormous results, he never abandoned his humble demeanor.",
+        interval: 0, repetitions: 0, easeFactor: 2.5, dueDate: 0
+      },
+      {
+        id: "k-10",
+        type: "kanji",
+        level: "N2",
+        front: "模索",
+        furigana: "もさく",
+        meaning: "Groping in the dark; searching for a solution",
+        nuance: "Searching for ways out when there is no clear established playbook or roadmap.",
+        exampleJp: "混迷を極める業界の中で、各社は新しい生き残り策を模索している。",
+        exampleEn: "Amid extreme confusion in the industry, companies are groping for survival strategies.",
+        interval: 0, repetitions: 0, easeFactor: 2.5, dueDate: 0
+      },
+      {
+        id: "k-11",
+        type: "kanji",
+        level: "N2",
+        front: "該当",
+        furigana: "がいとう",
+        meaning: "Falling under, meeting conditions, corresponding to",
+        nuance: "Matching administrative criteria or legal definitions (該当者なし = No one eligible).",
+        exampleJp: "申請資格の条件に該当するかどうか、要綱を事前に確認してください。",
+        exampleEn: "Please review the guidelines beforehand to verify if you meet application requirements.",
+        interval: 0, repetitions: 0, easeFactor: 2.5, dueDate: 0
+      },
+      {
+        id: "k-12",
+        type: "kanji",
+        level: "N2",
+        front: "是正",
+        furigana: "ぜせい",
+        meaning: "Correction, rectification of wrongs/imbalances",
+        nuance: "Righting an unfair, illegal, or flawed condition (格差是正, 是正勧告).",
+        exampleJp: "不当な長時間労働の是正を求めて、労働組合が会社と協議を行った。",
+        exampleEn: "Demanding rectification of excessive unpaid overtime, the union conferred with the company.",
+        interval: 0, repetitions: 0, easeFactor: 2.5, dueDate: 0
+      },
+      {
+        id: "k-13",
+        type: "kanji",
+        level: "N2",
+        front: "遂行",
+        furigana: "すいこう",
+        meaning: "Accomplishment, execution, carrying out duty",
+        nuance: "Tenaciously completing a mission or difficult assignment until the very end.",
+        exampleJp: "過酷な任務を無事に遂行した兵士たちに、勲章が授与された。",
+        exampleEn: "Medals were conferred upon the soldiers who successfully carried out the harsh mission.",
+        interval: 0, repetitions: 0, easeFactor: 2.5, dueDate: 0
+      },
+      {
+        id: "k-14",
+        type: "kanji",
+        level: "N2",
+        front: "克服",
+        furigana: "こくふく",
+        meaning: "Overcoming, conquering (hardship or illness)",
+        nuance: "Battling through weaknesses, traumatic memories, or physical ailments.",
+        exampleJp: "語学への苦手意識を克服して、海外勤務の切符を手に入れた。",
+        exampleEn: "By overcoming his aversion to foreign languages, he earned an overseas assignment.",
+        interval: 0, repetitions: 0, easeFactor: 2.5, dueDate: 0
+      },
+      {
+        id: "k-15",
+        type: "kanji",
+        level: "N2",
+        front: "顕著",
+        furigana: "けんちょ",
+        meaning: "Remarkable, striking, conspicuous",
+        nuance: "An unmistakable, noticeable shift or characteristic visible to all observers.",
+        exampleJp: "新薬を投与した患者のグループに、顕著な症状の改善が見られた。",
+        exampleEn: "A conspicuous improvement in symptoms was observed in the patient group given the new drug.",
+        interval: 0, repetitions: 0, easeFactor: 2.5, dueDate: 0
+      },
+      {
+        id: "k-16",
+        type: "kanji",
+        level: "N2",
+        front: "猶予",
+        furigana: "ゆうよ",
+        meaning: "Postponement, grace period, hesitation",
+        nuance: "Extending a deadline or granting respite from a payment/sentence (猶予期間).",
+        exampleJp: "経営難に陥った企業に、債務返済のための猶予が与えられた。",
+        exampleEn: "A grace period for loan repayments was granted to the company facing insolvency.",
+        interval: 0, repetitions: 0, easeFactor: 2.5, dueDate: 0
+      },
+      {
+        id: "k-17",
+        type: "kanji",
+        level: "N2",
+        front: "拒絶",
+        furigana: "きょぜつ",
+        meaning: "Outright refusal, rejection",
+        nuance: "Stronger and more decisive than 断る. An unequivocal refusal to accept a proposal or organ.",
+        exampleJp: "提示された不公平な契約条件に対し、彼はきっぱりと拒絶の意を示した。",
+        exampleEn: "Against the unfair contract terms offered, he decisively expressed total rejection.",
+        interval: 0, repetitions: 0, easeFactor: 2.5, dueDate: 0
+      },
+      {
+        id: "k-18",
+        type: "kanji",
+        level: "N2",
+        front: "委託",
+        furigana: "いたく",
+        meaning: "Consignment, outsourcing, entrusting",
+        nuance: "Contractually handing over specific jobs, asset management, or research to external entities.",
+        exampleJp: "システムの保守管理業務を外部の専門企業に委託することに決めた。",
+        exampleEn: "We decided to outsource the system maintenance operations to an outside specialist firm.",
+        interval: 0, repetitions: 0, easeFactor: 2.5, dueDate: 0
+      },
+      {
+        id: "k-19",
+        type: "kanji",
+        level: "N2",
+        front: "崩壊",
+        furigana: "ほうかい",
+        meaning: "Collapse, breakdown, crumble",
+        nuance: "Catastrophic structural or social collapse (e.g. 経済崩壊, 家庭崩壊).",
+        exampleJp: "バブル経済の崩壊によって、多くの金融機関が深刻な打撃を受けた。",
+        exampleEn: "Due to the collapse of the bubble economy, numerous financial institutions suffered severe blows.",
+        interval: 0, repetitions: 0, easeFactor: 2.5, dueDate: 0
+      },
+      {
+        id: "k-20",
+        type: "kanji",
+        level: "N2",
+        front: "迅速",
+        furigana: "じんそく",
+        meaning: "Swift, prompt, high-speed agility",
+        nuance: "Performing an urgent emergency task or customer service without hesitation.",
+        exampleJp: "災害発生時には、被災者の救助と物資支援を迅速に行う必要がある。",
+        exampleEn: "When a disaster strikes, it is necessary to execute victim rescue and supply relief swiftly.",
+        interval: 0, repetitions: 0, easeFactor: 2.5, dueDate: 0
+      }
+    ];
+
+    /* ==========================================================================
+       2. STATE & PERSISTENCE MANAGEMENT
+       ========================================================================== */
+    const STORAGE_KEY_DECK = "vance_jlpt_deck_v1";
+    const STORAGE_KEY_HIGHSCORE = "vance_jlpt_highscore";
+    const STORAGE_KEY_PRO = "jlpt_pro_unlocked";
+
+    let deck = [];
+    let currentCardIndex = 0;
+    let dueCardQueue = [];
+    let isFlipped = false;
+
+    // Speed Drill State
+    let drillTimer = null;
+    let drillTimeLeft = 60;
+    let drillScore = 0;
+    let drillStreak = 0;
+    let drillCurrentQ = null;
+
+    function initApp() {
+      // 1. Pro check from query param ?pro=unlocked
+      const urlParams = new URLSearchParams(window.location.search);
+      if (urlParams.get('pro') === 'unlocked') {
+        localStorage.setItem(STORAGE_KEY_PRO, "true");
+      }
+
+      applyProStatus();
+
+      // 2. Load or seed deck
+      const savedDeck = localStorage.getItem(STORAGE_KEY_DECK);
+      if (savedDeck) {
+        try {
+          deck = JSON.parse(savedDeck);
+        } catch (e) {
+          deck = [...DEFAULT_DECK];
+          saveDeck();
+        }
+      } else {
+        deck = [...DEFAULT_DECK];
+        saveDeck();
+      }
+
+      // 3. Prep SRS Queue
+      refreshSrsQueue();
+      updateDashboardStats();
+      renderDeckTable();
+
+      // 4. Keyboard Shortcuts (Space to flip, 1-4 to rate)
+      window.addEventListener('keydown', handleKeyNavigation);
+    }
+
+    function saveDeck() {
+      localStorage.setItem(STORAGE_KEY_DECK, JSON.stringify(deck));
+      document.getElementById('tab-deck-count').textContent = deck.length;
+    }
+
+    function applyProStatus() {
+      const isPro = localStorage.getItem(STORAGE_KEY_PRO) === "true";
+      const banner = document.getElementById('upgrade-banner');
+      const statusBar = document.getElementById('pro-status-bar');
+      const headerBadge = document.getElementById('pro-header-badge');
+      const btnDownload = document.getElementById('btn-download-offline');
+      const headerUpgradeBtn = document.getElementById('header-upgrade-btn');
+
+      if (isPro) {
+        if (banner) banner.style.display = 'none';
+        if (statusBar) statusBar.style.display = 'flex';
+        if (headerBadge) headerBadge.style.display = 'inline-block';
+        if (btnDownload) btnDownload.style.display = 'inline-flex';
+        if (headerUpgradeBtn) headerUpgradeBtn.style.display = 'none';
+      } else {
+        if (banner) banner.style.display = 'flex';
+        if (statusBar) statusBar.style.display = 'none';
+        if (headerBadge) headerBadge.style.display = 'none';
+        if (btnDownload) btnDownload.style.display = 'none';
+        if (headerUpgradeBtn) headerUpgradeBtn.style.display = 'inline-flex';
+      }
+    }
+
+    // Allows Pro users to download this self-contained web app directly as an offline .html file
+    function downloadOfflineCopy() {
+      const pageHtml = "<!DOCTYPE html>\n" + document.documentElement.outerHTML;
+      const blob = new Blob([pageHtml], { type: "text/html;charset=utf-8" });
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "JLPT_Master_Pro_Offline.html";
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      URL.revokeObjectURL(url);
+    }
+
+    /* ==========================================================================
+       3. SRS ENGINE (SM-2 Based Interval Scheduler)
+       ========================================================================== */
+    function refreshSrsQueue() {
+      const now = Date.now();
+      // Cards whose dueDate is <= now, or brand new cards
+      dueCardQueue = deck.filter(c => !c.dueDate || c.dueDate <= now);
+      
+      // If none due, fall back to showing cards sorted by least recently reviewed
+      if (dueCardQueue.length === 0 && deck.length > 0) {
+        dueCardQueue = [...deck].sort((a, b) => (a.dueDate || 0) - (b.dueDate || 0));
+      }
+      currentCardIndex = 0;
+      loadCardToUI();
+    }
+
+    function loadCardToUI() {
+      const flipper = document.getElementById('card-flipper');
+      flipper.classList.remove('flipped');
+      isFlipped = false;
+
+      if (!dueCardQueue || dueCardQueue.length === 0) {
+        document.getElementById('card-front-text').textContent = "All Done!";
+        document.getElementById('card-front-sub').textContent = "No cards due in this session. Add more or test in Speed Drill!";
+        document.getElementById('card-back-meaning').textContent = "Session Complete";
+        document.getElementById('card-back-nuance').textContent = "Check back later or review your active deck.";
+        document.getElementById('card-back-ex-jp').textContent = "";
+        document.getElementById('card-back-ex-en').textContent = "";
+        return;
+      }
+
+      if (currentCardIndex >= dueCardQueue.length) {
+        currentCardIndex = 0;
+      }
+
+      const card = dueCardQueue[currentCardIndex];
+      document.getElementById('card-level-tag').textContent = "JLPT " + card.level;
+      document.getElementById('card-back-level-tag').textContent = "JLPT " + card.level;
+      document.getElementById('card-type-tag').textContent = card.type;
+      document.getElementById('card-back-type-tag').textContent = card.type;
+
+      // Render front with optional furigana if available
+      if (card.type === 'kanji' && card.furigana) {
+        document.getElementById('card-front-text').innerHTML = `<ruby>${escapeHtml(card.front)}<rt>${escapeHtml(card.furigana)}</rt></ruby>`;
+      } else {
+        document.getElementById('card-front-text').textContent = card.front;
+      }
+
+      document.getElementById('card-front-sub').textContent = "Click or press Space to reveal answer";
+      document.getElementById('card-back-meaning').textContent = card.meaning;
+      document.getElementById('card-back-nuance').textContent = card.nuance || "Exam tip: Memorize sentence context.";
+      document.getElementById('card-back-ex-jp').textContent = card.exampleJp || "";
+      document.getElementById('card-back-ex-en').textContent = card.exampleEn || "";
+
+      // Preview interval labels
+      updateIntervalPreviewLabels(card);
+    }
+
+    function updateIntervalPreviewLabels(card) {
+      const curInt = card.interval || 0;
+      const ef = card.easeFactor || 2.5;
+
+      const hardDays = Math.max(1, Math.round(curInt * 1.2));
+      const goodDays = curInt === 0 ? 1 : (curInt === 1 ? 3 : Math.round(curInt * ef));
+      const easyDays = curInt === 0 ? 3 : (curInt === 1 ? 6 : Math.round(curInt * ef * 1.3));
+
+      document.getElementById('hard-interval-lbl').textContent = hardDays + "d";
+      document.getElementById('good-interval-lbl').textContent = goodDays + "d";
+      document.getElementById('easy-interval-lbl').textContent = easyDays + "d";
+    }
+
+    function flipCard() {
+      const flipper = document.getElementById('card-flipper');
+      isFlipped = !isFlipped;
+      flipper.classList.toggle('flipped', isFlipped);
+    }
+
+    function rateCard(grade) {
+      if (!dueCardQueue || dueCardQueue.length === 0) return;
+      const card = dueCardQueue[currentCardIndex];
+
+      let ef = card.easeFactor || 2.5;
+      let repetitions = card.repetitions || 0;
+      let interval = card.interval || 0;
+
+      // SM-2 Spaced Repetition Logic
+      if (grade === 1) { // Again (Failed)
+        repetitions = 0;
+        interval = 1; // 1 day
+        ef = Math.max(1.3, ef - 0.2);
+      } else {
+        if (grade === 2) { // Hard
+          interval = interval === 0 ? 1 : Math.max(1, Math.round(interval * 1.2));
+          ef = Math.max(1.3, ef - 0.15);
+        } else if (grade === 3) { // Good
+          if (repetitions === 0) interval = 1;
+          else if (repetitions === 1) interval = 3;
+          else interval = Math.round(interval * ef);
+          repetitions += 1;
+        } else if (grade === 4) { // Easy
+          if (repetitions === 0) interval = 3;
+          else if (repetitions === 1) interval = 6;
+          else interval = Math.round(interval * ef * 1.3);
+          ef += 0.15;
+          repetitions += 1;
+        }
+      }
+
+      card.repetitions = repetitions;
+      card.interval = interval;
+      card.easeFactor = Number(ef.toFixed(2));
+      card.dueDate = Date.now() + (interval * 86400000); // days in ms
+
+      saveDeck();
+      updateDashboardStats();
+
+      // Proceed to next card in due queue
+      currentCardIndex++;
+      if (currentCardIndex >= dueCardQueue.length) {
+        refreshSrsQueue();
+      } else {
+        loadCardToUI();
+      }
+    }
+
+    function updateDashboardStats() {
+      const now = Date.now();
+      const dueCount = deck.filter(c => !c.dueDate || c.dueDate <= now).length;
+      const learnedCount = deck.filter(c => c.repetitions > 0 && (c.easeFactor || 2.5) <= 2.6).length;
+      const masteredCount = deck.filter(c => (c.easeFactor || 2.5) > 2.6).length;
+
+      document.getElementById('srs-due-count').textContent = dueCount;
+      document.getElementById('srs-learned-count').textContent = learnedCount;
+      document.getElementById('srs-mastered-count').textContent = masteredCount;
+
+      const record = localStorage.getItem(STORAGE_KEY_HIGHSCORE) || 0;
+      document.getElementById('drill-high-score').textContent = record;
+      document.getElementById('tab-deck-count').textContent = deck.length;
+    }
+
+    function handleKeyNavigation(e) {
+      const activeTab = document.querySelector('.tab-content.active');
+      if (!activeTab || activeTab.id !== 'tab-srs') return;
+
+      if (e.code === 'Space') {
+        e.preventDefault();
+        flipCard();
+      } else if (isFlipped) {
+        if (e.key === '1') rateCard(1);
+        if (e.key === '2') rateCard(2);
+        if (e.key === '3') rateCard(3);
+        if (e.key === '4') rateCard(4);
+      }
+    }
+
+    /* ==========================================================================
+       4. TIMED 60-SECOND SPEED DRILL MINI-GAME
+       ========================================================================== */
+    function startSpeedDrill() {
+      if (deck.length < 4) {
+        alert("Deck requires at least 4 cards to generate multiple-choice options.");
+        return;
+      }
+
+      document.getElementById('drill-start-screen').style.display = 'none';
+      document.getElementById('drill-gameover-screen').style.display = 'none';
+      document.getElementById('drill-play-screen').style.display = 'block';
+
+      drillScore = 0;
+      drillStreak = 0;
+      drillTimeLeft = 60;
+      updateDrillHeaderUI();
+
+      clearInterval(drillTimer);
+      drillTimer = setInterval(() => {
+        drillTimeLeft--;
+        updateDrillHeaderUI();
+        if (drillTimeLeft <= 0) {
+          endSpeedDrill();
+        }
+      }, 1000);
+
+      nextDrillQuestion();
+    }
+
+    function updateDrillHeaderUI() {
+      const timerDisplay = document.getElementById('drill-timer-seconds');
+      const timerBox = document.getElementById('drill-timer-display');
+      timerDisplay.textContent = drillTimeLeft;
+
+      if (drillTimeLeft <= 10) {
+        timerBox.classList.add('urgent');
+      } else {
+        timerBox.classList.remove('urgent');
+      }
+
+      document.getElementById('drill-score').textContent = drillScore;
+      document.getElementById('drill-streak').textContent = drillStreak;
+    }
+
+    function nextDrillQuestion() {
+      // Pick random question card
+      const qCard = deck[Math.floor(Math.random() * deck.length)];
+      drillCurrentQ = qCard;
+
+      document.getElementById('drill-question-term').textContent = qCard.front;
+      document.getElementById('drill-question-hint').textContent = 
+        qCard.type === 'kanji' ? `JLPT ${qCard.level} Kanji — Choose Meaning / Reading` : `JLPT ${qCard.level} Grammar — Select Translation`;
+
+      // Build 4 options (1 correct + 3 distinct distractors)
+      const distractors = deck.filter(c => c.id !== qCard.id);
+      shuffleArray(distractors);
+
+      const options = [
+        { text: qCard.type === 'kanji' ? `${qCard.furigana} (${qCard.meaning})` : qCard.meaning, isCorrect: true },
+        { text: distractors[0].type === 'kanji' ? `${distractors[0].furigana} (${distractors[0].meaning})` : distractors[0].meaning, isCorrect: false },
+        { text: distractors[1].type === 'kanji' ? `${distractors[1].furigana} (${distractors[1].meaning})` : distractors[1].meaning, isCorrect: false },
+        { text: distractors[2].type === 'kanji' ? `${distractors[2].furigana} (${distractors[2].meaning})` : distractors[2].meaning, isCorrect: false }
+      ];
+
+      shuffleArray(options);
+
+      const grid = document.getElementById('drill-options-grid');
+      grid.innerHTML = '';
+
+      options.forEach(opt => {
+        const btn = document.createElement('button');
+        btn.className = 'drill-opt-btn';
+        btn.textContent = opt.text;
+        btn.onclick = () => selectDrillAnswer(btn, opt.isCorrect);
+        grid.appendChild(btn);
+      });
+    }
+
+    function selectDrillAnswer(btnElement, isCorrect) {
+      // Disable all option buttons immediately to prevent double click
+      const buttons = document.querySelectorAll('.drill-opt-btn');
+      buttons.forEach(b => b.disabled = true);
+
+      if (isCorrect) {
+        btnElement.classList.add('correct');
+        drillStreak++;
+        const bonus = Math.min(drillStreak, 5);
+        drillScore += (100 * bonus);
+      } else {
+        btnElement.classList.add('wrong');
+        drillStreak = 0;
+        // Highlight correct button
+        buttons.forEach(b => {
+          const qText = drillCurrentQ.type === 'kanji' 
+            ? `${drillCurrentQ.furigana} (${drillCurrentQ.meaning})` 
+            : drillCurrentQ.meaning;
+          if (b.textContent === qText) {
+            b.classList.add('correct');
+          }
+        });
+      }
+
+      updateDrillHeaderUI();
+
+      setTimeout(() => {
+        if (drillTimeLeft > 0) {
+          nextDrillQuestion();
+        }
+      }, 350);
+    }
+
+    function endSpeedDrill() {
+      clearInterval(drillTimer);
+      document.getElementById('drill-play-screen').style.display = 'none';
+      document.getElementById('drill-gameover-screen').style.display = 'block';
+
+      document.getElementById('drill-final-score').textContent = drillScore;
+
+      const currentRecord = parseInt(localStorage.getItem(STORAGE_KEY_HIGHSCORE) || '0', 10);
+      if (drillScore > currentRecord) {
+        localStorage.setItem(STORAGE_KEY_HIGHSCORE, drillScore);
+        document.getElementById('drill-record-msg').textContent = `🎉 NEW HIGH RECORD! Previous was ${currentRecord}`;
+      } else {
+        document.getElementById('drill-record-msg').textContent = `Personal Best: ${currentRecord}`;
+      }
+      updateDashboardStats();
+    }
+
+    /* ==========================================================================
+       5. DECK MANAGER, JSON IMPORT/EXPORT & CRUD
+       ========================================================================== */
+    function renderDeckTable() {
+      const search = (document.getElementById('deck-search').value || "").toLowerCase().trim();
+      const tbody = document.getElementById('deck-table-body');
+      tbody.innerHTML = '';
+
+      const filtered = deck.filter(c => {
+        return c.front.toLowerCase().includes(search) ||
+               (c.furigana && c.furigana.toLowerCase().includes(search)) ||
+               c.meaning.toLowerCase().includes(search) ||
+               c.level.toLowerCase().includes(search);
+      });
+
+      filtered.forEach(c => {
+        const tr = document.createElement('tr');
+        tr.innerHTML = `
+          <td><span class="tag-level">${escapeHtml(c.level)}</span></td>
+          <td><span class="tag-type">${escapeHtml(c.type)}</span></td>
+          <td><strong>${escapeHtml(c.front)}</strong></td>
+          <td>${c.furigana ? `<ruby>${escapeHtml(c.front)}<rt>${escapeHtml(c.furigana)}</rt></ruby> &bull; ` : ''}${escapeHtml(c.meaning)}</td>
+          <td style="font-family:var(--font-mono);">${c.interval || 0}d</td>
+          <td>
+            <button class="btn-sm-danger" onclick="deleteCard('${c.id}')">Delete</button>
+          </td>
+        `;
+        tbody.appendChild(tr);
+      });
+    }
+
+    function deleteCard(id) {
+      if (!confirm("Are you sure you want to remove this card?")) return;
+      deck = deck.filter(c => c.id !== id);
+      saveDeck();
+      refreshSrsQueue();
+      updateDashboardStats();
+      renderDeckTable();
+    }
+
+    function exportDeckJSON() {
+      const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify(deck, null, 2));
+      const dlAnchor = document.createElement('a');
+      dlAnchor.setAttribute("href", dataStr);
+      dlAnchor.setAttribute("download", `JLPT_Deck_Export_${Date.now()}.json`);
+      document.body.appendChild(dlAnchor);
+      dlAnchor.click();
+      dlAnchor.remove();
+    }
+
+    function importDeckJSON(event) {
+      const file = event.target.files[0];
+      if (!file) return;
+
+      const reader = new FileReader();
+      reader.onload = (e) => {
+        try {
+          const imported = JSON.parse(e.target.result);
+          if (!Array.isArray(imported)) {
+            alert("Invalid format: JSON file must contain an array of cards.");
+            return;
+          }
+          let added = 0;
+          imported.forEach(card => {
+            if (card.front && card.meaning) {
+              card.id = card.id || "custom-" + Date.now() + "-" + Math.random().toString(36).substr(2, 5);
+              card.level = card.level || "N2";
+              card.type = card.type || "grammar";
+              card.interval = card.interval || 0;
+              card.repetitions = card.repetitions || 0;
+              card.easeFactor = card.easeFactor || 2.5;
+              deck.push(card);
+              added++;
+            }
+          });
+          saveDeck();
+          refreshSrsQueue();
+          updateDashboardStats();
+          renderDeckTable();
+          alert(`Successfully imported ${added} cards!`);
+        } catch (err) {
+          alert("Could not parse JSON file: " + err.message);
+        }
+      };
+      reader.readAsText(file);
+      event.target.value = "";
+    }
+
+    function resetDefaultDeck() {
+      if (!confirm("Reset entire deck to the original 35 JLPT N2 grammar & kanji cards? All custom cards and interval progress will be restored to defaults.")) return;
+      deck = [...DEFAULT_DECK];
+      saveDeck();
+      refreshSrsQueue();
+      updateDashboardStats();
+      renderDeckTable();
+    }
+
+    function openAddCardModal() {
+      document.getElementById('card-modal').style.display = 'flex';
+      document.getElementById('modal-front').focus();
+    }
+
+    function closeAddCardModal() {
+      document.getElementById('card-modal').style.display = 'none';
+      document.getElementById('modal-front').value = '';
+      document.getElementById('modal-furigana').value = '';
+      document.getElementById('modal-meaning').value = '';
+      document.getElementById('modal-nuance').value = '';
+      document.getElementById('modal-ex-jp').value = '';
+      document.getElementById('modal-ex-en').value = '';
+    }
+
+    function saveCustomCard() {
+      const front = document.getElementById('modal-front').value.trim();
+      const meaning = document.getElementById('modal-meaning').value.trim();
+
+      if (!front || !meaning) {
+        alert("Please provide at least the Front expression and the Meaning.");
+        return;
+      }
+
+      const newCard = {
+        id: "custom-" + Date.now(),
+        level: document.getElementById('modal-level').value,
+        type: document.getElementById('modal-type').value,
+        front: front,
+        furigana: document.getElementById('modal-furigana').value.trim(),
+        meaning: meaning,
+        nuance: document.getElementById('modal-nuance').value.trim(),
+        exampleJp: document.getElementById('modal-ex-jp').value.trim(),
+        exampleEn: document.getElementById('modal-ex-en').value.trim(),
+        interval: 0,
+        repetitions: 0,
+        easeFactor: 2.5,
+        dueDate: 0
+      };
+
+      deck.unshift(newCard);
+      saveDeck();
+      refreshSrsQueue();
+      updateDashboardStats();
+      renderDeckTable();
+      closeAddCardModal();
+    }
+
+    /* ==========================================================================
+       6. UI NAVIGATION & HELPERS
+       ========================================================================== */
+    function switchTab(tabId) {
+      document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+      document.querySelectorAll('.tab-btn').forEach(btn => btn.classList.remove('active'));
+
+      const targetSection = document.getElementById('tab-' + tabId);
+      if (targetSection) targetSection.classList.add('active');
+
+      const buttons = document.querySelectorAll('.tab-btn');
+      if (tabId === 'srs') buttons[0].classList.add('active');
+      if (tabId === 'drill') buttons[1].classList.add('active');
+      if (tabId === 'manager') buttons[2].classList.add('active');
+      if (tabId === 'pro') buttons[3].classList.add('active');
+
+      // Stop drill timer if switching away
+      if (tabId !== 'drill' && drillTimer) {
+        clearInterval(drillTimer);
+      }
+    }
+
+    function shuffleArray(arr) {
+      for (let i = arr.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        [arr[i], arr[j]] = [arr[j], arr[i]];
+      }
+    }
+
+    function escapeHtml(str) {
+      if (!str) return '';
+      return String(str)
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+    }
+
+    // Initialize application on load
+    window.addEventListener('DOMContentLoaded', initApp);
+  </script>
+</body>
+</html>

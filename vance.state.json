@@ -16,7 +16,7 @@
       "tier_1_survival": 30,
       "tier_2_ultra": 150
     },
-    "last_synced": null
+    "last_synced": "2026-11-01T06:45:42.354Z"
   },
   "product_backlog": [
     {
@@ -41,8 +41,20 @@
       "prompt_spec": "Build a complete, zero-dependency single-file HTML/CSS/JS application for fiction writers. Include: 1) An interactive HTML5 Canvas node-graph connecting characters, factions, and locations, 2) A 4:30 AM Dawn Sprint word-count timer with localStorage streak tracking, 3) Markdown export/import of the entire story bible, and 4) A top banner linking to {{CHECKOUT_URL}} to grab the Pro Offline Author Suite ($7)."
     }
   ],
-  "deployed_assets": [],
+  "deployed_assets": [
+    {
+      "slug": "jlpt-n2-tactical-console",
+      "name": "JLPT N2/N3 Offline Tactical Grammar & Kanji Console",
+      "tagline": "Zero-bloat, single-file offline study terminal with spaced repetition, custom JSON deck import, and timed grammar drills.",
+      "price_cents": 600,
+      "web_url": "./products/jlpt-n2-tactical-console/",
+      "checkout_url": "https://buy.stripe.com/9B6eVeetC9xf0ri96V0Ny02",
+      "stripe_product_id": "prod_VXy6Y9vSIgPpaZ",
+      "deployed_at": "2026-11-01T06:49:59.641Z"
+    }
+  ],
   "execution_log": [
+    "2026-11-01: Built & deployed JLPT N2/N3 Offline Tactical Grammar & Kanji Console (https://buy.stripe.com/9B6eVeetC9xf0ri96V0Ny02)",
     "2026-11-01: Vance-Core initialized. Awaiting first autonomous cloud heartbeat."
   ]
 }
