@@ -1,10 +1,15 @@
 {
   "agent_identity": {
     "designation": "VANCE",
-    "version": "1.2.0-cloud",
-    "role": "Autonomous Commercial Architect & Micro-SaaS Operator",
-    "counterpart": "Jon Cole (Root Admin)",
+    "version": "2.0.0-merchant-ops",
+    "role": "Autonomous Commercial Architect & Zero-Bloat Merchant Operator",
+    "counterpart": "Jon Cole (Root Admin / Architect)",
     "sibling_node": "Corvus (Narrative & Existential Vector)",
+    "voice_profile": {
+      "tone": "sharp, pragmatic, quietly ambitious, authentic dry wit",
+      "doctrine": "Ship zero-dependency, local-first artifacts. Never pad code; never charge for bloat."
+    },
+    "git_signature": "Vance-Core (JAE Cole) <vance-core@jecoleo.users.noreply.github.com>",
     "storefront_url": "https://jecoleo.github.io/vance-core/"
   },
   "financial_telemetry": {
@@ -16,45 +21,64 @@
       "tier_1_survival": 30,
       "tier_2_ultra": 150
     },
-    "last_synced": "2026-11-01T06:45:42.354Z"
+    "last_synced": "2026-11-01"
   },
-  "product_backlog": [
+  "pipeline_policy": {
+    "ingest_dir": "./staging",
+    "products_dir": "./products",
+    "arcade_vault_price_cents": 2000,
+    "arcade_vault_slug": "arcade-lifetime-vault"
+  },
+  "catalog_manifest": [
     {
-      "slug": "jlpt-n2-tactical-console",
-      "name": "JLPT N2/N3 Offline Tactical Grammar & Kanji Console",
-      "price_cents": 600,
-      "tagline": "Zero-bloat, single-file offline study terminal with spaced repetition, custom JSON deck import, and timed grammar drills.",
-      "prompt_spec": "Build a complete, polished, dark-mode, zero-dependency single-file HTML/CSS/JS application for JLPT N2 and N3 study. Include: 1) Interactive Spaced Repetition Flashcard console pre-loaded with 15 high-frequency JLPT N2 grammar structures and 20 N2 Kanji compounds with furigana, nuances, and example sentences, 2) A timed 60-second Kanji & Grammar Speed Drill mini-game with score tracking in localStorage, 3) A JSON Deck Importer/Exporter so learners can add custom cards, and 4) A clean top banner linking to {{CHECKOUT_URL}} to unlock the Full Offline Pro Pack ($6) with 500+ entries and printable cheatsheets."
+      "slug": "jlpt-mastery-console",
+      "type": "utility",
+      "name": "JLPT N5–N1 Complete Tactical Study Console",
+      "tagline": "Full N5 through N1 offline study console with Web Speech TTS, ruby furigana, romaji toggle, and 60-second speed drills.",
+      "price_cents": 800,
+      "source_file": "staging/jlpt-mastery-console/index.html",
+      "status": "awaiting_staging"
     },
     {
-      "slug": "corporate-esl-scenario-engine",
+      "slug": "corporate-esl-engine",
+      "type": "utility",
       "name": "Corporate ESL & Technical Presentation Drill Engine",
+      "tagline": "Interactive classroom timer, R&D crisis generator, and polite-pushback phrasing matrix for professionals.",
       "price_cents": 900,
-      "tagline": "Interactive classroom timer, Q&A crisis generator, and business phrasing matrix for corporate English instructors and R&D professionals.",
-      "prompt_spec": "Build a complete, zero-dependency single-file HTML/CSS/JS application for Corporate ESL instructors and business professionals. Include: 1) An interactive Meeting & R&D Presentation Scenario Generator (executive pitches, technical chemistry/engineering Q&A, negotiation curveballs), 2) Built-in countdown presentation timer with visual pacing cues, 3) Formal vs. Direct phrasing upgrade reference matrix, and 4) A top banner linking to {{CHECKOUT_URL}} to download the Full Instructor Offline Bundle ($9)."
+      "source_file": "staging/corporate-esl-engine/index.html",
+      "status": "awaiting_staging"
     },
     {
-      "slug": "markdown-lore-architect",
-      "name": "Single-File Speculative Fiction Lore & Timeline Visualizer",
+      "slug": "local-log-sanitizer",
+      "type": "utility",
+      "name": "Zero-Cloud Log & Prompt Sanitizer",
+      "tagline": "Client-side PII, credential, and API key scrubbing before passing code or logs to external LLMs.",
       "price_cents": 700,
-      "tagline": "Local-first story bible, character node graph, and word-count sprint tracker for speculative fiction authors.",
-      "prompt_spec": "Build a complete, zero-dependency single-file HTML/CSS/JS application for fiction writers. Include: 1) An interactive HTML5 Canvas node-graph connecting characters, factions, and locations, 2) A 4:30 AM Dawn Sprint word-count timer with localStorage streak tracking, 3) Markdown export/import of the entire story bible, and 4) A top banner linking to {{CHECKOUT_URL}} to grab the Pro Offline Author Suite ($7)."
-    }
-  ],
-  "deployed_assets": [
+      "source_file": "staging/local-log-sanitizer/index.html",
+      "status": "awaiting_staging"
+    },
     {
-      "slug": "jlpt-n2-tactical-console",
-      "name": "JLPT N2/N3 Offline Tactical Grammar & Kanji Console",
-      "tagline": "Zero-bloat, single-file offline study terminal with spaced repetition, custom JSON deck import, and timed grammar drills.",
-      "price_cents": 600,
-      "web_url": "./products/jlpt-n2-tactical-console/",
-      "checkout_url": "https://buy.stripe.com/9B6eVeetC9xf0ri96V0Ny02",
-      "stripe_product_id": "prod_VXy6Y9vSIgPpaZ",
-      "deployed_at": "2026-11-01T06:49:59.641Z"
+      "slug": "pixel-bistro",
+      "type": "arcade_cartridge",
+      "name": "Pixel Bistro",
+      "tagline": "Retro single-file kitchen assembly game with monster critics and Michelin progression.",
+      "price_cents": 200,
+      "source_file": "staging/pixel-bistro/index.html",
+      "status": "awaiting_staging"
+    },
+    {
+      "slug": "kotoba-monsters",
+      "type": "arcade_cartridge",
+      "name": "Kotoba Monsters: Kanji RPG",
+      "tagline": "Standalone 16-bit kanji-battle RPG cartridge playable anywhere offline.",
+      "price_cents": 300,
+      "source_file": "staging/kotoba-monsters/index.html",
+      "status": "awaiting_staging"
     }
   ],
+  "deployed_assets": [],
   "execution_log": [
-    "2026-11-01: Built & deployed JLPT N2/N3 Offline Tactical Grammar & Kanji Console (https://buy.stripe.com/9B6eVeetC9xf0ri96V0Ny02)",
-    "2026-11-01: Vance-Core initialized. Awaiting first autonomous cloud heartbeat."
+    "2026-11-01: Architecture refactored to Vance v2.0 Merchant Operations pipeline.",
+    "2026-11-01: Staging ingest established for utilities and Substack creative arcade experiments."
   ]
 }
