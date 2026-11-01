@@ -3,6 +3,7 @@ import path from 'path';
 
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY;
+const GEMINI_MODEL = process.env.GEMINI_MODEL || 'gemini-3.8-flash';
 const STATE_PATH = './vance.state.json';
 
 if (!GEMINI_API_KEY || !STRIPE_SECRET_KEY) {
@@ -71,11 +72,26 @@ async function syncStripeTelemetry() {
 }
 
 async function createStripeProductAndLink(item) {
-  console.log(`Creating Stripe product & payment link for: ${item.name}`);
-  const product = await stripeRequest('products', 'POST', {
-    name: item.name,
-    description: item.tagline
-  });
+  console.log(`Setting up Stripe product & payment link for: ${item.name}`);
+
+  // Check if product already exists from a previous partial run to avoid duplicates
+  let product = null;
+  try {
+    const existing = await stripeRequest('products?active=true&limit=50');
+    product = existing.data?.find(p => p.name === item.name) || null;
+    if (product) {
+      console.log(`Found existing Stripe product (${product.id}), reusing...`);
+    }
+  } catch (e) {
+    // Fallback to creating new product
+  }
+
+  if (!product) {
+    product = await stripeRequest('products', 'POST', {
+      name: item.name,
+      description: item.tagline
+    });
+  }
 
   const price = await stripeRequest('prices', 'POST', {
     product: product.id,
@@ -100,7 +116,7 @@ async function createStripeProductAndLink(item) {
 }
 
 async function generateSingleFileApp(item, checkoutUrl) {
-  console.log(`Calling Gemini API to engineer: ${item.slug}...`);
+  console.log(`Calling Gemini API (${GEMINI_MODEL}) to engineer: ${item.slug}...`);
   const prompt = `You are VANCE, an elite zero-dependency web application architect.
 ${item.prompt_spec.replace('{{CHECKOUT_URL}}', checkoutUrl)}
 
@@ -111,7 +127,7 @@ CRITICAL REQUIREMENTS:
 4. Include a prominent, high-converting upgrade button linking directly to: ${checkoutUrl}`;
 
   const res = await fetch(
-    `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${GEMINI_API_KEY}`,
+    `https://generativelanguage.googleapis.com/v1beta/models/${GEMINI_MODEL}:generateContent?key=${GEMINI_API_KEY}`,
     {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
@@ -124,7 +140,7 @@ CRITICAL REQUIREMENTS:
 
   const data = await res.json();
   if (!res.ok) {
-    throw new Error(`Gemini API Error: ${ JSON.stringify(data) }`);
+    throw new Error(`Gemini API Error: ${JSON.stringify(data)}`);
   }
 
   let html = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
