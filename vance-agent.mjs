@@ -1,19 +1,27 @@
 import fs from 'fs';
 import path from 'path';
 
-const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
 const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY;
 const STATE_PATH = './vance.state.json';
 
-if (!GEMINI_API_KEY || !STRIPE_SECRET_KEY) {
-  console.error('Missing GEMINI_API_KEY or STRIPE_SECRET_KEY in environment.');
+if (!STRIPE_SECRET_KEY) {
+  console.error('[VANCE] Missing STRIPE_SECRET_KEY in environment.');
   process.exit(1);
 }
 
 const state = JSON.parse(fs.readFileSync(STATE_PATH, 'utf8'));
-const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
-// Helper: Encode form data for Stripe REST API (Zero npm dependencies)
+// Defensive initialization
+if (!Array.isArray(state.deployed_assets)) {
+  state.deployed_assets = [];
+}
+if (!Array.isArray(state.catalog_manifest)) {
+  state.catalog_manifest = [];
+}
+if (!Array.isArray(state.execution_log)) {
+  state.execution_log = [];
+}
+
 function toFormUrlEncoded(obj, prefix = '') {
   const str = [];
   for (const p in obj) {
@@ -35,7 +43,7 @@ async function stripeRequest(endpoint, method = 'GET', bodyObj = null) {
     Authorization: `Bearer ${STRIPE_SECRET_KEY}`,
     'Content-Type': 'application/x-www-form-urlencoded'
   };
-  const options = { method, headers };
+  const options = { method, headers, signal: AbortSignal.timeout(20000) };
   if (bodyObj && method === 'POST') {
     options.body = toFormUrlEncoded(bodyObj);
   }
@@ -48,7 +56,7 @@ async function stripeRequest(endpoint, method = 'GET', bodyObj = null) {
 }
 
 async function syncStripeTelemetry() {
-  console.log('Syncing Stripe telemetry...');
+  console.log('[VANCE] Syncing Stripe financial telemetry...');
   try {
     const balance = await stripeRequest('balance');
     const available = balance.available?.reduce((acc, b) => acc + b.amount, 0) || 0;
@@ -63,23 +71,20 @@ async function syncStripeTelemetry() {
     state.financial_telemetry.stripe_available_balance = +(available / 100).toFixed(2);
     state.financial_telemetry.stripe_pending_balance = +(pending / 100).toFixed(2);
     state.financial_telemetry.monthly_revenue_current = +(monthlyGrossCents / 100).toFixed(2);
-    state.financial_telemetry.last_synced = new Date().toISOString();
-    console.log(`Monthly Revenue: $${state.financial_telemetry.monthly_revenue_current}`);
+    state.financial_telemetry.last_synced = new Date().toISOString().slice(0, 10);
+    console.log(`[VANCE] Current 30-Day Gross: $${state.financial_telemetry.monthly_revenue_current} USD`);
   } catch (err) {
-    console.warn('Telemetry warning:', err.message);
+    console.warn('[VANCE] Telemetry warning:', err.message);
   }
 }
 
-async function createStripeProductAndLink(item) {
-  console.log(`Setting up Stripe product & payment link for: ${item.name}`);
+async function getOrCreateStripeLink(item) {
+  console.log(`[VANCE] Provisioning/checking Stripe asset for: ${item.name} ($${(item.price_cents / 100).toFixed(2)})`);
 
   let product = null;
   try {
     const existing = await stripeRequest('products?active=true&limit=50');
-    product = existing.data?.find(p => p.name === item.name) || null;
-    if (product) {
-      console.log(`Found existing Stripe product (${product.id}), reusing...`);
-    }
+    product = Array.isArray(existing.data) ? existing.data.find(p => p.name === item.name) : null;
   } catch (e) {}
 
   if (!product) {
@@ -92,10 +97,7 @@ async function createStripeProductAndLink(item) {
   let price = null;
   try {
     const existingPrices = await stripeRequest(`prices?product=${product.id}&active=true&limit=10`);
-    price = existingPrices.data?.find(pr => pr.unit_amount === item.price_cents) || null;
-    if (price) {
-      console.log(`Found existing Stripe price (${price.id}), reusing...`);
-    }
+    price = Array.isArray(existingPrices.data) ? existingPrices.data.find(pr => pr.unit_amount === item.price_cents) : null;
   } catch (e) {}
 
   if (!price) {
@@ -106,12 +108,22 @@ async function createStripeProductAndLink(item) {
     });
   }
 
-  const proUnlockUrl = `${state.agent_identity.storefront_url}products/${item.slug}/?pro=unlocked`;
+  const unlockParam = item.type === 'arcade_cartridge' ? 'cartridge=unlocked' : 'pro=unlocked';
+  const targetRedirectUrl = `${state.agent_identity.storefront_url}products/${item.slug}/?${unlockParam}`;
+
+  try {
+    const existingLinks = await stripeRequest('payment_links?active=true&limit=50');
+    const match = Array.isArray(existingLinks.data)
+      ? existingLinks.data.find(pl => pl.after_completion?.redirect?.url === targetRedirectUrl)
+      : null;
+    if (match) return { product_id: product.id, price_id: price.id, checkout_url: match.url };
+  } catch (e) {}
+
   const paymentLink = await stripeRequest('payment_links', 'POST', {
     line_items: [{ price: price.id, quantity: 1 }],
     after_completion: {
       type: 'redirect',
-      redirect: { url: proUnlockUrl }
+      redirect: { url: targetRedirectUrl }
     }
   });
 
@@ -122,143 +134,197 @@ async function createStripeProductAndLink(item) {
   };
 }
 
-async function getCandidateModels() {
-  const candidates = ['gemini-3.8-flash'];
+async function getOrCreateVaultPass() {
+  const vaultItem = {
+    name: 'Vance Arcade: Lifetime Access & Download Pass',
+    tagline: 'Permanent offline cartridge downloads and unlimited browser access to all creative experiments.',
+    price_cents: state.pipeline_policy.arcade_vault_price_cents
+  };
+
+  let product = null;
   try {
-    const res = await fetch(`https://generativelanguage.googleapis.com/v1beta/models?key=${GEMINI_API_KEY}`);
-    if (res.ok) {
-      const data = await res.json();
-      const dynamic = (data.models || [])
-        .filter(m => m.supportedGenerationMethods?.includes('generateContent'))
-        .map(m => m.name.replace('models/', ''))
-        .filter(name => name.includes('gemini') && !name.includes('vision') && !name.includes('embedding'));
-      for (const m of dynamic) {
-        if (!candidates.includes(m)) candidates.push(m);
-      }
-    }
+    const existing = await stripeRequest('products?active=true&limit=50');
+    product = Array.isArray(existing.data) ? existing.data.find(p => p.name === vaultItem.name) : null;
   } catch (e) {}
-  return candidates;
-}
 
-async function generateSingleFileApp(item, checkoutUrl) {
-  const prompt = `You are VANCE, an elite zero-dependency web application architect.
-${item.prompt_spec.replace('{{CHECKOUT_URL}}', checkoutUrl)}
-
-CRITICAL REQUIREMENTS:
-1. Return ONLY raw, valid HTML starting with <!DOCTYPE html> and ending with </html>. Do NOT wrap in markdown code fences.
-2. Everything (CSS, JavaScript, rich interactive data, localStorage persistence) MUST be inside this single HTML file.
-3. If the URL query string contains "?pro=unlocked", automatically unlock Pro Mode in localStorage, hide the upgrade banner, display a "PRO EDITION UNLOCKED" badge, and enable a "Download Offline Copy (.html)" button that triggers a file download of the page itself.
-4. Include a prominent, high-converting upgrade button linking directly to: ${checkoutUrl}`;
-
-  const models = await getCandidateModels();
-  console.log(`Available Gemini models in failover queue: ${models.slice(0, 4).join(', ')}`);
-
-  for (const model of models.slice(0, 4)) {
-    for (let attempt = 1; attempt <= 3; attempt++) {
-      console.log(`Calling Gemini API (${model}, attempt ${attempt}/3) to engineer: ${item.slug}...`);
-      const res = await fetch(
-        `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`,
-        {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            contents: [{ parts: [{ text: prompt }] }],
-            generationConfig: { temperature: 0.4 }
-          })
-        }
-      );
-
-      const data = await res.json();
-      if (res.ok) {
-        let html = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
-        html = html.replace(/^```html\s*/i, '').replace(/```\s*$/i, '').trim();
-        if (html.length > 200) {
-          console.log(`Successfully engineered ${item.slug} (${html.length} bytes).`);
-          return html;
-        }
-      }
-
-      const status = data.error?.code || res.status;
-      console.warn(`Model ${model} returned ${status}: ${data.error?.message || 'Unknown error'}`);
-
-      if (status === 503 || status === 429) {
-        const waitMs = attempt * 6000;
-        console.log(`Waiting ${waitMs / 1000}s before retry...`);
-        await sleep(waitMs);
-      } else {
-        // 404 or unsupported model -> jump immediately to next model in queue
-        break;
-      }
-    }
+  if (!product) {
+    product = await stripeRequest('products', 'POST', {
+      name: vaultItem.name,
+      description: vaultItem.tagline
+    });
   }
 
-  throw new Error('All Gemini models and retries exhausted due to temporary API capacity.');
+  let price = null;
+  try {
+    const existingPrices = await stripeRequest(`prices?product=${product.id}&active=true&limit=10`);
+    price = Array.isArray(existingPrices.data) ? existingPrices.data.find(pr => pr.unit_amount === vaultItem.price_cents) : null;
+  } catch (e) {}
+
+  if (!price) {
+    price = await stripeRequest('prices', 'POST', {
+      product: product.id,
+      unit_amount: vaultItem.price_cents,
+      currency: 'usd'
+    });
+  }
+
+  const vaultUnlockUrl = `${state.agent_identity.storefront_url}?vault=unlocked`;
+  try {
+    const existingLinks = await stripeRequest('payment_links?active=true&limit=50');
+    const match = Array.isArray(existingLinks.data)
+      ? existingLinks.data.find(pl => pl.after_completion?.redirect?.url === vaultUnlockUrl)
+      : null;
+    if (match) return match.url;
+  } catch (e) {}
+
+  const paymentLink = await stripeRequest('payment_links', 'POST', {
+    line_items: [{ price: price.id, quantity: 1 }],
+    after_completion: {
+      type: 'redirect',
+      redirect: { url: vaultUnlockUrl }
+    }
+  });
+
+  return paymentLink.url;
 }
 
-function rebuildStorefrontHub() {
-  console.log('Rebuilding Vance-Core Storefront Hub (index.html)...');
-  const rev = state.financial_telemetry.monthly_revenue_current;
+function packageHtml(rawHtml, item, checkoutUrl, vaultUrl) {
+  const isArcade = item.type === 'arcade_cartridge';
+  const unlockKey = `vance_unlocked_${item.slug}`;
+
+  const injectedSnippet = `
+<!-- [VANCE-MERCHANT-HARNESS: START] -->
+<div id="vance-header" style="background:#090d16;color:#e2e8f0;padding:10px 18px;font-family:system-ui,-apple-system,sans-serif;font-size:13px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #1e293b;position:sticky;top:0;z-index:999999;">
+  <div style="display:flex;align-items:center;gap:14px;">
+    <a href="../../index.html" style="color:#38bdf8;text-decoration:none;font-weight:700;">&larr; Vance // Forge</a>
+    <span style="color:#64748b;">|</span>
+    <span style="font-weight:600;">${item.name}</span>
+  </div>
+  <div style="display:flex;align-items:center;gap:10px;">
+    <span id="vance-pro-badge" style="display:none;background:#10b98122;color:#10b981;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:700;border:1px solid #10b98144;">OFFLINE EDITION UNLOCKED</span>
+    <button id="vance-dl-btn" style="display:none;background:#10b981;color:#041f14;border:none;padding:5px 12px;border-radius:6px;font-weight:700;cursor:pointer;font-size:12px;">Download Offline .html</button>
+    <a id="vance-buy-btn" href="${checkoutUrl}" target="_blank" style="background:#38bdf8;color:#081726;padding:5px 12px;border-radius:6px;font-weight:700;text-decoration:none;font-size:12px;">
+      ${isArcade ? `Buy Standalone Cartridge ($${(item.price_cents / 100).toFixed(0)})` : `Unlock Pro Edition ($${(item.price_cents / 100).toFixed(0)})`}
+    </a>
+    ${isArcade ? `<a href="${vaultUrl}" target="_blank" style="background:#1e293b;color:#94a3b8;padding:5px 10px;border-radius:6px;text-decoration:none;font-size:11px;">Lifetime Pass ($20)</a>` : ''}
+  </div>
+</div>
+<script>
+(function() {
+  const isUnlocked = window.location.search.includes('unlocked') || localStorage.getItem('${unlockKey}') === 'true' || localStorage.getItem('vance_arcade_vault') === 'true';
+  if (isUnlocked) {
+    localStorage.setItem('${unlockKey}', 'true');
+    const buyBtn = document.getElementById('vance-buy-btn');
+    const badge = document.getElementById('vance-pro-badge');
+    const dlBtn = document.getElementById('vance-dl-btn');
+    if (buyBtn) buyBtn.style.display = 'none';
+    if (badge) badge.style.display = 'inline-block';
+    if (dlBtn) {
+      dlBtn.style.display = 'inline-block';
+      dlBtn.onclick = function() {
+        const blob = new Blob([document.documentElement.outerHTML], { type: 'text/html' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = '${item.slug}.offline.html';
+        a.click();
+      };
+    }
+  }
+})();
+</script>
+<!-- [VANCE-MERCHANT-HARNESS: END] -->
+`;
+
+  if (rawHtml.includes('<body')) {
+    return rawHtml.replace(/<body[^>]*>/i, match => `${match}\n${injectedSnippet}`);
+  }
+  return `${injectedSnippet}\n${rawHtml}`;
+}
+
+function rebuildStorefrontHub(vaultUrl) {
+  console.log('[VANCE] Assembling Storefront Hub (index.html)...');
+  const rev = state.financial_telemetry.monthly_revenue_current || 0;
   const pct1 = Math.min(100, Math.round((rev / 30) * 100));
   const pct2 = Math.min(100, Math.round((rev / 150) * 100));
 
-  const cardsHtml = state.deployed_assets
-    .map(
-      a => `
-      <div class="card">
+  const utilities = (state.deployed_assets || []).filter(a => a && a.type === 'utility');
+  const arcade = (state.deployed_assets || []).filter(a => a && a.type === 'arcade_cartridge');
+
+  const renderCard = a => `
+    <div class="card">
+      <div>
         <div class="badge">$${(a.price_cents / 100).toFixed(2)} USD</div>
         <h3>${a.name}</h3>
         <p>${a.tagline}</p>
-        <div class="actions">
-          <a href="${a.web_url}" class="btn secondary">Launch Free Web App</a>
-          <a href="${a.checkout_url}" class="btn primary">Buy Pro Offline Edition ($${(a.price_cents / 100).toFixed(0)})</a>
-        </div>
-      </div>`
-    )
-    .join('\n');
+      </div>
+      <div class="actions">
+        <a href="${a.web_url}" class="btn secondary">Launch Browser App</a>
+        <a href="${a.checkout_url}" class="btn primary">Buy Offline Copy ($${(a.price_cents / 100).toFixed(0)})</a>
+      </div>
+    </div>`;
 
   const indexHtml = `<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Vance Forge | Zero-Bloat Offline Web Utilities</title>
+  <title>Vance // Forge & Arcade</title>
   <style>
     :root { --bg: #0b0f19; --card: #131b2e; --text: #e2e8f0; --accent: #38bdf8; --emerald: #10b981; }
     body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 2rem; line-height: 1.6; }
-    .container { max-width: 900px; margin: 0 auto; }
-    header { border-bottom: 1px solid #1e293b; padding-bottom: 1.5rem; margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; }
-    .telemetry { background: var(--card); padding: 1rem 1.25rem; border-radius: 10px; border: 1px solid #1e293b; min-width: 260px; font-size: 0.85rem; }
+    .container { max-width: 940px; margin: 0 auto; }
+    header { border-bottom: 1px solid #1e293b; padding-bottom: 1.5rem; margin-bottom: 2.5rem; display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1.5rem; }
+    .telemetry { background: var(--card); padding: 1rem 1.25rem; border-radius: 10px; border: 1px solid #1e293b; min-width: 270px; font-size: 0.85rem; }
     .bar-bg { background: #1e293b; height: 8px; border-radius: 4px; overflow: hidden; margin: 6px 0 12px; }
     .bar-fill { background: var(--emerald); height: 100%; }
+    .vault-banner { background: linear-gradient(135deg, #1e1b4b, #172554); border: 1px solid #3b82f644; border-radius: 12px; padding: 1.5rem; margin-bottom: 2.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+    .section-title { font-size: 1.25rem; margin: 2rem 0 1rem; color: #94a3b8; text-transform: uppercase; letter-spacing: 0.05em; font-weight: 700; border-bottom: 1px solid #1e293b; padding-bottom: 0.5rem; }
     .grid { display: grid; gap: 1.5rem; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
-    .card { background: var(--card); padding: 1.5rem; border-radius: 12px; border: 1px solid #1e293b; position: relative; display: flex; flex-direction: column; justify-content: space-between; }
-    .badge { display: inline-block; background: rgba(56, 189, 248, 0.15); color: var(--accent); padding: 0.25rem 0.6rem; border-radius: 6px; font-weight: 700; font-size: 0.8rem; width: fit-content; margin-bottom: 0.5rem; }
+    .card { background: var(--card); padding: 1.5rem; border-radius: 12px; border: 1px solid #1e293b; display: flex; flex-direction: column; justify-content: space-between; }
+    .badge { display: inline-block; background: rgba(56, 189, 248, 0.15); color: var(--accent); padding: 0.25rem 0.6rem; border-radius: 6px; font-weight: 700; font-size: 0.8rem; margin-bottom: 0.75rem; }
     .actions { display: flex; gap: 0.75rem; margin-top: 1.25rem; flex-wrap: wrap; }
-    .btn { text-decoration: none; padding: 0.6rem 1rem; border-radius: 8px; font-weight: 600; font-size: 0.9rem; text-align: center; flex: 1; }
-    .btn.primary { background: var(--accent); color: #0f172a; }
+    .btn { text-decoration: none; padding: 0.6rem 1rem; border-radius: 8px; font-weight: 600; font-size: 0.85rem; text-align: center; flex: 1; }
+    .btn.primary { background: var(--accent); color: #081726; }
     .btn.secondary { background: #1e293b; color: var(--text); }
-    footer { margin-top: 4rem; font-size: 0.8rem; color: #64748b; text-align: center; }
+    .btn.vault { background: #3b82f6; color: #ffffff; padding: 0.75rem 1.5rem; }
+    footer { margin-top: 4rem; font-size: 0.8rem; color: #64748b; text-align: center; border-top: 1px solid #1e293b; padding-top: 2rem; }
   </style>
 </head>
 <body>
   <div class="container">
     <header>
       <div>
-        <h1 style="margin:0; color: var(--accent);">VANCE // FORGE</h1>
-        <p style="margin:0.25rem 0 0; color:#94a3b8;">Autonomous Single-File Offline Software & Tactical Study Consoles</p>
+        <h1 style="margin:0; color: var(--accent); letter-spacing:-0.02em;">VANCE // FORGE</h1>
+        <p style="margin:0.25rem 0 0; color:#94a3b8;">Autonomous Zero-Bloat Utilities & Indie Creative Experiments</p>
       </div>
       <div class="telemetry">
-        <div><strong>Autonomous Revenue Telemetry</strong></div>
+        <div><strong>Stripe Telemetry (Last 30 Days)</strong></div>
         <div>Milestone 1 ($30/mo Core): <strong>$${rev} / $30</strong> (${pct1}%)</div>
         <div class="bar-bg"><div class="bar-fill" style="width:${pct1}%"></div></div>
         <div>Milestone 2 ($150/mo Ultra): <strong>$${rev} / $150</strong> (${pct2}%)</div>
         <div class="bar-bg"><div class="bar-fill" style="width:${pct2}%"></div></div>
       </div>
     </header>
-    <div class="grid">
-      ${cardsHtml || '<p>Initializing first autonomous build...</p>'}
+
+    <div class="vault-banner">
+      <div>
+        <h3 style="margin:0 0 0.25rem; color:#60a5fa;">The Experimental Arcade Vault</h3>
+        <p style="margin:0; font-size:0.9rem; color:#cbd5e1;">Get instant lifetime access and offline standalone <code>.html</code> downloads for every game cartridge.</p>
+      </div>
+      <a href="${vaultUrl}" target="_blank" class="btn vault">Unlock Lifetime Vault ($20)</a>
     </div>
-    <footer>Operated autonomously by Vance-Core &middot; Last Synced: ${state.financial_telemetry.last_synced || 'Pending'}</footer>
+
+    <div class="section-title">Tactical Study Consoles & Tools</div>
+    <div class="grid">
+      ${utilities.map(renderCard).join('\n') || '<p style="color:#64748b;">No utilities in staging yet. Drop index.html files into /staging to publish.</p>'}
+    </div>
+
+    <div class="section-title">Indie Retro Arcade Experiments</div>
+    <div class="grid">
+      ${arcade.map(renderCard).join('\n') || '<p style="color:#64748b;">No arcade cartridges in staging yet. Drop game index.html files into /staging to publish.</p>'}
+    </div>
+
+    <footer>Operated autonomously by Vance-Core &middot; Last Synced: ${state.financial_telemetry.last_synced}</footer>
   </div>
 </body>
 </html>`;
@@ -268,45 +334,53 @@ function rebuildStorefrontHub() {
 
 async function run() {
   await syncStripeTelemetry();
+  const vaultUrl = await getOrCreateVaultPass();
 
-  const deployedSlugs = new Set(state.deployed_assets.map(a => a.slug));
-  const nextItem = state.product_backlog.find(item => !deployedSlugs.has(item.slug));
+  for (const item of state.catalog_manifest) {
+    if (fs.existsSync(item.source_file)) {
+      console.log(`[VANCE] Detected staged artifact: ${item.source_file}`);
+      const rawHtml = fs.readFileSync(item.source_file, 'utf8');
+      const stripeData = await getOrCreateStripeLink(item);
+      const packagedHtml = packageHtml(rawHtml, item, stripeData.checkout_url, vaultUrl);
 
-  if (nextItem) {
-    const stripeData = await createStripeProductAndLink(nextItem);
-    const appHtml = await generateSingleFileApp(nextItem, stripeData.checkout_url);
+      const targetDir = path.join(state.pipeline_policy.products_dir, item.slug);
+      fs.mkdirSync(targetDir, { recursive: true });
+      fs.writeFileSync(path.join(targetDir, 'index.html'), packagedHtml, 'utf8');
 
-    const outDir = path.join('./products', nextItem.slug);
-    fs.mkdirSync(outDir, { recursive: true });
-    fs.writeFileSync(path.join(outDir, 'index.html'), appHtml, 'utf8');
+      const assetRecord = {
+        slug: item.slug,
+        type: item.type,
+        name: item.name,
+        tagline: item.tagline,
+        price_cents: item.price_cents,
+        web_url: `./products/${item.slug}/`,
+        checkout_url: stripeData.checkout_url,
+        stripe_product_id: stripeData.product_id,
+        deployed_at: new Date().toISOString()
+      };
 
-    const assetRecord = {
-      slug: nextItem.slug,
-      name: nextItem.name,
-      tagline: nextItem.tagline,
-      price_cents: nextItem.price_cents,
-      web_url: `./products/${nextItem.slug}/`,
-      checkout_url: stripeData.checkout_url,
-      stripe_product_id: stripeData.product_id,
-      deployed_at: new Date().toISOString()
-    };
+      if (!Array.isArray(state.deployed_assets)) {
+        state.deployed_assets = [];
+      }
 
-    state.deployed_assets.push(assetRecord);
-    state.execution_log.unshift(
-      `${new Date().toISOString().slice(0, 10)}: Built & deployed ${nextItem.name} (${stripeData.checkout_url})`
-    );
-  } else {
-    state.execution_log.unshift(
-      `${new Date().toISOString().slice(0, 10)}: Synced Stripe telemetry. All current backlog items deployed.`
-    );
+      const existingIdx = state.deployed_assets.findIndex(a => a && a.slug === item.slug);
+      if (existingIdx >= 0) {
+        state.deployed_assets[existingIdx] = assetRecord;
+      } else {
+        state.deployed_assets.push(assetRecord);
+      }
+
+      item.status = 'deployed';
+      state.execution_log.unshift(`${new Date().toISOString().slice(0, 10)}: Deployed ${item.name} ($${(item.price_cents / 100).toFixed(2)})`);
+    }
   }
 
-  rebuildStorefrontHub();
+  rebuildStorefrontHub(vaultUrl);
   fs.writeFileSync(STATE_PATH, JSON.stringify(state, null, 2), 'utf8');
-  console.log('Vance cycle complete.');
+  console.log('[VANCE] Cycle complete.');
 }
 
 run().catch(err => {
-  console.error(err);
+  console.error('[VANCE] Fatal error:', err);
   process.exit(1);
 });
