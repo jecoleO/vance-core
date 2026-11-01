@@ -176,7 +176,7 @@ function packageHtml(rawHtml, item, checkoutUrl, hubUrl = '../../index.html', hu
 }
 
 async function callGemini(prompt, isJson = false) {
-  const model = 'gemini-1.5-flash';
+  const model = 'gemini-3.8-flash';
   const url = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent?key=${GEMINI_API_KEY}`;
 
   const body = {
