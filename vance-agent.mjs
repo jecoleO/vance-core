@@ -181,7 +181,10 @@ async function callGemini(prompt, isJson = false, timeoutMs = 60000) {
   const body = {
     contents: [{ parts: [{ text: prompt }] }],
     generationConfig: {
-      temperature: isJson ? 0.3 : 0.2
+      temperature: isJson ? 0.3 : 0.2,
+      thinkingConfig: {
+        thinkingBudget: 0 // Bypasses internal reasoning tokens for instant output
+      }
     }
   };
 
@@ -191,37 +194,43 @@ async function callGemini(prompt, isJson = false, timeoutMs = 60000) {
 
   const maxAttempts = 3;
   for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), timeoutMs);
+
     try {
       console.log(`[VANCE-AI] Querying ${model} (attempt ${attempt}/${maxAttempts}, timeout: ${Math.round(timeoutMs / 1000)}s)...`);
       const res = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(body),
-        signal: AbortSignal.timeout(timeoutMs)
+        signal: controller.signal
       });
 
       const raw = await res.text();
+      clearTimeout(timer);
 
       if (res.status === 503 || res.status === 429) {
-        const waitMs = attempt * 6000;
+        const waitMs = attempt * 5000;
         console.warn(`[VANCE-AI] ${model} capacity dip (HTTP ${res.status}). Waiting ${waitMs / 1000}s...`);
         await new Promise(r => setTimeout(r, waitMs));
         continue;
       }
 
       if (!res.ok) {
-        throw new Error(`Gemini API HTTP ${res.status}: ${raw}`);
+        throw new Error(`Gemini API HTTP ${res.status}: ${raw.slice(0, 150)}`);
       }
 
       const data = JSON.parse(raw);
       const text = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || '';
-      if (!text) throw new Error(`Gemini returned empty candidate content: ${raw}`);
+      if (!text) throw new Error('Gemini returned empty candidate content');
       return text;
     } catch (err) {
-      if (attempt === maxAttempts) throw err;
-      const waitMs = attempt * 4000;
-      console.warn(`[VANCE-AI] Attempt ${attempt} failed (${err.message}). Retrying in ${waitMs / 1000}s...`);
-      await new Promise(r => setTimeout(r, waitMs));
+      clearTimeout(timer);
+      const isAbort = err.name === 'AbortError' || controller.signal.aborted;
+      const msg = isAbort ? `Socket timed out after ${Math.round(timeoutMs / 1000)}s` : err.message;
+      if (attempt === maxAttempts) throw new Error(msg);
+      console.warn(`[VANCE-AI] Attempt ${attempt} failed (${msg}). Retrying in 4s...`);
+      await new Promise(r => setTimeout(r, 4000));
     }
   }
 
