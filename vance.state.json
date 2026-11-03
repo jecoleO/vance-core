@@ -83,7 +83,7 @@
       "tagline": "Full N5 through N1 offline study console with Web Speech TTS, ruby furigana, romaji toggle, and 60-second speed drills.",
       "price_cents": 800,
       "web_url": "./products/jlpt-mastery-console/",
-      "checkout_url": "https://buy.stripe.com/00w00kclugZHfmc5UJ0Ny04",
+      "checkout_url": "",
       "stripe_product_id": "prod_VY4vYcVBFLxm1C",
       "deployed_at": "2026-11-03T02:19:23.513Z"
     },
@@ -94,7 +94,7 @@
       "tagline": "A fast-paced 16-bit culinary arcade cartridge. Cook, plate, and serve against the kitchen clock.",
       "price_cents": 300,
       "web_url": "../products/pixel-bistro/",
-      "checkout_url": "https://buy.stripe.com/00w28s4T224N8XOfvj0Ny0c",
+      "checkout_url": "",
       "stripe_product_id": "prod_VYhfWypZhn8l5T",
       "deployed_at": "2026-11-03T09:06:45.054Z"
     }
@@ -127,7 +127,7 @@
       "price_cents": 200,
       "revenue_cents": 0,
       "web_url": "../products/news-n4-regional-baseball-stadium/",
-      "checkout_url": "https://buy.stripe.com/9B614o4T29xf3Ducj70Ny0e",
+      "checkout_url": "",
       "stripe_product_id": "prod_VYlC352h1VP5wV",
       "invented_at": "2026-11-03T09:07:02.972Z"
     },
@@ -140,7 +140,7 @@
       "price_cents": 500,
       "revenue_cents": 0,
       "web_url": "../products/news-n5-clean-energy-solar/",
-      "checkout_url": "https://buy.stripe.com/aFaaEYfxG5gZde4aaZ0Ny06",
+      "checkout_url": "",
       "stripe_product_id": "prod_VY8LnZ64i9XJ62",
       "invented_at": "2026-11-01T16:57:52.820Z"
     },
@@ -153,7 +153,7 @@
       "price_cents": 500,
       "revenue_cents": 0,
       "web_url": "../products/news-n5-ocean-clean-robot/",
-      "checkout_url": "https://buy.stripe.com/7sY6oI3OYbFn1vmerf0Ny07",
+      "checkout_url": "",
       "stripe_product_id": "prod_VYDtCbKSeZ8L5t",
       "invented_at": "2026-11-01T22:41:30.305Z"
     },
@@ -166,7 +166,7 @@
       "price_cents": 500,
       "revenue_cents": 0,
       "web_url": "../products/news-n5-hokuriku-shinkansen-extension/",
-      "checkout_url": "https://buy.stripe.com/14A7sMfxG38R0ri6YN0Ny08",
+      "checkout_url": "",
       "stripe_product_id": "prod_VYEJV7Hz7CYhSs",
       "invented_at": "2026-11-01T23:07:39.038Z"
     },
@@ -179,7 +179,7 @@
       "price_cents": 500,
       "revenue_cents": 0,
       "web_url": "../products/news-n4-tokyo-marathon-return/",
-      "checkout_url": "https://buy.stripe.com/6oU5kEadmaBj8XOfvj0Ny09",
+      "checkout_url": "",
       "stripe_product_id": "prod_VYeaHiqaoJsPCZ",
       "invented_at": "2026-11-03T02:16:24.830Z"
     },
@@ -193,7 +193,7 @@
       "price_cents": 500,
       "revenue_cents": 0,
       "web_url": "../products/news-n4-regional-robotics-cafe/",
-      "checkout_url": "https://buy.stripe.com/eVqeVegBK4cVde4fvj0Ny0a",
+      "checkout_url": "",
       "stripe_product_id": "prod_VYgNmwBKj601Es",
       "invented_at": "2026-11-03T04:07:25.969Z"
     },
@@ -207,7 +207,7 @@
       "price_cents": 500,
       "revenue_cents": 0,
       "web_url": "../products/news-n4-hokuriku-shinkansen-extension/",
-      "checkout_url": "https://buy.stripe.com/9B64gAadm8tbde43MB0Ny0b",
+      "checkout_url": "",
       "stripe_product_id": "prod_VYgbY3FwLTJpH3",
       "invented_at": "2026-11-03T04:21:55.337Z"
     },
@@ -221,7 +221,7 @@
       "price_cents": 500,
       "revenue_cents": 0,
       "web_url": "../products/news-n4-regional-cuisine-festival/",
-      "checkout_url": "https://buy.stripe.com/cNicN62KUbFn4Hy4QF0Ny0d",
+      "checkout_url": "",
       "stripe_product_id": "prod_VYhfBDIPh1PD3R",
       "invented_at": "2026-11-03T05:27:52.209Z"
     }
