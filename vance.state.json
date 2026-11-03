@@ -57,14 +57,13 @@
       "source_file": "staging/local-log-sanitizer/index.html",
       "status": "awaiting_staging"
     },
-    {
+   {
       "slug": "pixel-bistro",
-      "type": "arcade_cartridge",
-      "name": "Pixel Bistro",
-      "tagline": "Retro single-file kitchen assembly game with monster critics and Michelin progression.",
-      "price_cents": 200,
-      "source_file": "staging/pixel-bistro/index.html",
-      "status": "awaiting_staging"
+      "pod": "arcade",
+      "name": "Pixel Bistro: Cyber Diner Rush",
+      "tagline": "A fast-paced 16-bit culinary arcade cartridge. Cook, plate, and serve against the kitchen clock.",
+      "price_cents": 300,
+      "status": "staged"
     },
     {
       "slug": "kotoba-monsters",
