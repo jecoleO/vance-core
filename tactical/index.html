@@ -1,0 +1,119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Tactical Japanese Mastery // HUD Command Console</title>
+  <style>
+    :root {
+      --bg: #020617;
+      --card: #0b1329;
+      --border: #1e293b;
+      --text: #f8fafc;
+      --muted: #94a3b8;
+      --accent: #38bdf8;
+      --amber: #f59e0b;
+      --emerald: #10b981;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      padding: 2rem 1rem 4rem;
+    }
+    .container { max-width: 960px; margin: 0 auto; display: flex; flex-direction: column; gap: 2rem; }
+    header {
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .hub-link {
+      font-size: 0.8rem;
+      color: var(--accent);
+      text-decoration: none;
+      padding: 0.35rem 0.75rem;
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      border-radius: 6px;
+      font-weight: 700;
+    }
+    h1 { font-size: 2rem; font-weight: 800; color: #fff; letter-spacing: -0.02em; }
+    .tagline { color: var(--muted); font-size: 0.95rem; margin-top: 0.25rem; }
+    .grid { display: grid; gap: 1.5rem; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+    }
+    .badge {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-family: monospace;
+      font-weight: 700;
+      color: var(--accent);
+      background: rgba(56, 189, 248, 0.1);
+      border: 1px solid rgba(56, 189, 248, 0.25);
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      margin-bottom: 0.75rem;
+    }
+    .actions { display: flex; gap: 0.75rem; margin-top: 1.25rem; }
+    .btn {
+      text-decoration: none;
+      padding: 0.5rem 0.85rem;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-align: center;
+      flex: 1;
+    }
+    .btn-launch { background: var(--accent); color: #020617; font-weight: 700; }
+    .btn-buy { background: #1e293b; color: var(--text); border: 1px solid var(--border); }
+    footer { border-top: 1px solid var(--border); padding-top: 1.5rem; text-align: center; font-size: 0.75rem; color: #64748b; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div>
+        <a href="../index.html" class="hub-link">&larr; The Creativity Experiment</a>
+        <h1 style="margin-top: 0.75rem;">TACTICAL JAPANESE MASTERY</h1>
+        <p class="tagline">N5–N1 High-Density Kanji, Grammar &amp; Speed Recall Workstations</p>
+      </div>
+    </header>
+
+    <!-- [POD-ROSTER-START] -->
+<div class="grid">
+
+    <div class="card">
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
+          <div class="badge">$8.00 USD</div>
+          
+        </div>
+        <h3 style="font-size:1.05rem; font-weight:700; margin-bottom:0.35rem; color:#fff;">JLPT N5–N1 Complete Tactical Study Console</h3>
+        <p style="font-size:0.85rem; color:#94a3b8; line-height:1.4;">Full N5 through N1 offline study console with Web Speech TTS, ruby furigana, romaji toggle, and 60-second speed drills.</p>
+      </div>
+      <div class="actions" style="display:flex; gap:0.5rem; margin-top:1.25rem;">
+        <a href="./products/jlpt-mastery-console/" class="btn btn-launch" style="text-decoration:none; padding:0.5rem; border-radius:6px; font-size:0.8rem; font-weight:700; text-align:center; flex:1;">Launch</a>
+        <a href="https://buy.stripe.com/00w00kclugZHfmc5UJ0Ny04" target="_blank" class="btn btn-buy" style="text-decoration:none; padding:0.5rem; border-radius:6px; font-size:0.8rem; font-weight:700; text-align:center; flex:1;">Buy Offline ($8)</a>
+      </div>
+    </div>
+</div>
+<!-- [POD-ROSTER-END] -->
+
+    <footer>
+      Tactical Japanese Mastery &bull; Zero-Cloud Client-Side Study Engines
+    </footer>
+  </div>
+</body>
+</html>

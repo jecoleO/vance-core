@@ -90,6 +90,7 @@
     }
   ],
   "execution_log": [
+    "2026-11-03: Deployed World News Japanese: Tourist destinations bustle with the Hokuriku Shinkansen extension (N4)",
     "2026-11-03: Deployed World News Japanese: New Robot Café Opens in Tokyo (N4)",
     "2026-11-03: Vance Lab deployed World News Japanese: Many runners enthusiastically complete the Tokyo Marathon (N4)",
     "2026-11-01: Vance Lab deployed World News Japanese: New Hokuriku Shinkansen Extension Opens (N5)",
@@ -180,6 +181,20 @@
       "checkout_url": "https://buy.stripe.com/eVqeVegBK4cVde4fvj0Ny0a",
       "stripe_product_id": "prod_VYgNmwBKj601Es",
       "invented_at": "2026-11-03T04:07:25.969Z"
+    },
+    {
+      "slug": "news-n4-hokuriku-shinkansen-extension",
+      "pod": "news",
+      "type": "news_dossier",
+      "level": "N4",
+      "name": "World News Japanese: Tourist destinations bustle with the Hokuriku Shinkansen extension (N4)",
+      "tagline": "Tuesday Commute Edition &bull; 25-Word Match, 5 Grammar Cloze & Reading Check.",
+      "price_cents": 500,
+      "revenue_cents": 0,
+      "web_url": "../products/news-n4-hokuriku-shinkansen-extension/",
+      "checkout_url": "https://buy.stripe.com/9B64gAadm8tbde43MB0Ny0b",
+      "stripe_product_id": "prod_VYgbY3FwLTJpH3",
+      "invented_at": "2026-11-03T04:21:55.337Z"
     }
   ]
 }
