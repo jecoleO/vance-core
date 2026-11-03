@@ -90,6 +90,7 @@
     }
   ],
   "execution_log": [
+    "2026-11-03: Removed & archived asset japan-freelance-tax-engine",
     "2026-11-03: Deployed World News Japanese: Tourist destinations bustle with the Hokuriku Shinkansen extension (N4)",
     "2026-11-03: Deployed World News Japanese: New Robot Café Opens in Tokyo (N4)",
     "2026-11-03: Vance Lab deployed World News Japanese: Many runners enthusiastically complete the Tokyo Marathon (N4)",
@@ -104,18 +105,6 @@
     "2026-11-01: Staging ingest established for utilities and Substack creative arcade experiments."
   ],
   "autonomous_lab_assets": [
-    {
-      "slug": "japan-freelance-tax-engine",
-      "type": "autonomous_utility",
-      "name": "Japan Freelance Tax & Qualified Invoice Engine",
-      "tagline": "Offline 10.21% withholding tax and 8%/10% consumption tax calculator with print-ready invoice export.",
-      "price_cents": 600,
-      "revenue_cents": 0,
-      "web_url": "../products/japan-freelance-tax-engine/",
-      "checkout_url": "https://buy.stripe.com/4gM14o4T25gZca082R0Ny05",
-      "stripe_product_id": "prod_VY6KiQ85mWbZ7g",
-      "invented_at": "2026-11-01T15:13:49.585Z"
-    },
     {
       "slug": "news-n5-clean-energy-solar",
       "type": "news_dossier",
