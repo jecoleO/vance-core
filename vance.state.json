@@ -97,9 +97,9 @@
       "tagline": "A fast-paced 16-bit culinary arcade cartridge. Cook, plate, and serve against the kitchen clock.",
       "price_cents": 300,
       "web_url": "../products/pixel-bistro/",
-      "checkout_url": "https://buy.stripe.com/7sYdRaetCaBjb5W82R0Ny0l",
+      "checkout_url": "https://buy.stripe.com/bJefZi4T26l35LC4QF0Ny0n",
       "stripe_product_id": "prod_VYhfWypZhn8l5T",
-      "deployed_at": "2026-11-03T12:35:24.929Z"
+      "deployed_at": "2026-11-03T13:03:37.450Z"
     }
   ],
   "execution_log": [

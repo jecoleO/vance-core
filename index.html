@@ -219,5 +219,33 @@
       The Creativity Experiment &bull; Orchestrated by Vance & Jon Cole &bull; Hosted on GitHub Pages
     </footer>
   </div>
+
+<script>
+(function() {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('debug') === 'creator') {
+    localStorage.setItem('vance_creator_debug', 'true');
+  }
+  const isDebug = localStorage.getItem('vance_creator_debug') === 'true';
+
+  if (isDebug) {
+    // Unhide debug launch buttons on vaulted cards
+    document.querySelectorAll('.vance-debug-launch-btn').forEach(btn => btn.style.display = 'inline-block');
+    document.querySelectorAll('.vault-card').forEach(card => card.style.opacity = '0.9');
+
+    // Add discreet floating creator badge
+    const badge = document.createElement('div');
+    badge.innerHTML = '⚙ CREATOR DEBUG [ON] <span style="cursor:pointer;margin-left:6px;text-decoration:underline;">(Reset)</span>';
+    badge.style.cssText = 'position:fixed;bottom:12px;right:12px;background:#f59e0b;color:#041f14;padding:6px 12px;font-family:monospace;font-size:11px;font-weight:bold;border-radius:6px;z-index:999999;box-shadow:0 4px 12px rgba(0,0,0,0.5);';
+    badge.querySelector('span').onclick = function() {
+      localStorage.removeItem('vance_creator_debug');
+      localStorage.removeItem('vance_lifetime_pass');
+      window.location.reload();
+    };
+    document.body.appendChild(badge);
+  }
+})();
+</script>
+
 </body>
 </html>

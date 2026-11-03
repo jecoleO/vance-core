@@ -256,10 +256,11 @@
     <a href="../../news/index.html" style="color:#38bdf8;text-decoration:none;font-weight:700;">&larr; Japanese Today</a>
     <span style="color:#64748b;">|</span>
     <span style="font-weight:600;color:#f8fafc;">World News Japanese: Many fans gather at a new regional baseball stadium (N4)</span>
-    <span style="background:#10b98122;color:#10b981;font-size:11px;font-weight:700;padding:2px 6px;border-radius:4px;border:1px solid #10b98144;">FREE PREVIEW</span>
+    <span id="vance-mode-tag" style="background:#10b98122;color:#10b981;font-size:11px;font-weight:700;padding:2px 6px;border-radius:4px;border:1px solid #10b98144;">FREE PREVIEW</span>
   </div>
   <div style="display:flex;align-items:center;gap:10px;">
     <span id="vance-supporter-badge" style="display:none;background:#38bdf822;color:#38bdf8;padding:4px 8px;border-radius:4px;font-size:11px;font-weight:800;border:1px solid #38bdf844;">★ ALL-ACCESS SUPPORTER</span>
+    <span id="vance-debug-badge" style="display:none;background:#f59e0b22;color:#f59e0b;padding:4px 8px;border-radius:4px;font-size:11px;font-weight:800;border:1px solid #f59e0b44;">⚙ CREATOR DEBUG MODE</span>
     <button id="vance-dl-btn" style="display:none;background:#10b981;color:#041f14;border:none;padding:6px 14px;border-radius:6px;font-weight:800;cursor:pointer;font-size:12px;">Download Offline .html</button>
     <a id="vance-lifetime-btn" href="https://buy.stripe.com/7sYcN61GQ24N7TK6YN0Ny0f" target="_blank" rel="noopener" style="background:#38bdf8;color:#020617;padding:6px 14px;border-radius:6px;font-weight:800;text-decoration:none;font-size:12px;box-shadow:0 2px 8px rgba(56,189,248,0.3);">
       Get Studio Lifetime Pass &bull; $30
@@ -269,16 +270,33 @@
 <script>
 (function() {
   const params = new URLSearchParams(window.location.search);
-  const isLifetime = params.get('lifetime') === 'unlocked' || localStorage.getItem('vance_lifetime_pass') === 'true';
+  
+  // 1. Creator Debug Check
+  if (params.get('debug') === 'creator') {
+    localStorage.setItem('vance_creator_debug', 'true');
+  }
+  const isDebug = localStorage.getItem('vance_creator_debug') === 'true';
+
+  // 2. Paid / Lifetime Check
+  const isLifetime = params.get('lifetime') === 'unlocked' || localStorage.getItem('vance_lifetime_pass') === 'true' || isDebug;
 
   if (isLifetime) {
-    localStorage.setItem('vance_lifetime_pass', 'true');
+    if (!isDebug) localStorage.setItem('vance_lifetime_pass', 'true');
     const lifetimeBtn = document.getElementById('vance-lifetime-btn');
-    const badge = document.getElementById('vance-supporter-badge');
+    const supporterBadge = document.getElementById('vance-supporter-badge');
+    const debugBadge = document.getElementById('vance-debug-badge');
     const dlBtn = document.getElementById('vance-dl-btn');
+    const modeTag = document.getElementById('vance-mode-tag');
 
     if (lifetimeBtn) lifetimeBtn.style.display = 'none';
-    if (badge) badge.style.display = 'inline-block';
+
+    if (isDebug) {
+      if (debugBadge) debugBadge.style.display = 'inline-block';
+      if (modeTag) { modeTag.innerText = 'DEBUG UNLOCKED'; modeTag.style.color = '#f59e0b'; modeTag.style.borderColor = '#f59e0b44'; }
+    } else {
+      if (supporterBadge) supporterBadge.style.display = 'inline-block';
+    }
+
     if (dlBtn) {
       dlBtn.style.display = 'inline-block';
       dlBtn.onclick = function() {
@@ -293,6 +311,9 @@
 })();
 </script>
 <!-- [VANCE-MERCHANT-HARNESS: END] -->
+
+
+
 
 
 
