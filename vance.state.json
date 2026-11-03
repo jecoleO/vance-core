@@ -21,7 +21,10 @@
       "tier_1_survival": 30,
       "tier_2_ultra": 150
     },
-    "last_synced": "2026-11-03"
+    "last_synced": "2026-11-03",
+    "lifetime_pass_url": "https://buy.stripe.com/7sYcN61GQ24N7TK6YN0Ny0f",
+    "lifetime_price_id": "price_1UXeysLAgkJy5FcEmGzIhj1M",
+    "lifetime_product_id": "prod_VYmXLA015b3x9r"
   },
   "pipeline_policy": {
     "ingest_dir": "./staging",
@@ -94,12 +97,13 @@
       "tagline": "A fast-paced 16-bit culinary arcade cartridge. Cook, plate, and serve against the kitchen clock.",
       "price_cents": 300,
       "web_url": "../products/pixel-bistro/",
-      "checkout_url": "",
+      "checkout_url": "https://buy.stripe.com/aFabJ23OY38R0rigzn0Ny0g",
       "stripe_product_id": "prod_VYhfWypZhn8l5T",
-      "deployed_at": "2026-11-03T09:06:45.054Z"
+      "deployed_at": "2026-11-03T10:30:20.005Z"
     }
   ],
   "execution_log": [
+    "2026-11-03: Deployed World News Japanese: Robot-staffed cafe in Tokyo gains popularity (N4)",
     "2026-11-03: Deployed World News Japanese: Many fans gather at a new regional baseball stadium (N4)",
     "2026-11-03: Deployed World News Japanese: Food festival celebrating regional traditional dishes opens in Tokyo (N4)",
     "2026-11-03: Removed & archived asset japan-freelance-tax-engine",
@@ -117,6 +121,20 @@
     "2026-11-01: Staging ingest established for utilities and Substack creative arcade experiments."
   ],
   "autonomous_lab_assets": [
+    {
+      "slug": "news-n4-robot-cafe-tokyo",
+      "pod": "news",
+      "type": "news_dossier",
+      "level": "N4",
+      "name": "World News Japanese: Robot-staffed cafe in Tokyo gains popularity (N4)",
+      "tagline": "Tuesday Commute Edition &bull; 25-Word Match, 5 Grammar Cloze & Reading Check.",
+      "price_cents": 200,
+      "revenue_cents": 0,
+      "web_url": "../products/news-n4-robot-cafe-tokyo/",
+      "checkout_url": "https://buy.stripe.com/7sY6oIetC9xf0rierf0Ny0h",
+      "stripe_product_id": "prod_VYmZWCSjf0Qouj",
+      "invented_at": "2026-11-03T10:31:29.398Z"
+    },
     {
       "slug": "news-n4-regional-baseball-stadium",
       "pod": "news",
