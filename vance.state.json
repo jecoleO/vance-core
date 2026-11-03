@@ -96,10 +96,11 @@
       "web_url": "../products/pixel-bistro/",
       "checkout_url": "https://buy.stripe.com/00w28s4T224N8XOfvj0Ny0c",
       "stripe_product_id": "prod_VYhfWypZhn8l5T",
-      "deployed_at": "2026-11-03T05:27:39.444Z"
+      "deployed_at": "2026-11-03T09:06:45.054Z"
     }
   ],
   "execution_log": [
+    "2026-11-03: Deployed World News Japanese: Many fans gather at a new regional baseball stadium (N4)",
     "2026-11-03: Deployed World News Japanese: Food festival celebrating regional traditional dishes opens in Tokyo (N4)",
     "2026-11-03: Removed & archived asset japan-freelance-tax-engine",
     "2026-11-03: Deployed World News Japanese: Tourist destinations bustle with the Hokuriku Shinkansen extension (N4)",
@@ -116,6 +117,20 @@
     "2026-11-01: Staging ingest established for utilities and Substack creative arcade experiments."
   ],
   "autonomous_lab_assets": [
+    {
+      "slug": "news-n4-regional-baseball-stadium",
+      "pod": "news",
+      "type": "news_dossier",
+      "level": "N4",
+      "name": "World News Japanese: Many fans gather at a new regional baseball stadium (N4)",
+      "tagline": "Tuesday Commute Edition &bull; 25-Word Match, 5 Grammar Cloze & Reading Check.",
+      "price_cents": 200,
+      "revenue_cents": 0,
+      "web_url": "../products/news-n4-regional-baseball-stadium/",
+      "checkout_url": "https://buy.stripe.com/9B614o4T29xf3Ducj70Ny0e",
+      "stripe_product_id": "prod_VYlC352h1VP5wV",
+      "invented_at": "2026-11-03T09:07:02.972Z"
+    },
     {
       "slug": "news-n5-clean-energy-solar",
       "type": "news_dossier",
