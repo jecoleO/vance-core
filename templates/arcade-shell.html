@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>JAE & Corvus' Arcade // A Carnival of Games</title>
+  <style>
+    :root {
+      --bg: #080114;
+      --card: #150a2a;
+      --border: #2e1065;
+      --text: #f3e8ff;
+      --muted: #a855f7;
+      --dim: #7e22ce;
+      --accent: #c084fc;
+      --glow: #f43f5e;
+      --cyan: #38bdf8;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Courier New', Courier, monospace, system-ui;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      padding: 2rem 1rem 4rem;
+      background-image: radial-gradient(circle at 50% 0%, rgba(192, 132, 252, 0.12), transparent 70%);
+    }
+    .container { max-width: 960px; margin: 0 auto; display: flex; flex-direction: column; gap: 2rem; }
+    header {
+      border-bottom: 2px solid var(--border);
+      padding-bottom: 1.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-start;
+      flex-wrap: wrap;
+      gap: 1rem;
+    }
+    .hub-link {
+      font-size: 0.8rem;
+      color: var(--cyan);
+      text-decoration: none;
+      padding: 0.35rem 0.75rem;
+      border: 1px solid rgba(56, 189, 248, 0.3);
+      border-radius: 6px;
+      font-weight: 700;
+      transition: all 0.15s;
+    }
+    .hub-link:hover { background: rgba(56, 189, 248, 0.1); }
+    h1 { font-size: 2rem; color: #fff; text-shadow: 0 0 12px rgba(192, 132, 252, 0.5); }
+    .tagline { color: #d8b4fe; font-size: 0.95rem; margin-top: 0.25rem; }
+    .grid { display: grid; gap: 1.5rem; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); }
+    .card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      position: relative;
+    }
+    .card:hover { border-color: var(--accent); }
+    .badge {
+      display: inline-block;
+      font-size: 0.75rem;
+      font-weight: 700;
+      color: var(--glow);
+      background: rgba(244, 63, 94, 0.15);
+      border: 1px solid rgba(244, 63, 94, 0.3);
+      padding: 0.2rem 0.5rem;
+      border-radius: 4px;
+      margin-bottom: 0.75rem;
+    }
+    .actions { display: flex; gap: 0.75rem; margin-top: 1.25rem; }
+    .btn {
+      text-decoration: none;
+      padding: 0.5rem 0.85rem;
+      border-radius: 6px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-align: center;
+      flex: 1;
+    }
+    .btn-play { background: var(--accent); color: #080114; }
+    .btn-buy { background: rgba(255, 255, 255, 0.08); color: #fff; border: 1px solid var(--border); }
+    footer { border-top: 1px solid var(--border); padding-top: 1.5rem; text-align: center; font-size: 0.75rem; color: #a855f7; }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div>
+        <a href="../index.html" class="hub-link">&larr; The Creativity Experiment</a>
+        <h1 style="margin-top: 0.75rem;">JAE &amp; CORVUS' ARCADE</h1>
+        <p class="tagline">A Carnival of Standalone Games Brought to You by a Writer and an AI</p>
+      </div>
+    </header>
+
+    <!-- [POD-ROSTER-START] -->
+    <div class="grid">
+      <!-- Injected by Vance -->
+    </div>
+    <!-- [POD-ROSTER-END] -->
+
+    <footer>
+      Handcrafted 16-bit browser cartridges &bull; 100% Offline Single-File HTML5
+    </footer>
+  </div>
+</body>
+</html>
