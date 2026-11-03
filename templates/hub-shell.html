@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>The Creativity Experiment // Federated Local-First Digital Works</title>
+  <style>
+    :root {
+      --bg: #030712;
+      --panel: #0b1329;
+      --card: #0f172a;
+      --border: #1e293b;
+      --text: #f8fafc;
+      --text-muted: #94a3b8;
+      --text-dim: #64748b;
+      --sky: #38bdf8;
+      --emerald: #10b981;
+      --purple: #a855f7;
+      --amber: #f59e0b;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background: var(--bg);
+      color: var(--text);
+      line-height: 1.6;
+      padding: 2rem 1rem 4rem;
+    }
+    .container {
+      max-width: 960px;
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 2.5rem;
+    }
+    header {
+      border-bottom: 1px solid var(--border);
+      padding-bottom: 2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    .brand-tag {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.75rem;
+      font-weight: 700;
+      letter-spacing: 0.08em;
+      text-transform: uppercase;
+      color: var(--sky);
+      background: rgba(56, 189, 248, 0.1);
+      padding: 0.25rem 0.6rem;
+      border-radius: 9999px;
+      border: 1px solid rgba(56, 189, 248, 0.25);
+      width: fit-content;
+    }
+    h1 {
+      font-size: 2.2rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      color: #fff;
+    }
+    .lead {
+      font-size: 1.05rem;
+      color: var(--text-muted);
+      max-width: 680px;
+    }
+    .pillar-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+      gap: 1.25rem;
+    }
+    .pod-card {
+      background: var(--card);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1.5rem;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      gap: 1.25rem;
+      transition: transform 0.15s ease, border-color 0.15s ease;
+      position: relative;
+      overflow: hidden;
+    }
+    .pod-card:hover {
+      transform: translateY(-2px);
+      border-color: #334155;
+    }
+    .pod-badge {
+      font-size: 0.7rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      padding: 0.2rem 0.55rem;
+      border-radius: 6px;
+      width: fit-content;
+    }
+    .badge-arcade { background: rgba(168, 85, 247, 0.15); color: #c084fc; border: 1px solid rgba(168, 85, 247, 0.3); }
+    .badge-tactical { background: rgba(56, 189, 248, 0.15); color: #38bdf8; border: 1px solid rgba(56, 189, 248, 0.3); }
+    .badge-utility { background: rgba(16, 185, 129, 0.15); color: #10b981; border: 1px solid rgba(16, 185, 129, 0.3); }
+    .badge-news { background: rgba(245, 158, 11, 0.15); color: #fbbf24; border: 1px solid rgba(245, 158, 11, 0.3); }
+    .pod-title { font-size: 1.2rem; font-weight: 700; color: #fff; margin-top: 0.5rem; }
+    .pod-desc { font-size: 0.85rem; color: var(--text-muted); margin-top: 0.35rem; line-height: 1.5; }
+    .pod-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      border-top: 1px solid var(--border);
+      padding-top: 1rem;
+      font-size: 0.8rem;
+    }
+    .pod-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      color: #fff;
+      text-decoration: none;
+      font-weight: 600;
+    }
+    .pod-link:hover { text-decoration: underline; }
+    .count-indicator { font-family: monospace; color: var(--text-dim); }
+    .manifesto {
+      background: rgba(15, 23, 42, 0.5);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.5rem;
+      font-size: 0.88rem;
+      color: var(--text-muted);
+      display: flex;
+      flex-direction: column;
+      gap: 0.75rem;
+    }
+    footer {
+      border-top: 1px solid var(--border);
+      padding-top: 1.5rem;
+      text-align: center;
+      font-size: 0.75rem;
+      color: var(--text-dim);
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <header>
+      <div class="brand-tag">Autonomous Federation &bull; Zero-Cloud</div>
+      <h1>The Creativity Experiment</h1>
+      <p class="lead">
+        A sustainable federation of focused micro-tools, language engines, retro arcade cartridges, and daily commute editions. Zero backend trackers, zero heavy dependencies, 100% client-side privacy.
+      </p>
+    </header>
+
+    <div class="pillar-grid">
+      <div class="pod-card">
+        <div>
+          <span class="pod-badge badge-news">Daily Commute Reader</span>
+          <h2 class="pod-title">Japanese Today</h2>
+          <p class="pod-desc">
+            Bite-sized, adult world news dossiers built for your train ride. 25-word flashcards, particle cloze exercises, and authentic reading comprehension with furigana toggles.
+          </p>
+        </div>
+        <div class="pod-footer">
+          <span class="count-indicator">__COUNT_NEWS__ Live Editions</span>
+          <a href="./news/index.html" class="pod-link">Enter News Desk &rarr;</a>
+        </div>
+      </div>
+
+      <div class="pod-card">
+        <div>
+          <span class="pod-badge badge-tactical">Reference Workstation</span>
+          <h2 class="pod-title">Tactical Japanese Mastery</h2>
+          <p class="pod-desc">
+            Complete N5 through N1 study console with offline Web Speech audio, kanji breakdown matrices, and 60-second speed recall drills.
+          </p>
+        </div>
+        <div class="pod-footer">
+          <span class="count-indicator">__COUNT_TACTICAL__ Tools</span>
+          <a href="./tactical/index.html" class="pod-link">Launch Console &rarr;</a>
+        </div>
+      </div>
+
+      <div class="pod-card">
+        <div>
+          <span class="pod-badge badge-arcade">Retro Browser Cartridges</span>
+          <h2 class="pod-title">JAE &amp; Corvus' Arcade</h2>
+          <p class="pod-desc">
+            A carnival of games brought to you by a writer and an autonomous AI. 16-bit playable cartridges (Pixel Bistro, Kotoba Monsters) downloadable as single-file offline .html.
+          </p>
+        </div>
+        <div class="pod-footer">
+          <span class="count-indicator">__COUNT_ARCADE__ Cartridges</span>
+          <a href="./arcade/index.html" class="pod-link">Play Cartridges &rarr;</a>
+        </div>
+      </div>
+
+      <div class="pod-card">
+        <div>
+          <span class="pod-badge badge-utility">Local-First Utilities</span>
+          <h2 class="pod-title">The Utility Belt</h2>
+          <p class="pod-desc">
+            Practical offline tools for life and work: Japan Freelance 10.21% Withholding Tax and Qualified Invoice Engine, client-side prompt sanitizers, and focus timers.
+          </p>
+        </div>
+        <div class="pod-footer">
+          <span class="count-indicator">__COUNT_UTILITY__ Utilities</span>
+          <a href="./utility/index.html" class="pod-link">Access Belt &rarr;</a>
+        </div>
+      </div>
+    </div>
+
+    <div class="manifesto">
+      <div style="font-weight:700; color:#fff; font-size:0.95rem;">Why Single-File Local-First?</div>
+      <p>
+        The modern web is bloated with megabyte-heavy frameworks that fail the moment you lose cellular connection on the Osaka subway or on a flight. Every tool here is engineered as a standalone, zero-dependency HTML document that runs completely in your browser, saves its state locally, and can be saved to your device as a permanent, offline file.
+      </p>
+    </div>
+
+    <footer>
+      The Creativity Experiment &bull; Orchestrated by Vance & Jon Cole &bull; Hosted on GitHub Pages
+    </footer>
+  </div>
+</body>
+</html>
