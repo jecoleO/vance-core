@@ -97,12 +97,13 @@
       "tagline": "A fast-paced 16-bit culinary arcade cartridge. Cook, plate, and serve against the kitchen clock.",
       "price_cents": 300,
       "web_url": "../products/pixel-bistro/",
-      "checkout_url": "https://buy.stripe.com/7sYfZi3OY5gZ0ri5UJ0Ny0i",
+      "checkout_url": "https://buy.stripe.com/8x25kE0CM8tbgqg96V0Ny0j",
       "stripe_product_id": "prod_VYhfWypZhn8l5T",
-      "deployed_at": "2026-11-03T10:47:40.004Z"
+      "deployed_at": "2026-11-03T11:14:46.519Z"
     }
   ],
   "execution_log": [
+    "2026-11-03: Deployed World News Japanese: Hotel with Robot Staff Opens Anew (N4)",
     "2026-11-03: Deployed World News Japanese: Robot-staffed cafe in Tokyo gains popularity (N4)",
     "2026-11-03: Deployed World News Japanese: Many fans gather at a new regional baseball stadium (N4)",
     "2026-11-03: Deployed World News Japanese: Food festival celebrating regional traditional dishes opens in Tokyo (N4)",
@@ -121,6 +122,20 @@
     "2026-11-01: Staging ingest established for utilities and Substack creative arcade experiments."
   ],
   "autonomous_lab_assets": [
+    {
+      "slug": "news-n4-robot-hotel-staff",
+      "pod": "news",
+      "type": "news_dossier",
+      "level": "N4",
+      "name": "World News Japanese: Hotel with Robot Staff Opens Anew (N4)",
+      "tagline": "Tuesday Commute Edition &bull; 25-Word Match, 5 Grammar Cloze & Reading Check.",
+      "price_cents": 200,
+      "revenue_cents": 0,
+      "web_url": "../products/news-n4-robot-hotel-staff/",
+      "checkout_url": "https://buy.stripe.com/fZueVe5X65gZca0dnb0Ny0k",
+      "stripe_product_id": "prod_VYnGEAaPtPpIs9",
+      "invented_at": "2026-11-03T11:14:57.908Z"
+    },
     {
       "slug": "news-n4-robot-cafe-tokyo",
       "pod": "news",

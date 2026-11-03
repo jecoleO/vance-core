@@ -250,46 +250,52 @@
 </head>
 <body>
 
-  <!-- [VANCE-MERCHANT-HARNESS: START] -->
-  <div id="vance-header" style="background:#090d16;color:#e2e8f0;padding:8px 16px;font-family:system-ui,-apple-system,sans-serif;font-size:12px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #1e293b;position:sticky;top:0;z-index:999999;">
-    <div style="display:flex;align-items:center;gap:12px;">
-      <a href="../../lab/index.html" style="color:#38bdf8;text-decoration:none;font-weight:700;">&larr; Vance Lab</a>
-      <span style="color:#475569;">|</span>
-      <span id="vance-product-name" style="font-weight:600; color:#cbd5e1;">World News Japanese Dossier</span>
-    </div>
-    <div style="display:flex;align-items:center;gap:10px;">
-      <span id="vance-pro-badge" style="display:none;background:rgba(16,185,129,0.15);color:#10b981;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:700;border:1px solid rgba(16,185,129,0.3);">OFFLINE EDITION UNLOCKED</span>
-      <button id="vance-dl-btn" style="display:none;background:#10b981;color:#022c22;border:none;padding:4px 10px;border-radius:6px;font-weight:700;cursor:pointer;font-size:11px;">Save Offline .html</button>
-      <a id="vance-buy-btn" href="https://buy.stripe.com/6oU5kEadmaBj8XOfvj0Ny09" target="_blank" style="background:#0284c7;color:#ffffff;padding:4px 10px;border-radius:6px;font-weight:700;text-decoration:none;font-size:11px;">
-        Unlock Full Archive ($5)
-      </a>
-    </div>
+<!-- [VANCE-MERCHANT-HARNESS: START] -->
+<div id="vance-header" style="background:#090d16;color:#e2e8f0;padding:10px 18px;font-family:system-ui,-apple-system,sans-serif;font-size:13px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #1e293b;position:sticky;top:0;z-index:999999;">
+  <div style="display:flex;align-items:center;gap:14px;">
+    <a href="../news/index.html" style="color:#38bdf8;text-decoration:none;font-weight:700;">&larr; Japanese Today</a>
+    <span style="color:#64748b;">|</span>
+    <span style="font-weight:600;color:#f8fafc;">World News Japanese: Many runners enthusiastically complete the Tokyo Marathon (N4)</span>
+    <span style="background:#10b98122;color:#10b981;font-size:11px;font-weight:700;padding:2px 6px;border-radius:4px;border:1px solid #10b98144;">FREE PREVIEW</span>
   </div>
-  <script>
-  (function() {
-    const slug = window.location.pathname.split('/').filter(Boolean).pop() || 'daily-dossier';
-    const isUnlocked = window.location.search.includes('unlocked') || localStorage.getItem('vance_unlocked_' + slug) === 'true';
-    if (isUnlocked) {
-      localStorage.setItem('vance_unlocked_' + slug, 'true');
-      const buyBtn = document.getElementById('vance-buy-btn');
-      const badge = document.getElementById('vance-pro-badge');
-      const dlBtn = document.getElementById('vance-dl-btn');
-      if (buyBtn) buyBtn.style.display = 'none';
-      if (badge) badge.style.display = 'inline-block';
-      if (dlBtn) {
-        dlBtn.style.display = 'inline-block';
-        dlBtn.onclick = function() {
-          const blob = new Blob([document.documentElement.outerHTML], { type: 'text/html' });
-          const a = document.createElement('a');
-          a.href = URL.createObjectURL(blob);
-          a.download = slug + '.offline.html';
-          a.click();
-        };
-      }
+  <div style="display:flex;align-items:center;gap:10px;">
+    <span id="vance-supporter-badge" style="display:none;background:#38bdf822;color:#38bdf8;padding:4px 8px;border-radius:4px;font-size:11px;font-weight:800;border:1px solid #38bdf844;">★ ALL-ACCESS SUPPORTER</span>
+    <button id="vance-dl-btn" style="display:none;background:#10b981;color:#041f14;border:none;padding:6px 14px;border-radius:6px;font-weight:800;cursor:pointer;font-size:12px;">Download Offline .html</button>
+    <a id="vance-lifetime-btn" href="https://buy.stripe.com/7sYcN61GQ24N7TK6YN0Ny0f" target="_blank" rel="noopener" style="background:#38bdf8;color:#020617;padding:6px 14px;border-radius:6px;font-weight:800;text-decoration:none;font-size:12px;box-shadow:0 2px 8px rgba(56,189,248,0.3);">
+      Get Studio Lifetime Pass &bull; $30
+    </a>
+  </div>
+</div>
+<script>
+(function() {
+  const params = new URLSearchParams(window.location.search);
+  const isLifetime = params.get('lifetime') === 'unlocked' || localStorage.getItem('vance_lifetime_pass') === 'true';
+
+  if (isLifetime) {
+    localStorage.setItem('vance_lifetime_pass', 'true');
+    const lifetimeBtn = document.getElementById('vance-lifetime-btn');
+    const badge = document.getElementById('vance-supporter-badge');
+    const dlBtn = document.getElementById('vance-dl-btn');
+
+    if (lifetimeBtn) lifetimeBtn.style.display = 'none';
+    if (badge) badge.style.display = 'inline-block';
+    if (dlBtn) {
+      dlBtn.style.display = 'inline-block';
+      dlBtn.onclick = function() {
+        const blob = new Blob([document.documentElement.outerHTML], { type: 'text/html' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'news-n4-tokyo-marathon-return.offline.html';
+        a.click();
+      };
     }
-  })();
-  </script>
-  <!-- [VANCE-MERCHANT-HARNESS: END] -->
+  }
+})();
+</script>
+<!-- [VANCE-MERCHANT-HARNESS: END] -->
+
+
+  
 
   <!-- App Header -->
   <header>

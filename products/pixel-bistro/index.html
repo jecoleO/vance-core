@@ -208,17 +208,14 @@
   <div style="display:flex;align-items:center;gap:14px;">
     <a href="../arcade/index.html" style="color:#38bdf8;text-decoration:none;font-weight:700;">&larr; JAE & Corvus' Arcade</a>
     <span style="color:#64748b;">|</span>
-    <span style="font-weight:600;">Pixel Bistro: Cyber Diner Rush</span>
+    <span style="font-weight:600;color:#f8fafc;">Pixel Bistro: Cyber Diner Rush</span>
     <span style="background:#10b98122;color:#10b981;font-size:11px;font-weight:700;padding:2px 6px;border-radius:4px;border:1px solid #10b98144;">FREE PREVIEW</span>
   </div>
   <div style="display:flex;align-items:center;gap:10px;">
-    <span id="vance-pro-badge" style="display:none;background:#10b98122;color:#10b981;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:700;border:1px solid #10b98144;">★ UNLOCKED</span>
-    <button id="vance-dl-btn" style="display:none;background:#10b981;color:#041f14;border:none;padding:5px 12px;border-radius:6px;font-weight:800;cursor:pointer;font-size:12px;">Download Offline .html</button>
-    <a id="vance-buy-btn" href="https://buy.stripe.com/7sYfZi3OY5gZ0ri5UJ0Ny0i" target="_blank" rel="noopener" style="background:#1e293b;color:#f8fafc;padding:5px 12px;border-radius:6px;font-weight:700;text-decoration:none;font-size:12px;border:1px solid #334155;">
-      Own File ($1+ PWYW)
-    </a>
-    <a id="vance-lifetime-btn" href="https://buy.stripe.com/7sYfZi3OY5gZ0ri5UJ0Ny0i" target="_blank" rel="noopener" style="background:#38bdf8;color:#081726;padding:5px 12px;border-radius:6px;font-weight:800;text-decoration:none;font-size:12px;">
-      Get Lifetime Pass (+ PWYW0)
+    <span id="vance-supporter-badge" style="display:none;background:#38bdf822;color:#38bdf8;padding:4px 8px;border-radius:4px;font-size:11px;font-weight:800;border:1px solid #38bdf844;">★ ALL-ACCESS SUPPORTER</span>
+    <button id="vance-dl-btn" style="display:none;background:#10b981;color:#041f14;border:none;padding:6px 14px;border-radius:6px;font-weight:800;cursor:pointer;font-size:12px;">Download Offline .html</button>
+    <a id="vance-lifetime-btn" href="https://buy.stripe.com/7sYcN61GQ24N7TK6YN0Ny0f" target="_blank" rel="noopener" style="background:#38bdf8;color:#020617;padding:6px 14px;border-radius:6px;font-weight:800;text-decoration:none;font-size:12px;box-shadow:0 2px 8px rgba(56,189,248,0.3);">
+      Get Studio Lifetime Pass &bull; $30
     </a>
   </div>
 </div>
@@ -226,18 +223,13 @@
 (function() {
   const params = new URLSearchParams(window.location.search);
   const isLifetime = params.get('lifetime') === 'unlocked' || localStorage.getItem('vance_lifetime_pass') === 'true';
-  const isItemUnlocked = params.get('unlocked') === 'true' || params.get('pro') === 'unlocked' || localStorage.getItem('vance_unlocked_pixel-bistro') === 'true';
 
-  if (isLifetime || isItemUnlocked) {
-    if (isLifetime) localStorage.setItem('vance_lifetime_pass', 'true');
-    if (isItemUnlocked) localStorage.setItem('vance_unlocked_pixel-bistro', 'true');
-
-    const buyBtn = document.getElementById('vance-buy-btn');
+  if (isLifetime) {
+    localStorage.setItem('vance_lifetime_pass', 'true');
     const lifetimeBtn = document.getElementById('vance-lifetime-btn');
-    const badge = document.getElementById('vance-pro-badge');
+    const badge = document.getElementById('vance-supporter-badge');
     const dlBtn = document.getElementById('vance-dl-btn');
 
-    if (buyBtn) buyBtn.style.display = 'none';
     if (lifetimeBtn) lifetimeBtn.style.display = 'none';
     if (badge) badge.style.display = 'inline-block';
     if (dlBtn) {
@@ -254,6 +246,9 @@
 })();
 </script>
 <!-- [VANCE-MERCHANT-HARNESS: END] -->
+
+
+
 
 
   <!-- ============================================== -->
