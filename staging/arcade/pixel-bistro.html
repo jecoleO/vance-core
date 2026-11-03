@@ -1,0 +1,3257 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Pixel Bistro: Monster Critic</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com/3.4.17"></script>
+  <style>
+    :root {
+      --color-wood: #8b5a2b;
+      --color-wood-dark: #5c3a1e;
+      --color-cream: #fbf5e6;
+      --color-border: #222034;
+      --color-gold: #f4b41b;
+      --color-red: #d95763;
+      --color-green: #63c74d;
+      --color-blue: #0099db;
+    }
+
+    body {
+      font-family: 'Press Start 2P', monospace;
+      background-color: #140e1d;
+      color: #3f271e;
+      image-rendering: pixelated;
+      image-rendering: crisp-edges;
+      user-select: none;
+      -webkit-user-select: none;
+      overflow-x: hidden;
+    }
+
+    .pixel-box {
+      background: #fbf5e6;
+      border: 4px solid var(--color-border);
+      box-shadow: 
+        inset -4px -4px 0px 0px #d4c8af,
+        inset 4px 4px 0px 0px #ffffff,
+        4px 4px 0px 0px rgba(0,0,0,0.5);
+    }
+
+    .pixel-box-dark {
+      background: #2b1f38;
+      border: 4px solid #140e1d;
+      color: #fbf5e6;
+      box-shadow: 
+        inset -4px -4px 0px 0px #1a1224,
+        inset 4px 4px 0px 0px #423055,
+        4px 4px 0px 0px rgba(0,0,0,0.5);
+    }
+
+    .pixel-btn {
+      position: relative;
+      background: #e8c170;
+      color: #3f271e;
+      border: 3px solid var(--color-border);
+      box-shadow: inset -3px -3px 0px 0px #b89146, inset 3px 3px 0px 0px #fce3a2, 2px 2px 0px 0px rgba(0,0,0,0.3);
+      transition: all 0.05s ease;
+      cursor: pointer;
+    }
+
+    .pixel-btn:hover:not(:disabled) {
+      background: #f4d084;
+    }
+
+    .pixel-btn:active:not(:disabled) {
+      transform: translate(2px, 2px);
+      box-shadow: inset -1px -1px 0px 0px #b89146, inset 1px 1px 0px 0px #fce3a2, 0px 0px 0px 0px rgba(0,0,0,0.3);
+    }
+
+    .pixel-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+      filter: grayscale(60%);
+    }
+
+    .pixel-btn-primary {
+      background: #63c74d;
+      color: #113608;
+      box-shadow: inset -3px -3px 0px 0px #3e8927, inset 3px 3px 0px 0px #9ee789, 2px 2px 0px 0px rgba(0,0,0,0.3);
+    }
+    .pixel-btn-primary:hover:not(:disabled) {
+      background: #7ae363;
+    }
+
+    .pixel-btn-danger {
+      background: #d95763;
+      color: #44090e;
+      box-shadow: inset -3px -3px 0px 0px #9e2835, inset 3px 3px 0px 0px #f78993, 2px 2px 0px 0px rgba(0,0,0,0.3);
+    }
+    .pixel-btn-danger:hover:not(:disabled) {
+      background: #e86d79;
+    }
+
+    .pixel-btn-blue {
+      background: #2ce8f5;
+      color: #064045;
+      box-shadow: inset -3px -3px 0px 0px #12a1ab, inset 3px 3px 0px 0px #8df4fc, 2px 2px 0px 0px rgba(0,0,0,0.3);
+    }
+
+    .pixel-btn-amber {
+      background: #f4b41b;
+      color: #3f271e;
+      box-shadow: inset -3px -3px 0px 0px #b87c42, inset 3px 3px 0px 0px #fce3a2, 2px 2px 0px 0px rgba(0,0,0,0.3);
+    }
+
+    .pixel-btn-monster {
+      background: linear-gradient(135deg, #a855f7 0%, #ec4899 50%, #f43f5e 100%);
+      color: #ffffff;
+      border: 3px solid #fef08a;
+      box-shadow: 0 0 12px rgba(236, 72, 153, 0.7), inset 2px 2px 0px #fbcfe8;
+      animation: monsterPulse 1.2s infinite alternate ease-in-out;
+    }
+
+    @keyframes monsterPulse {
+      0% { box-shadow: 0 0 8px rgba(168, 85, 247, 0.7); transform: scale(1); }
+      100% { box-shadow: 0 0 20px rgba(244, 63, 94, 0.9); transform: scale(1.02); }
+    }
+
+    .pixel-btn-boss {
+      background: linear-gradient(135deg, #f4b41b 0%, #d95763 50%, #9e2835 100%);
+      color: #ffffff;
+      border: 3px solid #ffd700;
+      box-shadow: 0 0 14px rgba(244, 180, 27, 0.8), inset 2px 2px 0px #ffe57f;
+      animation: bossPulse 1.2s infinite alternate ease-in-out;
+    }
+
+    @keyframes bossPulse {
+      0% { box-shadow: 0 0 8px #f4b41b, inset 2px 2px 0px #ffe57f; transform: scale(1); }
+      100% { box-shadow: 0 0 20px #ff3344, inset 2px 2px 0px #ffffff; transform: scale(1.02); }
+    }
+
+    @keyframes pulseGlow {
+      0%, 100% {
+        box-shadow: inset -4px -4px 0px 0px #3e8927, inset 4px 4px 0px 0px #9ee789, 0 0 16px rgba(99, 199, 77, 0.7);
+        transform: scale(1);
+      }
+      50% {
+        box-shadow: inset -4px -4px 0px 0px #3e8927, inset 4px 4px 0px 0px #9ee789, 0 0 24px rgba(99, 199, 77, 1);
+        transform: scale(1.02);
+      }
+    }
+    .pulse-start-btn {
+      animation: pulseGlow 1.4s infinite ease-in-out;
+    }
+
+    .order-ticket {
+      background: #fffdf5;
+      border: 3px solid #222034;
+      box-shadow: 2px 2px 0px 0px rgba(0,0,0,0.35);
+      position: relative;
+    }
+    .order-ticket::after {
+      content: '';
+      position: absolute;
+      bottom: -6px;
+      left: 0;
+      right: 0;
+      height: 6px;
+      background: radial-gradient(circle, transparent, transparent 50%, #222034 50%, #222034 100%);
+      background-size: 8px 6px;
+    }
+
+    @keyframes pulseScore {
+      0% { transform: scale(1); }
+      50% { transform: scale(1.15); }
+      100% { transform: scale(1); }
+    }
+    .score-pop {
+      animation: pulseScore 0.25s ease-out;
+    }
+
+    @keyframes warningFlash {
+      0%, 100% { background-color: #ff3344; color: white !important; }
+      50% { background-color: #990011; color: white !important; }
+    }
+    .ticket-urgent {
+      animation: warningFlash 0.6s infinite;
+    }
+
+    @keyframes cheerDance {
+      0%, 100% { transform: translateY(0) rotate(0deg); }
+      25% { transform: translateY(-8px) rotate(-6deg); }
+      75% { transform: translateY(-8px) rotate(6deg); }
+    }
+    .cheer-animation {
+      animation: cheerDance 0.8s infinite ease-in-out;
+    }
+
+    ::-webkit-scrollbar {
+      width: 6px;
+      height: 6px;
+    }
+    ::-webkit-scrollbar-track {
+      background: #2b1f38;
+    }
+    ::-webkit-scrollbar-thumb {
+      background: #f4b41b;
+      border-radius: 2px;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex flex-col items-center justify-start p-2 sm:p-3 text-xs relative">
+
+  <!-- ============================================== -->
+  <!-- TITLE SCREEN WITH MICHELIN & BOSS RESTAURANT   -->
+  <!-- ============================================== -->
+  <div id="title-screen" class="fixed inset-0 bg-[#140e1d]/95 z-50 flex items-center justify-center p-3 sm:p-4 overflow-y-auto">
+    <div class="pixel-box max-w-lg w-full p-4 sm:p-6 flex flex-col items-center gap-3 bg-[#fff9ed] text-center shadow-2xl relative my-auto">
+      
+      <!-- Clean Title Header -->
+      <div class="flex flex-col items-center gap-1 mt-1">
+        <div class="flex items-center gap-2 text-2xl sm:text-3xl animate-bounce">
+          <span id="title-icons">🎀 🍳 🍣 🍔 👑</span>
+        </div>
+        <h1 class="text-xl sm:text-2xl md:text-3xl font-extrabold text-[#d95763] tracking-wide leading-tight drop-shadow-md">
+          PIXEL BISTRO
+        </h1>
+        <span class="text-[8px] sm:text-[9px] text-stone-600 font-bold uppercase tracking-widest flex items-center gap-1">
+          <span>💖</span> FEED THE MONSTER FOOD CRITICS <span>💖</span>
+        </span>
+      </div>
+
+      <!-- Restaurant Selector Grid -->
+      <div class="w-full max-w-md flex flex-col gap-1.5 text-left">
+        <div class="flex items-center justify-between">
+          <span class="text-[9px] font-bold text-stone-700 tracking-wider">SELECT VENUE:</span>
+          <button id="btn-dev-unlock" class="text-[7px] text-stone-400 hover:text-amber-600 underline font-sans" title="Developer shortcut to instantly unlock both Michelin stars">
+            [Dev: Unlock Boss Level]
+          </button>
+        </div>
+
+        <div id="restaurant-selector-container" class="grid grid-cols-2 gap-2">
+          <button id="btn-select-bistro" class="pixel-btn p-2 sm:p-2.5 rounded flex flex-col items-center gap-1 border-2 border-amber-600 ring-2 ring-amber-500 bg-[#ffea9f]">
+            <span class="text-xl sm:text-2xl">🍳 🎀</span>
+            <span class="text-[9px] sm:text-[10px] font-bold text-amber-950">PIXEL BISTRO</span>
+            <span class="text-[7px] sm:text-[8px] text-stone-600">Critic: Baby Bistrotte</span>
+          </button>
+          <button id="btn-select-sushi" class="pixel-btn p-2 sm:p-2.5 rounded flex flex-col items-center gap-1 border-2 border-stone-400 opacity-75 hover:opacity-100 bg-[#e8e4db]">
+            <span class="text-xl sm:text-2xl">🍣 🫧</span>
+            <span class="text-[9px] sm:text-[10px] font-bold text-teal-950">TOKYO SUSHI BAR</span>
+            <span class="text-[7px] sm:text-[8px] text-stone-600">Critic: Baby Mochikichi</span>
+          </button>
+        </div>
+
+        <!-- Boss Level Selector Slot -->
+        <div id="boss-level-slot" class="hidden w-full mt-1">
+          <button id="btn-select-boss" class="pixel-btn pixel-btn-boss w-full p-2.5 rounded flex items-center justify-between gap-2 shadow-lg">
+            <div class="flex items-center gap-2">
+              <span class="text-2xl sm:text-3xl animate-spin" style="animation-duration: 4s;">👑</span>
+              <div class="flex flex-col text-left">
+                <span class="text-[10px] sm:text-[11px] font-extrabold text-amber-200 tracking-wider">BOSS LEVEL: GRAND MASTER DUEL</span>
+                <span class="text-[7px] sm:text-[8px] text-amber-100">Critic: Glouton Prime • 20 Streak • 1 Error = Game Over!</span>
+              </div>
+            </div>
+            <span class="text-xs bg-red-800/80 px-2 py-1 rounded border border-amber-300 font-bold text-amber-200 uppercase tracking-widest shrink-0">
+              ULTIMATE
+            </span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Michelin Review Card -->
+      <div id="michelin-status-card" class="w-full max-w-md bg-[#fff4dc] border-2 border-dashed border-[#bfa67a] rounded-lg p-2.5 flex items-center justify-between gap-3 shadow-inner transition-all">
+        <div class="flex items-center gap-2.5 text-left">
+          <div id="michelin-badge-icon" class="w-11 h-11 rounded-full bg-stone-200 border-2 border-stone-400 flex items-center justify-center text-xl shrink-0">
+            ⏳
+          </div>
+          <div class="flex flex-col">
+            <span id="michelin-badge-title" class="text-[9px] sm:text-[10px] font-extrabold text-stone-800 tracking-wide">
+              MICHELIN INSPECTION: REVIEW PENDING
+            </span>
+            <span id="michelin-badge-desc" class="text-[7px] sm:text-[8px] text-stone-600 leading-tight mt-0.5">
+              Completed: 0/3 Levels • Satisfy the baby critic across all shifts!
+            </span>
+          </div>
+        </div>
+        <div id="michelin-stamp-slot" class="shrink-0 flex items-center justify-center">
+          <span class="text-[8px] font-bold text-stone-400 uppercase border border-dashed border-stone-300 px-1.5 py-1 rounded bg-stone-100">
+            TIER 1
+          </span>
+        </div>
+      </div>
+
+      <!-- Chef Avatar & Briefing Dialogue -->
+      <div class="flex items-center gap-3 bg-[#f6ecd2] p-2.5 rounded-lg border-2 border-[#d4c19c] w-full max-w-md text-left">
+        <div class="w-14 h-14 sm:w-16 sm:h-16 bg-[#fff5de] border-2 border-stone-800 rounded relative overflow-hidden shrink-0 shadow-inner flex items-center justify-center">
+          <canvas id="title-chef-canvas" width="64" height="64" class="w-14 h-14 sm:w-16 sm:h-16"></canvas>
+        </div>
+        <div class="flex flex-col gap-0.5 text-[8px] sm:text-[9px] text-stone-800 leading-relaxed">
+          <span id="title-chef-name" class="font-bold text-red-800">CHEF PIERRE SAYS:</span>
+          <p id="title-chef-quote" class="italic">"Bienvenue! The adorable baby monster food critic 'Bistrotte' has taken a seat at our counter! Feed her sweet cravings before she gets grumpy!"</p>
+        </div>
+      </div>
+
+      <!-- Start Cooking Button -->
+      <div class="flex flex-col items-center gap-2 mt-0.5 w-full max-w-xs">
+        <button id="btn-start-cooking" class="pixel-btn pixel-btn-primary pulse-start-btn w-full py-3 text-xs sm:text-sm font-bold tracking-wider flex items-center justify-center gap-2">
+          <span>🔥</span> START COOKING! <span>🔥</span>
+        </button>
+        <button id="btn-title-help" class="pixel-btn pixel-btn-blue w-full py-1.5 text-[8px] sm:text-[9px] font-bold">
+          📖 CHEF'S SURVIVAL GUIDE
+        </button>
+      </div>
+
+      <div class="text-[7px] sm:text-[8px] text-stone-500">
+        Satisfy baby critics in Bistro & Sushi to face Glouton Prime in the Boss Duel!
+      </div>
+    </div>
+  </div>
+
+  <!-- ============================================== -->
+  <!-- MAIN GAME VIEW                                 -->
+  <!-- ============================================== -->
+  <div class="w-full max-w-5xl flex flex-col gap-2">
+
+    <!-- Top Status Header -->
+    <header class="pixel-box-dark p-2 sm:p-3 flex flex-wrap items-center justify-between gap-2">
+      <div class="flex items-center gap-2">
+        <span id="header-restaurant-title" class="text-amber-400 text-xs sm:text-sm">🍳 PIXEL BISTRO • LEVEL 1</span>
+      </div>
+
+      <div class="flex flex-wrap items-center gap-2">
+        <!-- Boss Gauntlet Streak Counter -->
+        <div id="boss-streak-display-wrap" class="hidden bg-[#351020] px-2.5 py-1 rounded border-2 border-amber-400 flex items-center gap-1.5 animate-pulse">
+          <span class="text-amber-300">👑 STREAK:</span>
+          <span id="boss-streak-count" class="font-black text-amber-300 text-xs">0 / 20</span>
+        </div>
+
+        <div id="standard-timer-wrap" class="bg-[#1c1424] px-2.5 py-1 rounded border border-[#423055] flex items-center gap-1.5">
+          <span class="text-red-400">⏱️</span>
+          <span id="shift-timer-display" class="font-bold text-amber-300">02:00</span>
+        </div>
+        <div class="bg-[#1c1424] px-2.5 py-1 rounded border border-[#423055] flex items-center gap-1.5">
+          <span class="text-yellow-400">🪙 SCORE</span>
+          <span id="score-display" class="font-bold text-white">0</span>
+        </div>
+        <div class="bg-[#1c1424] px-2.5 py-1 rounded border border-[#423055] flex items-center gap-1.5">
+          <span class="text-emerald-400">🔥 COMBO</span>
+          <span id="combo-display" class="font-bold text-emerald-300">x1</span>
+        </div>
+        <button id="btn-start-pause" class="pixel-btn pixel-btn-primary px-2.5 py-1 text-[9px] font-bold">⏸️ PAUSE</button>
+        <button id="btn-restart-header" class="pixel-btn pixel-btn-amber px-2 py-1 text-[9px] font-bold">🔄 RESTART</button>
+        <button id="btn-title-return" class="pixel-btn pixel-btn-blue px-2 py-1 text-[9px] font-bold">🏠 TITLE</button>
+        <button id="btn-toggle-sfx" class="pixel-btn px-2 py-1 text-[9px]">🔊 SFX</button>
+        <button id="btn-toggle-bgm" class="pixel-btn px-2 py-1 text-[9px]">🎵 BGM</button>
+        <button id="btn-help" class="pixel-btn pixel-btn-blue px-2 py-1 text-[9px]">❓ HELP</button>
+      </div>
+    </header>
+
+    <!-- Chef Portrait & Big High-Contrast Active Orders Ticket Rail -->
+    <section class="pixel-box p-3 bg-[#fbf5e6] flex flex-col md:flex-row items-center gap-3 relative shadow-md">
+      <div class="flex items-center gap-2.5 shrink-0">
+        <div class="w-16 h-16 bg-[#f4e2bb] border-2 border-stone-800 rounded relative overflow-hidden shadow-inner flex items-center justify-center">
+          <canvas id="chef-canvas" width="64" height="64" class="w-16 h-16"></canvas>
+        </div>
+        <div class="flex flex-col">
+          <span id="chef-title-sublabel" class="text-[9px] font-bold text-amber-950">HEAD CHEF</span>
+          <span id="chef-name-label" class="text-[11px] font-bold text-red-700">PIERRE</span>
+          <span id="orders-served-count" class="text-[8px] text-stone-600 mt-1">Fed Critic: 0</span>
+        </div>
+      </div>
+
+      <!-- Ticket Orders Rail -->
+      <div class="flex-1 w-full overflow-hidden flex flex-col gap-1.5">
+        <div class="flex items-center justify-between">
+          <span id="ticket-rail-title" class="text-[10px] sm:text-xs font-black text-amber-950 tracking-wide">🛎️ CRITIC'S ACTIVE ORDERS:</span>
+          <span id="chef-shout-banner" class="text-[9px] sm:text-[10px] text-red-700 font-bold animate-pulse">"FEED THE BABY CRITIC! DON'T KEEP HER WAITING!"</span>
+        </div>
+        <div id="tickets-container" class="flex items-stretch gap-2.5 overflow-x-auto py-1 min-h-[96px]">
+          <!-- High-visibility tickets injected dynamically -->
+        </div>
+      </div>
+    </section>
+
+    <!-- Main Kitchen Canvas & Quick Controls -->
+    <div class="pixel-box p-2 bg-[#d7c6b0] flex flex-col gap-2 relative">
+      <div class="relative w-full flex flex-col items-center">
+        <!-- Boss Level Ingredient Page Navigation Switch -->
+        <div id="boss-pantry-switcher" class="hidden w-full flex items-center justify-between bg-[#2d1b3e] text-amber-300 px-3 py-1.5 rounded-t border-t-2 border-x-2 border-amber-400 text-[8px] sm:text-[9px] font-bold">
+          <div class="flex items-center gap-2">
+            <span>📦 PANTRY CRATES:</span>
+            <span id="boss-pantry-page-label" class="text-white bg-amber-700 px-2 py-0.5 rounded">PAGE 1: BISTRO PANTRY</span>
+          </div>
+          <button id="btn-toggle-boss-pantry" class="pixel-btn pixel-btn-amber px-2.5 py-1 text-[8px] font-bold flex items-center gap-1">
+            🔄 SWITCH INGREDIENTS [TAB / Q]
+          </button>
+        </div>
+
+        <!-- Dynamic Kitchen Canvas -->
+        <canvas id="kitchen-canvas" width="940" height="590" class="w-full h-auto bg-[#3a284c] rounded border-4 border-[#1f142b] cursor-pointer shadow-xl"></canvas>
+
+        <!-- Tool Belt for Mobile & Mouse -->
+        <div class="w-full mt-2 grid grid-cols-2 sm:grid-cols-6 gap-2">
+          <button id="btn-quick-chop" class="pixel-btn pixel-btn-danger py-2.5 text-[9px] sm:text-[10px] font-bold flex items-center justify-center gap-1">
+            🔪 CHOP [C]
+          </button>
+          <button id="btn-quick-cook" class="pixel-btn pixel-btn-amber py-2.5 text-[9px] sm:text-[10px] font-bold flex items-center justify-center gap-1">
+            🍳 COOK [V]
+          </button>
+          <button id="btn-quick-plate" class="pixel-btn pixel-btn-primary py-2.5 text-[9px] sm:text-[10px] font-bold flex items-center justify-center gap-1">
+            🍽️ PLATE [B]
+          </button>
+          <button id="btn-quick-serve" class="pixel-btn pixel-btn-monster py-2.5 text-[9px] sm:text-[10px] font-bold flex items-center justify-center gap-1">
+            <span id="btn-serve-label">💖 FEED BABY CRITIC [SPACE]</span>
+          </button>
+          <button id="btn-quick-drop" class="pixel-btn pixel-btn-danger py-2.5 text-[9px] sm:text-[10px] font-bold flex items-center justify-center gap-1">
+            🫳 DROP HAND [X]
+          </button>
+          <button id="btn-quick-clear-plate" class="pixel-btn pixel-btn-amber py-2.5 text-[9px] sm:text-[10px] font-bold flex items-center justify-center gap-1">
+            🗑️ DUMP PLATE [Z]
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Kitchen Counter Footer Advice -->
+    <footer class="pixel-box-dark p-2 flex flex-wrap items-center justify-between text-[8px] sm:text-[9px] text-amber-200 gap-1">
+      <div>💡 <strong>How to Play:</strong> Prep on Board/Stove ➔ Stack onto Plate ➔ Feed the Monster Critic [Space]!</div>
+      <div id="keyboard-legend-text" class="text-stone-400">Keys: [1-7] Crates | [Tab/Q] Pantry | [C] Chop | [V] Cook | [B] Plate | [X] Drop | [Z] Dump | [Space] Feed Critic</div>
+    </footer>
+  </div>
+
+  <!-- ============================================== -->
+  <!-- MODAL: BOSS SUDDEN DEATH GAME OVER             -->
+  <!-- ============================================== -->
+  <div id="modal-boss-gameover" class="hidden fixed inset-0 bg-red-950/90 z-50 flex items-center justify-center p-3">
+    <div class="pixel-box max-w-md w-full p-5 flex flex-col items-center gap-3 bg-[#240a14] border-4 border-red-600 text-center text-white shadow-2xl">
+      <div class="text-4xl animate-bounce">💢 👑 💥</div>
+      <h2 class="text-lg sm:text-xl font-black text-red-500 tracking-wider">
+        GLOUTON PRIME RAMPAGE!
+      </h2>
+      <div class="text-[9px] sm:text-[10px] text-red-200 bg-red-900/60 p-2.5 rounded border border-red-500 leading-relaxed">
+        <p id="boss-fail-reason" class="font-bold">You made a mistake! In the Grand Master Duel, 1 mistake = INSTANT GAME OVER!</p>
+        <p class="mt-1 text-[8px] text-amber-200 italic">"Critique Glouton Prime destroyed the grand kitchen in titan fury!"</p>
+      </div>
+
+      <div class="grid grid-cols-2 gap-2 w-full bg-[#18050e] p-2.5 rounded border border-red-800 text-[9px]">
+        <div>
+          <span class="text-stone-400">FINAL STREAK:</span>
+          <div id="boss-fail-streak" class="text-amber-400 text-sm font-black">0 / 20</div>
+        </div>
+        <div>
+          <span class="text-stone-400">SCORE:</span>
+          <div id="boss-fail-score" class="text-white text-sm font-black">0</div>
+        </div>
+      </div>
+
+      <button id="btn-boss-return-title" class="pixel-btn pixel-btn-danger w-full py-2.5 text-xs font-bold tracking-wider mt-1">
+        🏠 RETURN TO TITLE SCREEN
+      </button>
+    </div>
+  </div>
+
+  <!-- ============================================== -->
+  <!-- MODAL: LEVEL CELEBRATION / VICTORY SCREEN      -->
+  <!-- ============================================== -->
+  <div id="modal-celebration" class="hidden fixed inset-0 bg-black/90 z-50 flex items-center justify-center p-3 overflow-hidden">
+    <canvas id="celebration-confetti-canvas" class="absolute inset-0 pointer-events-none w-full h-full"></canvas>
+    <div class="pixel-box max-w-lg w-full p-5 flex flex-col gap-3.5 bg-[#fffdf5] text-center relative z-10 border-4 border-amber-500 shadow-2xl">
+      
+      <!-- Big Animated Celebration Header -->
+      <div class="flex flex-col items-center gap-1 cheer-animation">
+        <span id="celebration-trophy-icons" class="text-3xl sm:text-4xl">🎉 🏆 ✨</span>
+        <h2 id="celebration-headline" class="text-base sm:text-xl font-extrabold text-[#d95763] tracking-wide drop-shadow-md">
+          LEVEL COMPLETE!
+        </h2>
+        <span id="celebration-subtitle" class="text-[10px] text-amber-800 font-bold bg-amber-100 px-3 py-1 rounded border border-amber-300">
+          THE MONSTER CRITIC IS DELIGHTED!
+        </span>
+      </div>
+
+      <!-- Star Graphic Reveal -->
+      <div class="flex items-center justify-center gap-2 text-3xl sm:text-4xl my-1" id="celebration-stars-row">
+        <span>⭐</span><span>⭐</span><span>⭐</span>
+      </div>
+
+      <!-- Chef Quote -->
+      <div id="celebration-chef-quote" class="bg-[#fff4d1] p-3 rounded-lg border-2 border-amber-300 text-[9px] sm:text-[10px] text-stone-800 italic leading-relaxed text-left flex items-center gap-2.5">
+        <span id="celebration-chef-avatar-emoji" class="text-2xl shrink-0">👨‍🍳</span>
+        <span id="celebration-quote-text">"C’est extraordinaire! Our critic is purring with joy! Next level unlocked!"</span>
+      </div>
+
+      <!-- Performance Stats -->
+      <div class="grid grid-cols-2 sm:grid-cols-4 gap-2 bg-[#ecdcc5] p-2.5 rounded border border-stone-400 text-[8px] sm:text-[9px] font-bold">
+        <div class="bg-white p-2 rounded border border-stone-300">
+          <div class="text-stone-500">FINAL SCORE</div>
+          <div id="celebration-score" class="text-amber-800 text-xs sm:text-sm mt-0.5">1450</div>
+        </div>
+        <div class="bg-white p-2 rounded border border-stone-300">
+          <div class="text-stone-500">DISHES FED</div>
+          <div id="celebration-served" class="text-emerald-800 text-xs sm:text-sm mt-0.5">8</div>
+        </div>
+        <div class="bg-white p-2 rounded border border-stone-300">
+          <div class="text-stone-500">MAX COMBO</div>
+          <div id="celebration-combo" class="text-blue-800 text-xs sm:text-sm mt-0.5">x5</div>
+        </div>
+        <div class="bg-white p-2 rounded border border-stone-300">
+          <div class="text-stone-500">EXPIRED</div>
+          <div id="celebration-failed" class="text-red-700 text-xs sm:text-sm mt-0.5">0</div>
+        </div>
+      </div>
+
+      <!-- Progression Buttons -->
+      <div class="flex flex-wrap items-center justify-center gap-2 mt-1">
+        <button id="btn-celebration-next" class="pixel-btn pixel-btn-primary px-4 py-2.5 text-[10px] font-bold flex items-center gap-1.5">
+          <span>🚀</span> ADVANCE TO NEXT LEVEL
+        </button>
+        <button id="btn-celebration-replay" class="pixel-btn pixel-btn-amber px-3 py-2 text-[9px] font-bold">
+          🔄 REPLAY LEVEL
+        </button>
+        <button id="btn-celebration-title" class="pixel-btn pixel-btn-blue px-3 py-2 text-[9px] font-bold">
+          🏠 RESTAURANT MENU
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- MODAL: HELP -->
+  <div id="modal-help" class="hidden fixed inset-0 bg-black/80 z-50 flex items-center justify-center p-3">
+    <div class="pixel-box max-w-md w-full p-4 flex flex-col gap-3 bg-[#fff9ed]">
+      <div class="flex items-center justify-between border-b-2 border-amber-300 pb-1">
+        <h3 class="text-xs sm:text-sm font-bold text-amber-950">📋 CHEF'S SURVIVAL GUIDE</h3>
+        <button id="btn-close-help" class="pixel-btn px-2 py-0.5 text-[9px]">✕</button>
+      </div>
+      <div class="text-[9px] text-stone-700 flex flex-col gap-2 leading-relaxed">
+        <p><strong class="text-pink-600">1. Baby Monster Critics:</strong> In Pixel Bistro, meet <strong>Bistrotte</strong>! In Tokyo Sushi Bar, meet <strong>Mochikichi</strong>! Satisfy their cravings before tickets expire.</p>
+        <p><strong class="text-amber-900">2. Stomp Tantrums:</strong> In Levels 2, 3, and Boss, the critics will periodically <strong>stomp and scramble</strong> all pantry crate positions!</p>
+        <p><strong class="text-amber-900">3. Michelin Campaign:</strong> Beat all 3 levels of Pixel Bistro and Tokyo Sushi Bar to earn both Michelin Stars.</p>
+        <p><strong class="text-red-700">4. Grand Master Boss Duel:</strong> Face titan <strong>Glouton Prime</strong>: <strong>Feed him 20 consecutive orders with ZERO mistakes!</strong> 1 wrong plate or 1 expired ticket causes an instant Game Over!</p>
+        <p><strong class="text-amber-900">5. Room Layout:</strong>
+          <br>• <strong>Top-Left:</strong> Cutting Board [C]
+          <br>• <strong>Top-Right:</strong> Stove & Cooker [V]
+          <br>• <strong>Center Island:</strong> Plating Assembly [B]
+          <br>• <strong>Bottom Booth:</strong> Feed Monster Critic [Space]
+        </p>
+      </div>
+      <div class="flex justify-end">
+        <button id="btn-ok-help" class="pixel-btn pixel-btn-primary px-3 py-1.5 text-[9px]">Understood!</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    /* =====================================================================
+       RETRO AUDIO SYNTHESIZER (Web Audio API)
+       ===================================================================== */
+    class ArcadeSound {
+      constructor() {
+        this.ctx = null;
+        this.sfxEnabled = true;
+        this.bgmEnabled = false;
+        this.bgmTimer = null;
+      }
+
+      init() {
+        if (!this.ctx) {
+          const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+          if (AudioContextClass) this.ctx = new AudioContextClass();
+        }
+        if (this.ctx && this.ctx.state === 'suspended') {
+          this.ctx.resume();
+        }
+      }
+
+      playTone(freq, type = 'square', duration = 0.08, vol = 0.15) {
+        if (!this.sfxEnabled) return;
+        this.init();
+        if (!this.ctx) return;
+        try {
+          const now = this.ctx.currentTime;
+          const osc = this.ctx.createOscillator();
+          const gain = this.ctx.createGain();
+          osc.type = type;
+          osc.frequency.setValueAtTime(freq, now);
+          gain.gain.setValueAtTime(vol, now);
+          gain.gain.exponentialRampToValueAtTime(0.001, now + duration);
+          osc.connect(gain);
+          gain.connect(this.ctx.destination);
+          osc.start(now);
+          osc.stop(now + duration);
+        } catch (e) {}
+      }
+
+      playChop() {
+        if (!this.sfxEnabled) return;
+        this.init();
+        if (!this.ctx) return;
+        try {
+          const now = this.ctx.currentTime;
+          const bufferSize = Math.floor(this.ctx.sampleRate * 0.06);
+          const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+          const data = buffer.getChannelData(0);
+          for (let i = 0; i < bufferSize; i++) {
+            data[i] = (Math.random() * 2 - 1) * Math.exp(-i / (bufferSize * 0.3));
+          }
+          const whiteNoise = this.ctx.createBufferSource();
+          whiteNoise.buffer = buffer;
+          const filter = this.ctx.createBiquadFilter();
+          filter.type = 'lowpass';
+          filter.frequency.setValueAtTime(1200, now);
+          const gain = this.ctx.createGain();
+          gain.gain.setValueAtTime(0.35, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.06);
+          whiteNoise.connect(filter);
+          filter.connect(gain);
+          gain.connect(this.ctx.destination);
+          whiteNoise.start(now);
+        } catch (e) {}
+      }
+
+      playSizzle() {
+        if (!this.sfxEnabled) return;
+        this.init();
+        if (!this.ctx) return;
+        try {
+          const now = this.ctx.currentTime;
+          const bufferSize = Math.floor(this.ctx.sampleRate * 0.1);
+          const buffer = this.ctx.createBuffer(1, bufferSize, this.ctx.sampleRate);
+          const data = buffer.getChannelData(0);
+          for (let i = 0; i < bufferSize; i++) data[i] = (Math.random() * 2 - 1) * 0.2;
+          const src = this.ctx.createBufferSource();
+          src.buffer = buffer;
+          const filter = this.ctx.createBiquadFilter();
+          filter.type = 'bandpass';
+          filter.frequency.setValueAtTime(3200, now);
+          const gain = this.ctx.createGain();
+          gain.gain.setValueAtTime(0.12, now);
+          gain.gain.exponentialRampToValueAtTime(0.01, now + 0.1);
+          src.connect(filter);
+          filter.connect(gain);
+          gain.connect(this.ctx.destination);
+          src.start(now);
+        } catch (e) {}
+      }
+
+      playGrab() { this.playTone(680, 'sine', 0.05, 0.2); }
+      playPlace() { this.playTone(320, 'triangle', 0.08, 0.25); }
+      
+      playBabyMonsterChomp(type = 'bistro') {
+        if (!this.sfxEnabled) return;
+        this.init();
+        if (type === 'sushi') {
+          this.playTone(480, 'sine', 0.06, 0.25);
+          setTimeout(() => this.playTone(680, 'triangle', 0.08, 0.25), 60);
+          setTimeout(() => this.playTone(880, 'sine', 0.12, 0.2), 120);
+        } else {
+          this.playTone(440, 'triangle', 0.06, 0.25);
+          setTimeout(() => this.playTone(587, 'sine', 0.08, 0.25), 60);
+          setTimeout(() => this.playTone(880, 'sine', 0.12, 0.2), 120);
+        }
+      }
+
+      playGiantMonsterChomp() {
+        if (!this.sfxEnabled) return;
+        this.init();
+        this.playTone(240, 'triangle', 0.08, 0.3);
+        setTimeout(() => this.playTone(180, 'sawtooth', 0.12, 0.35), 70);
+        setTimeout(() => this.playTone(320, 'sine', 0.15, 0.25), 140);
+      }
+
+      playMonsterRoar(isBoss = false) {
+        if (!this.sfxEnabled) return;
+        this.init();
+        if (isBoss) {
+          [180, 150, 120, 90, 70].forEach((freq, idx) => {
+            setTimeout(() => this.playTone(freq, 'sawtooth', 0.22, 0.45), idx * 80);
+          });
+        } else {
+          [360, 310, 260, 220].forEach((freq, idx) => {
+            setTimeout(() => this.playTone(freq, 'sawtooth', 0.14, 0.28), idx * 70);
+          });
+        }
+      }
+
+      playSuccess() {
+        [523, 659, 783, 1046].forEach((f, idx) => {
+          setTimeout(() => this.playTone(f, 'triangle', 0.12, 0.25), idx * 70);
+        });
+      }
+
+      playVictoryFanfare() {
+        [440, 554, 659, 880, 880, 988, 1108, 1318].forEach((f, idx) => {
+          setTimeout(() => this.playTone(f, idx % 2 === 0 ? 'triangle' : 'sine', 0.18, 0.28), idx * 85);
+        });
+      }
+
+      playGrandMasterFanfare() {
+        [523, 659, 784, 1046, 1318, 1568, 2093].forEach((f, idx) => {
+          setTimeout(() => this.playTone(f, 'triangle', 0.25, 0.35), idx * 90);
+        });
+      }
+
+      playError() {
+        this.playTone(180, 'sawtooth', 0.18, 0.3);
+      }
+
+      playBell() {
+        [1567, 3135].forEach((f, i) => {
+          this.playTone(f, i === 0 ? 'sine' : 'triangle', 0.8, 0.2 / (i + 1));
+        });
+      }
+
+      startBGM() {
+        this.bgmEnabled = true;
+        this.init();
+        if (this.bgmTimer) clearTimeout(this.bgmTimer);
+        const tune = [
+          { f: 261, d: 200 }, { f: 329, d: 200 }, { f: 392, d: 200 }, { f: 523, d: 200 },
+          { f: 440, d: 200 }, { f: 392, d: 200 }, { f: 329, d: 200 }, { f: 293, d: 200 },
+          { f: 349, d: 200 }, { f: 440, d: 200 }, { f: 523, d: 300 }, { f: 392, d: 300 }
+        ];
+        let idx = 0;
+        const loop = () => {
+          if (!this.bgmEnabled) return;
+          const n = tune[idx];
+          idx = (idx + 1) % tune.length;
+          this.playTone(n.f, 'triangle', n.d / 1000 * 0.85, 0.035);
+          this.bgmTimer = setTimeout(loop, n.d);
+        };
+        loop();
+      }
+
+      stopBGM() {
+        this.bgmEnabled = false;
+        if (this.bgmTimer) {
+          clearTimeout(this.bgmTimer);
+          this.bgmTimer = null;
+        }
+      }
+    }
+    const sound = new ArcadeSound();
+
+    /* =====================================================================
+       RESTAURANT THEMES, MONSTER CRITICS & BOSS SYSTEM
+       ===================================================================== */
+    const THEMES = {
+      bistro: {
+        id: 'bistro',
+        name: 'Pixel Bistro',
+        criticName: 'Bistrotte (Baby Monster Critic)',
+        criticShort: 'Baby Bistrotte',
+        criticType: 'baby_bistro',
+        chefName: 'PIERRE',
+        chefTitle: 'HEAD CHEF',
+        backWallColor: '#1d1726',
+        floorTile1: '#322340',
+        floorTile2: '#2a1d36',
+        boardName: '🔪 CUTTING BOARD [C]',
+        stoveName: '🍳 STOVE & PAN [V]',
+        plateName: '🍽️ PLATING ISLAND [B]',
+        levels: {
+          1: {
+            title: 'Level 1: Diner Burger Joint',
+            desc: 'Diner Basics',
+            banner: '🍳 PIXEL BISTRO: LVL 1 DINER RUSH',
+            chefQuote: '"Bienvenue! Baby Bistrotte has taken a seat at our counter! Feed her sweet cravings with fresh burgers, tomatoes, and crisp greens!"',
+            rawItems: {
+              beef: { id: 'beef', name: 'Beef', icon: '🥩', color: '#962c2c', canChop: true, chopYield: 'ground_beef' },
+              bread: { id: 'bread', name: 'Bread', icon: '🍞', color: '#d9a066', canChop: false },
+              cheese: { id: 'cheese', name: 'Cheddar', icon: '🧀', color: '#f4b41b', canChop: false },
+              lettuce: { id: 'lettuce', name: 'Lettuce', icon: '🥬', color: '#5dbb43', canChop: true, chopYield: 'shredded_lettuce' },
+              tomato: { id: 'tomato', name: 'Tomato', icon: '🍅', color: '#e03b3b', canChop: true, chopYield: 'diced_tomato' },
+              onion: { id: 'onion', name: 'Onion', icon: '🧅', color: '#ba3c7a', canChop: true, chopYield: 'diced_onion' },
+              pickle: { id: 'pickle', name: 'Pickles', icon: '🥒', color: '#4d8a36', canChop: false }
+            },
+            processedItems: {
+              ground_beef: { id: 'ground_beef', name: 'Ground Beef', icon: '🥩', color: '#822525', canCook: true, cookYield: 'cooked_patty' },
+              cooked_patty: { id: 'cooked_patty', name: 'Cooked Patty', icon: '🍔', color: '#5c2211' },
+              shredded_lettuce: { id: 'shredded_lettuce', name: 'Shredded Greens', icon: '🥗', color: '#76db48' },
+              diced_tomato: { id: 'diced_tomato', name: 'Diced Tomato', icon: '🥣', color: '#ff5c5c' },
+              diced_onion: { id: 'diced_onion', name: 'Diced Onion', icon: '🧅', color: '#e07ba8' }
+            },
+            recipes: [
+              { id: 'classic_burger', name: 'Classic Burger', icon: '🍔', points: 120, timeLimit: 74, required: ['bread', 'cooked_patty', 'shredded_lettuce'] },
+              { id: 'deluxe_cheeseburger', name: 'Deluxe Cheeseburger', icon: '🍔', points: 160, timeLimit: 82, required: ['bread', 'cooked_patty', 'cheese', 'pickle'] },
+              { id: 'onion_burger', name: 'Caramelized Onion Burger', icon: '🍔', points: 150, timeLimit: 78, required: ['bread', 'cooked_patty', 'diced_onion', 'diced_tomato'] },
+              { id: 'garden_salad', name: 'Fresh Bistro Salad', icon: '🥗', points: 110, timeLimit: 62, required: ['shredded_lettuce', 'diced_tomato', 'cheese'] }
+            ]
+          },
+          2: {
+            title: 'Level 2: Italian Trattoria',
+            desc: 'Pasta & Skillets',
+            banner: '🍝 PIXEL BISTRO: LVL 2 PASTA TRATTORIA',
+            chefQuote: '"Trattoria time! Boil pasta al dente, simmer rich marinara sauce, and keep Baby Bistrotte clapping with joy!"',
+            rawItems: {
+              pasta: { id: 'pasta', name: 'Raw Pasta', icon: '🌾', color: '#f0e386', canCook: true, cookYield: 'al_dente_pasta' },
+              tomato: { id: 'tomato', name: 'Tomato', icon: '🍅', color: '#e03b3b', canChop: true, chopYield: 'marinara_base' },
+              beef: { id: 'beef', name: 'Meatball Beef', icon: '🥩', color: '#962c2c', canChop: true, chopYield: 'ground_beef' },
+              garlic: { id: 'garlic', name: 'Garlic', icon: '🧄', color: '#f7f4dc', canChop: true, chopYield: 'minced_garlic' },
+              cheese: { id: 'cheese', name: 'Parmesan', icon: '🧀', color: '#f4b41b', canChop: false },
+              basil: { id: 'basil', name: 'Fresh Basil', icon: '🌿', color: '#3fa32b', canChop: false },
+              bread: { id: 'bread', name: 'Garlic Loaf', icon: '🍞', color: '#d9a066', canChop: false }
+            },
+            processedItems: {
+              al_dente_pasta: { id: 'al_dente_pasta', name: 'Al Dente Pasta', icon: '🍝', color: '#ebd673' },
+              marinara_base: { id: 'marinara_base', name: 'Tomato Puree', icon: '🥫', color: '#c72c2c', canCook: true, cookYield: 'simmered_marinara' },
+              simmered_marinara: { id: 'simmered_marinara', name: 'Simmered Marinara', icon: '🥫', color: '#991b1b' },
+              ground_beef: { id: 'ground_beef', name: 'Spiced Meatballs', icon: '🧆', color: '#822525', canCook: true, cookYield: 'seared_meatballs' },
+              seared_meatballs: { id: 'seared_meatballs', name: 'Seared Meatballs', icon: '🧆', color: '#5c2211' },
+              minced_garlic: { id: 'minced_garlic', name: 'Minced Garlic', icon: '🧄', color: '#eae4c8' }
+            },
+            recipes: [
+              { id: 'spaghetti_pomodoro', name: 'Spaghetti Pomodoro', icon: '🍝', points: 150, timeLimit: 76, required: ['al_dente_pasta', 'simmered_marinara', 'basil'] },
+              { id: 'spaghetti_meatballs', name: 'Spaghetti & Meatballs', icon: '🍝', points: 190, timeLimit: 84, required: ['al_dente_pasta', 'simmered_marinara', 'seared_meatballs'] },
+              { id: 'garlic_parm_toast', name: 'Parmesan Bruschetta', icon: '🥖', points: 130, timeLimit: 68, required: ['bread', 'minced_garlic', 'cheese', 'basil'] },
+              { id: 'cheesy_pasta_bake', name: 'Four-Cheese Pasta', icon: '🧀', points: 160, timeLimit: 74, required: ['al_dente_pasta', 'cheese', 'minced_garlic'] }
+            ]
+          },
+          3: {
+            title: 'Level 3: Executive Grand Bistro',
+            desc: 'Gourmet Steak & Feast',
+            banner: '🥩 PIXEL BISTRO: LVL 3 GRAND FINALE',
+            chefQuote: '"Baby Bistrotte demands ribeye steaks and crispy frites! Earn our official Michelin Star!"',
+            rawItems: {
+              steak: { id: 'steak', name: 'Ribeye Steak', icon: '🥩', color: '#a83232', canChop: true, chopYield: 'tenderized_steak' },
+              potato: { id: 'potato', name: 'Russet Potato', icon: '🥔', color: '#c7945d', canChop: true, chopYield: 'raw_frites' },
+              mushroom: { id: 'mushroom', name: 'Truffle Mushroom', icon: '🍄', color: '#7a5a40', canChop: true, chopYield: 'sliced_mushroom' },
+              brioche: { id: 'brioche', name: 'Brioche Bun', icon: '🥯', color: '#e5a855', canChop: false },
+              cheese: { id: 'cheese', name: 'Gruyère Cheese', icon: '🧀', color: '#f4b41b', canChop: false },
+              butter: { id: 'butter', name: 'Herb Butter', icon: '🧈', color: '#fff399', canChop: false },
+              asparagus: { id: 'asparagus', name: 'Asparagus', icon: '🎋', color: '#559933', canCook: true, cookYield: 'grilled_asparagus' }
+            },
+            processedItems: {
+              tenderized_steak: { id: 'tenderized_steak', name: 'Tenderized Steak', icon: '🥩', color: '#942626', canCook: true, cookYield: 'seared_steak' },
+              seared_steak: { id: 'seared_steak', name: 'Seared Ribeye', icon: '🥩', color: '#4a1717' },
+              raw_frites: { id: 'raw_frites', name: 'Cut Frites', icon: '🍟', color: '#f5d576', canCook: true, cookYield: 'crispy_frites' },
+              crispy_frites: { id: 'crispy_frites', name: 'Crispy Frites', icon: '🍟', color: '#dba92e' },
+              sliced_mushroom: { id: 'sliced_mushroom', name: 'Sliced Truffles', icon: '🍄', color: '#5e432d', canCook: true, cookYield: 'sauteed_mushrooms' },
+              sauteed_mushrooms: { id: 'sauteed_mushrooms', name: 'Sauteed Truffles', icon: '🍄', color: '#3d2b1c' },
+              grilled_asparagus: { id: 'grilled_asparagus', name: 'Grilled Asparagus', icon: '🎋', color: '#3c751e' }
+            },
+            recipes: [
+              { id: 'steak_frites', name: 'Steak Frites Royale', icon: '🥩', points: 220, timeLimit: 86, required: ['seared_steak', 'crispy_frites', 'butter'] },
+              { id: 'truffle_burger', name: 'Truffle Gruyere Melt', icon: '🍔', points: 200, timeLimit: 82, required: ['brioche', 'seared_steak', 'sauteed_mushrooms', 'cheese'] },
+              { id: 'bistro_grand_feast', name: 'Grand Chef Platter', icon: '🍽️', points: 260, timeLimit: 92, required: ['seared_steak', 'crispy_frites', 'grilled_asparagus', 'butter'] },
+              { id: 'loaded_truffle_fries', name: 'Loaded Truffle Frites', icon: '🍟', points: 170, timeLimit: 72, required: ['crispy_frites', 'sauteed_mushrooms', 'cheese'] }
+            ]
+          }
+        }
+      },
+      sushi: {
+        id: 'sushi',
+        name: 'Tokyo Sushi Bar',
+        criticName: 'Mochikichi (Baby Sea Monster)',
+        criticShort: 'Baby Mochikichi',
+        criticType: 'baby_sushi',
+        chefName: 'KENJI',
+        chefTitle: 'SUSHI MASTER',
+        backWallColor: '#122329',
+        floorTile1: '#1b3238',
+        floorTile2: '#16282d',
+        boardName: '🔪 SASHIMI BOARD [C]',
+        stoveName: '🍚 RICE STEAMER [V]',
+        plateName: '🍱 ROLLING MAT [B]',
+        levels: {
+          1: {
+            title: 'Level 1: Nigiri Express',
+            desc: 'Nigiri Basics',
+            banner: '🍣 TOKYO SUSHI: LVL 1 NIGIRI EXPRESS',
+            chefQuote: '"Irasshaimase! Meet Mochikichi, our sweet sea-mochi baby monster critic! Prepare fresh salmon and bluefin tuna sashimi for her!"',
+            rawItems: {
+              salmon: { id: 'salmon', name: 'Fresh Salmon', icon: '🍣', color: '#ff7755', canChop: true, chopYield: 'salmon_sashimi' },
+              tuna: { id: 'tuna', name: 'Bluefin Tuna', icon: '🐟', color: '#d93b54', canChop: true, chopYield: 'tuna_sashimi' },
+              rice: { id: 'rice', name: 'Sushi Rice', icon: '🌾', color: '#f5f5f0', canCook: true, cookYield: 'steamed_rice' },
+              wasabi: { id: 'wasabi', name: 'Wasabi Root', icon: '🟢', color: '#8bc34a', canChop: true, chopYield: 'grated_wasabi' },
+              ginger: { id: 'ginger', name: 'Pickled Ginger', icon: '🫚', color: '#f7b0b0', canChop: false },
+              soy: { id: 'soy', name: 'Sweet Shoyu', icon: '🍶', color: '#382218', canChop: false },
+              lemon: { id: 'lemon', name: 'Citrus Slice', icon: '🍋', color: '#ffe14f', canChop: true, chopYield: 'lemon_wedge' }
+            },
+            processedItems: {
+              salmon_sashimi: { id: 'salmon_sashimi', name: 'Salmon Sashimi', icon: '🍣', color: '#ff8866' },
+              tuna_sashimi: { id: 'tuna_sashimi', name: 'Tuna Sashimi', icon: '🐟', color: '#ea4c63' },
+              steamed_rice: { id: 'steamed_rice', name: 'Steamed Rice', icon: '🍚', color: '#ffffff' },
+              grated_wasabi: { id: 'grated_wasabi', name: 'Grated Wasabi', icon: '🟢', color: '#aed581' },
+              lemon_wedge: { id: 'lemon_wedge', name: 'Lemon Wedge', icon: '🍋', color: '#fff07a' }
+            },
+            recipes: [
+              { id: 'salmon_nigiri', name: 'Salmon Nigiri', icon: '🍣', points: 130, timeLimit: 72, required: ['steamed_rice', 'salmon_sashimi', 'grated_wasabi'] },
+              { id: 'tuna_nigiri', name: 'Maguro Tuna Nigiri', icon: '🍣', points: 135, timeLimit: 72, required: ['steamed_rice', 'tuna_sashimi', 'grated_wasabi'] },
+              { id: 'sashimi_tasting', name: 'Sashimi Duet', icon: '🥢', points: 150, timeLimit: 68, required: ['salmon_sashimi', 'tuna_sashimi', 'lemon_wedge'] },
+              { id: 'classic_sushi_set', name: 'Express Nigiri Set', icon: '🍱', points: 180, timeLimit: 82, required: ['steamed_rice', 'salmon_sashimi', 'ginger', 'soy'] }
+            ]
+          },
+          2: {
+            title: 'Level 2: Maki & Rolls Master',
+            desc: 'Maki & Veggie Rolls',
+            banner: '🍣 TOKYO SUSHI: LVL 2 MAKI MASTER',
+            chefQuote: '"Time to roll! Roll crisp nori seaweed, avocados, and cucumbers to make baby Mochikichi squeak with delight!"',
+            rawItems: {
+              nori: { id: 'nori', name: 'Nori Seaweed', icon: '⬛', color: '#1a2923', canChop: false },
+              rice: { id: 'rice', name: 'Sushi Rice', icon: '🌾', color: '#f5f5f0', canCook: true, cookYield: 'steamed_rice' },
+              salmon: { id: 'salmon', name: 'Fresh Salmon', icon: '🍣', color: '#ff7755', canChop: true, chopYield: 'salmon_sashimi' },
+              tuna: { id: 'tuna', name: 'Bluefin Tuna', icon: '🐟', color: '#d93b54', canChop: true, chopYield: 'tuna_sashimi' },
+              avocado: { id: 'avocado', name: 'Avocado', icon: '🥑', color: '#7cb342', canChop: true, chopYield: 'sliced_avocado' },
+              cucumber: { id: 'cucumber', name: 'Cucumber', icon: '🥒', color: '#43a047', canChop: true, chopYield: 'sliced_cucumber' },
+              sesame: { id: 'sesame', name: 'Toasted Sesame', icon: '✨', color: '#e0d5be', canChop: false }
+            },
+            processedItems: {
+              salmon_sashimi: { id: 'salmon_sashimi', name: 'Salmon Sashimi', icon: '🍣', color: '#ff8866' },
+              tuna_sashimi: { id: 'tuna_sashimi', name: 'Tuna Sashimi', icon: '🐟', color: '#ea4c63' },
+              steamed_rice: { id: 'steamed_rice', name: 'Steamed Rice', icon: '🍚', color: '#ffffff' },
+              sliced_avocado: { id: 'sliced_avocado', name: 'Sliced Avocado', icon: '🥑', color: '#9ccc65' },
+              sliced_cucumber: { id: 'sliced_cucumber', name: 'Cucumber Matchsticks', icon: '🥒', color: '#66bb6a' }
+            },
+            recipes: [
+              { id: 'tekka_maki', name: 'Tekka Maki (Tuna Roll)', icon: '🍱', points: 150, timeLimit: 75, required: ['nori', 'steamed_rice', 'tuna_sashimi'] },
+              { id: 'salmon_avocado_roll', name: 'Salmon Avocado Roll', icon: '🥑', points: 175, timeLimit: 80, required: ['nori', 'steamed_rice', 'salmon_sashimi', 'sliced_avocado'] },
+              { id: 'california_roll', name: 'California Roll Deluxe', icon: '🍱', points: 180, timeLimit: 82, required: ['nori', 'steamed_rice', 'sliced_avocado', 'sliced_cucumber', 'sesame'] },
+              { id: 'green_dragon_roll', name: 'Cucumber Green Roll', icon: '🥒', points: 140, timeLimit: 70, required: ['nori', 'steamed_rice', 'sliced_cucumber', 'sesame'] }
+            ]
+          },
+          3: {
+            title: 'Level 3: Imperial Omakase Feast',
+            desc: 'Luxury Omakase Boat',
+            banner: '🍣 TOKYO SUSHI: LVL 3 IMPERIAL OMAKASE',
+            chefQuote: '"Tamago omelettes, sparkling Ikura roe, and giant luxury sushi boats for baby Mochikichi! Earn our Michelin Star!"',
+            rawItems: {
+              egg: { id: 'egg', name: 'Tamago Egg', icon: '🥚', color: '#ffd152', canCook: true, cookYield: 'tamagoyaki' },
+              ikura: { id: 'ikura', name: 'Salmon Roe (Ikura)', icon: '🟠', color: '#ff5e14', canChop: false },
+              salmon: { id: 'salmon', name: 'King Salmon', icon: '🍣', color: '#ff7755', canChop: true, chopYield: 'salmon_sashimi' },
+              tuna: { id: 'tuna', name: 'Otoro Fatty Tuna', icon: '🐟', color: '#d93b54', canChop: true, chopYield: 'otoro_sashimi' },
+              rice: { id: 'rice', name: 'Premium Rice', icon: '🌾', color: '#f5f5f0', canCook: true, cookYield: 'steamed_rice' },
+              nori: { id: 'nori', name: 'Roasted Nori', icon: '⬛', color: '#1a2923', canChop: false },
+              spicy_sauce: { id: 'spicy_sauce', name: 'Spicy Truffle Mayo', icon: '🌶️', color: '#ff6633', canChop: false }
+            },
+            processedItems: {
+              tamagoyaki: { id: 'tamagoyaki', name: 'Sweet Tamagoyaki', icon: '🍳', color: '#ffdd55' },
+              salmon_sashimi: { id: 'salmon_sashimi', name: 'King Salmon Sashimi', icon: '🍣', color: '#ff8866' },
+              otoro_sashimi: { id: 'otoro_sashimi', name: 'Otoro Sashimi', icon: '🐟', color: '#ff5c7c' },
+              steamed_rice: { id: 'steamed_rice', name: 'Steamed Rice', icon: '🍚', color: '#ffffff' }
+            },
+            recipes: [
+              { id: 'ikura_gunkan', name: 'Ikura Battleship (Gunkan)', icon: '🍣', points: 210, timeLimit: 78, required: ['nori', 'steamed_rice', 'ikura'] },
+              { id: 'tamago_nigiri', name: 'Sweet Tamago Nigiri', icon: '🍳', points: 160, timeLimit: 72, required: ['steamed_rice', 'tamagoyaki', 'nori'] },
+              { id: 'spicy_otoro_roll', name: 'Spicy Otoro Roll', icon: '🍱', points: 230, timeLimit: 85, required: ['nori', 'steamed_rice', 'otoro_sashimi', 'spicy_sauce'] },
+              { id: 'imperial_omakase_boat', name: 'Imperial Omakase Boat', icon: '🥢', points: 275, timeLimit: 95, required: ['salmon_sashimi', 'otoro_sashimi', 'tamagoyaki', 'ikura'] }
+            ]
+          }
+        }
+      },
+      boss: {
+        id: 'boss',
+        name: 'Grand Master Duel',
+        criticName: 'Critique Glouton Prime (Giant Monster Boss)',
+        criticShort: 'Glouton Prime',
+        criticType: 'giant_boss',
+        chefName: 'PIERRE & KENJI',
+        chefTitle: 'ROYAL GRAND MASTERS',
+        backWallColor: '#2b0938',
+        floorTile1: '#421447',
+        floorTile2: '#2f0833',
+        boardName: '🔪 MASTER BOARD [C]',
+        stoveName: '🔥 IMPERIAL STOVE [V]',
+        plateName: '👑 MASTER PLATE [B]',
+        levels: {
+          1: {
+            title: 'Boss Level: Grand Master Duel',
+            desc: 'The Ultimate 20-Order Gauntlet',
+            banner: '👑 BOSS DUEL: 20 IN A ROW • ZERO MISTAKES',
+            chefQuote: '"Critique Glouton Prime has arrived! Feed this giant titan 20 consecutive orders without a single mistake or expired ticket. One error = Instant Game Over!"',
+            pantryPages: {
+              1: {
+                name: 'PAGE 1: BISTRO PANTRY',
+                rawItems: {
+                  beef: { id: 'beef', name: 'Beef', icon: '🥩', color: '#962c2c', canChop: true, chopYield: 'ground_beef' },
+                  bread: { id: 'bread', name: 'Bread', icon: '🍞', color: '#d9a066', canChop: false },
+                  cheese: { id: 'cheese', name: 'Cheddar', icon: '🧀', color: '#f4b41b', canChop: false },
+                  lettuce: { id: 'lettuce', name: 'Lettuce', icon: '🥬', color: '#5dbb43', canChop: true, chopYield: 'shredded_lettuce' },
+                  tomato: { id: 'tomato', name: 'Tomato', icon: '🍅', color: '#e03b3b', canChop: true, chopYield: 'diced_tomato' },
+                  onion: { id: 'onion', name: 'Onion', icon: '🧅', color: '#ba3c7a', canChop: true, chopYield: 'diced_onion' },
+                  pasta: { id: 'pasta', name: 'Raw Pasta', icon: '🌾', color: '#f0e386', canCook: true, cookYield: 'al_dente_pasta' }
+                }
+              },
+              2: {
+                name: 'PAGE 2: SUSHI PANTRY',
+                rawItems: {
+                  salmon: { id: 'salmon', name: 'Salmon', icon: '🍣', color: '#ff7755', canChop: true, chopYield: 'salmon_sashimi' },
+                  tuna: { id: 'tuna', name: 'Bluefin Tuna', icon: '🐟', color: '#d93b54', canChop: true, chopYield: 'tuna_sashimi' },
+                  rice: { id: 'rice', name: 'Sushi Rice', icon: '🌾', color: '#f5f5f0', canCook: true, cookYield: 'steamed_rice' },
+                  nori: { id: 'nori', name: 'Nori Sheet', icon: '⬛', color: '#1a2923', canChop: false },
+                  wasabi: { id: 'wasabi', name: 'Wasabi Root', icon: '🟢', color: '#8bc34a', canChop: true, chopYield: 'grated_wasabi' },
+                  avocado: { id: 'avocado', name: 'Avocado', icon: '🥑', color: '#7cb342', canChop: true, chopYield: 'sliced_avocado' },
+                  pickle: { id: 'pickle', name: 'Pickles', icon: '🥒', color: '#4d8a36', canChop: false }
+                }
+              }
+            },
+            processedItems: {
+              ground_beef: { id: 'ground_beef', name: 'Ground Beef', icon: '🥩', color: '#822525', canCook: true, cookYield: 'cooked_patty' },
+              cooked_patty: { id: 'cooked_patty', name: 'Cooked Patty', icon: '🍔', color: '#5c2211' },
+              shredded_lettuce: { id: 'shredded_lettuce', name: 'Shredded Greens', icon: '🥗', color: '#76db48' },
+              diced_tomato: { id: 'diced_tomato', name: 'Diced Tomato', icon: '🥣', color: '#ff5c5c' },
+              diced_onion: { id: 'diced_onion', name: 'Diced Onion', icon: '🧅', color: '#e07ba8' },
+              al_dente_pasta: { id: 'al_dente_pasta', name: 'Al Dente Pasta', icon: '🍝', color: '#ebd673' },
+              salmon_sashimi: { id: 'salmon_sashimi', name: 'Salmon Sashimi', icon: '🍣', color: '#ff8866' },
+              tuna_sashimi: { id: 'tuna_sashimi', name: 'Tuna Sashimi', icon: '🐟', color: '#ea4c63' },
+              steamed_rice: { id: 'steamed_rice', name: 'Steamed Rice', icon: '🍚', color: '#ffffff' },
+              grated_wasabi: { id: 'grated_wasabi', name: 'Grated Wasabi', icon: '🟢', color: '#aed581' },
+              sliced_avocado: { id: 'sliced_avocado', name: 'Sliced Avocado', icon: '🥑', color: '#9ccc65' }
+            },
+            recipes: [
+              { id: 'classic_burger', name: 'Classic Burger', icon: '🍔', points: 150, timeLimit: 48, required: ['bread', 'cooked_patty', 'shredded_lettuce'] },
+              { id: 'deluxe_cheeseburger', name: 'Deluxe Cheeseburger', icon: '🍔', points: 180, timeLimit: 50, required: ['bread', 'cooked_patty', 'cheese', 'pickle'] },
+              { id: 'salmon_nigiri', name: 'Salmon Nigiri', icon: '🍣', points: 160, timeLimit: 46, required: ['steamed_rice', 'salmon_sashimi', 'grated_wasabi'] },
+              { id: 'tuna_nigiri', name: 'Maguro Tuna Nigiri', icon: '🍣', points: 160, timeLimit: 46, required: ['steamed_rice', 'tuna_sashimi', 'grated_wasabi'] },
+              { id: 'tekka_maki', name: 'Tekka Maki (Tuna Roll)', icon: '🍱', points: 170, timeLimit: 48, required: ['nori', 'steamed_rice', 'tuna_sashimi'] },
+              { id: 'salmon_avocado_roll', name: 'Salmon Avocado Roll', icon: '🥑', points: 190, timeLimit: 52, required: ['nori', 'steamed_rice', 'salmon_sashimi', 'sliced_avocado'] },
+              { id: 'bistro_pasta_quick', name: 'Cheesy Garlic Pasta', icon: '🍝', points: 180, timeLimit: 50, required: ['al_dente_pasta', 'cheese', 'diced_tomato'] },
+              { id: 'tokyo_bistro_duo', name: 'Fusion Grand Tasting', icon: '🥢', points: 240, timeLimit: 54, required: ['steamed_rice', 'salmon_sashimi', 'cheese', 'pickle'] }
+            ]
+          }
+        }
+      }
+    };
+
+    let currentRestaurant = 'bistro';
+    let currentLevel = 1;
+    let bossPantryPage = 1;
+
+    const campaignProgress = {
+      bistro: { maxLevelCompleted: 0, michelinAwarded: false },
+      sushi: { maxLevelCompleted: 0, michelinAwarded: false },
+      bossBeaten: false
+    };
+
+    let RAW_ITEMS = THEMES[currentRestaurant].levels[currentLevel].rawItems;
+    let PROCESSED_ITEMS = THEMES[currentRestaurant].levels[currentLevel].processedItems;
+    let ITEM_CATALOG = { ...RAW_ITEMS, ...PROCESSED_ITEMS };
+    let MENU_RECIPES = THEMES[currentRestaurant].levels[currentLevel].recipes;
+    let BIN_KEYS = Object.keys(RAW_ITEMS);
+
+    const state = {
+      score: 0,
+      combo: 1,
+      maxCombo: 1,
+      shiftTimeRemaining: 120,
+      isGameOver: false,
+      isPaused: false,
+      hasStarted: false,
+      servedCount: 0,
+      failedCount: 0,
+      bossStreak: 0,
+
+      heldItem: null,
+      tickets: [],
+      nextTicketSpawn: 1,
+
+      cuttingStation: { item: null, chopProgress: 0, chopsNeeded: 4 },
+      stoveStation: { item: null, cookProgress: 0, isCooking: false, heat: 'med' },
+      plateStation: { items: [] },
+
+      monster: { mood: 'hungry', animTimer: 0, chewCount: 0 },
+
+      nextTantrumTime: 14,
+      isTantrumActive: false,
+
+      chefMood: 'idle',
+      chefShout: '',
+      knifeAnim: 0
+    };
+
+    const visualFX = {
+      steamParticles: [],
+      chopDebris: [],
+      monsterParticles: [],
+      confettiParticles: [],
+      tantrumParticles: [],
+      shakeTimer: 0
+    };
+
+    /* =====================================================================
+       ROOM STATION POSITIONS (Top Corners, Center Galley, Bottom)
+       ===================================================================== */
+    let isPortraitMobile = false;
+
+    // Desktop/Tablet Room Layout:
+    // Top-Left: Cutting Board
+    // Top-Right: Stove & Cooker
+    // Center Floor: Chef
+    // Center Island: Plating Assembly (Below Chef)
+    // Bottom: Monster Food Critic (Across from Plate)
+    const LANDSCAPE_STATIONS = {
+      cutting: { x: 35, y: 110, w: 260, h: 185 },
+      stove:   { x: 645, y: 110, w: 260, h: 185 },
+      plate:   { x: 230, y: 315, w: 480, h: 110 },
+      monster: { x: 230, y: 445, w: 480, h: 125 }
+    };
+
+    // Mobile Portrait Room Layout (520 x 680)
+    const PORTRAIT_STATIONS = {
+      cutting: { x: 20, y: 185, w: 230, h: 165 },
+      stove:   { x: 270, y: 185, w: 230, h: 165 },
+      plate:   { x: 50, y: 395, w: 420, h: 115 },
+      monster: { x: 50, y: 530, w: 420, h: 125 }
+    };
+
+    let STATIONS = { ...LANDSCAPE_STATIONS };
+
+    function checkAndApplyResponsiveCanvas(forceRebuild = false) {
+      const isPortrait = window.innerWidth < 640 && window.innerHeight > window.innerWidth;
+      if (isPortrait !== isPortraitMobile || forceRebuild) {
+        isPortraitMobile = isPortrait;
+        const canvas = document.getElementById('kitchen-canvas');
+        if (isPortraitMobile) {
+          canvas.width = 520;
+          canvas.height = 680;
+          STATIONS = { ...PORTRAIT_STATIONS };
+        } else {
+          canvas.width = 940;
+          canvas.height = 590;
+          STATIONS = { ...LANDSCAPE_STATIONS };
+        }
+        rebuildCanvasBins();
+      }
+    }
+
+    let CANVAS_BINS = [];
+    function rebuildCanvasBins() {
+      BIN_KEYS = Object.keys(RAW_ITEMS);
+      if (isPortraitMobile) {
+        CANVAS_BINS = BIN_KEYS.map((key, idx) => {
+          const row = idx < 4 ? 0 : 1;
+          const col = idx < 4 ? idx : idx - 4;
+          const totalInRow = row === 0 ? 4 : Math.min(3, BIN_KEYS.length - 4);
+          const binW = 110;
+          const spacing = 10;
+          const rowW = totalInRow * binW + (totalInRow - 1) * spacing;
+          const startX = (520 - rowW) / 2;
+          return {
+            key,
+            item: RAW_ITEMS[key] || ITEM_CATALOG[key],
+            x: startX + col * (binW + spacing),
+            y: 14 + row * 76,
+            w: binW,
+            h: 68
+          };
+        });
+      } else {
+        CANVAS_BINS = BIN_KEYS.map((key, idx) => ({
+          key,
+          item: RAW_ITEMS[key] || ITEM_CATALOG[key],
+          x: 45 + idx * 122,
+          y: 16,
+          w: 104,
+          h: 70
+        }));
+      }
+    }
+
+    window.addEventListener('resize', () => checkAndApplyResponsiveCanvas());
+
+    /* =====================================================================
+       MONSTER STOMP TANTRUM
+       ===================================================================== */
+    function triggerMonsterTantrum() {
+      if (!state.hasStarted || state.isGameOver || state.isPaused) return;
+
+      state.isTantrumActive = true;
+      state.monster.mood = 'roaring';
+      state.monster.animTimer = 2.5;
+      visualFX.shakeTimer = 1.2;
+
+      sound.playMonsterRoar(currentRestaurant === 'boss');
+      sound.playTone(90, 'sawtooth', 0.35, 0.4);
+      setTimeout(() => sound.playTone(70, 'sawtooth', 0.45, 0.45), 120);
+
+      // Scramble BIN_KEYS using Fisher-Yates
+      for (let i = BIN_KEYS.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1));
+        const temp = BIN_KEYS[i];
+        BIN_KEYS[i] = BIN_KEYS[j];
+        BIN_KEYS[j] = temp;
+      }
+
+      // Re-map the crates with new arrangement
+      rebuildCanvasBins();
+
+      CANVAS_BINS.forEach(bin => {
+        for (let p = 0; p < 3; p++) {
+          visualFX.tantrumParticles.push({
+            x: bin.x + bin.w / 2 + (Math.random() * 30 - 15),
+            y: bin.y + bin.h / 2 + (Math.random() * 20 - 10),
+            vx: (Math.random() - 0.5) * 3,
+            vy: -(Math.random() * 2 + 1),
+            text: ['💨', '❓', '⚡'][Math.floor(Math.random() * 3)],
+            life: 1.2
+          });
+        }
+      });
+
+      const criticName = THEMES[currentRestaurant].criticShort;
+      setChefShout(`TANTRUM STOMP! ${criticName.toUpperCase()} SHUFFLED THE CRATES!`, 'angry');
+
+      setTimeout(() => {
+        state.isTantrumActive = false;
+      }, 1500);
+    }
+
+    const el = {
+      titleScreen: document.getElementById('title-screen'),
+      btnSelectBistro: document.getElementById('btn-select-bistro'),
+      btnSelectSushi: document.getElementById('btn-select-sushi'),
+      btnSelectBoss: document.getElementById('btn-select-boss'),
+      bossLevelSlot: document.getElementById('boss-level-slot'),
+      btnDevUnlock: document.getElementById('btn-dev-unlock'),
+      titleIcons: document.getElementById('title-icons'),
+      titleChefCanvas: document.getElementById('title-chef-canvas'),
+      titleChefName: document.getElementById('title-chef-name'),
+      titleChefQuote: document.getElementById('title-chef-quote'),
+      btnStartCooking: document.getElementById('btn-start-cooking'),
+      btnTitleHelp: document.getElementById('btn-title-help'),
+
+      michelinStatusCard: document.getElementById('michelin-status-card'),
+      michelinBadgeIcon: document.getElementById('michelin-badge-icon'),
+      michelinBadgeTitle: document.getElementById('michelin-badge-title'),
+      michelinBadgeDesc: document.getElementById('michelin-badge-desc'),
+      michelinStampSlot: document.getElementById('michelin-stamp-slot'),
+
+      bossStreakDisplayWrap: document.getElementById('boss-streak-display-wrap'),
+      bossStreakCount: document.getElementById('boss-streak-count'),
+      bossPantrySwitcher: document.getElementById('boss-pantry-switcher'),
+      bossPantryPageLabel: document.getElementById('boss-pantry-page-label'),
+      btnToggleBossPantry: document.getElementById('btn-toggle-boss-pantry'),
+      standardTimerWrap: document.getElementById('standard-timer-wrap'),
+
+      modalBossGameOver: document.getElementById('modal-boss-gameover'),
+      bossFailReason: document.getElementById('boss-fail-reason'),
+      bossFailStreak: document.getElementById('boss-fail-streak'),
+      bossFailScore: document.getElementById('boss-fail-score'),
+      btnBossReturnTitle: document.getElementById('btn-boss-return-title'),
+
+      headerRestaurantTitle: document.getElementById('header-restaurant-title'),
+      shiftTimer: document.getElementById('shift-timer-display'),
+      score: document.getElementById('score-display'),
+      combo: document.getElementById('combo-display'),
+      ticketsContainer: document.getElementById('tickets-container'),
+      chefCanvas: document.getElementById('chef-canvas'),
+      chefNameLabel: document.getElementById('chef-name-label'),
+      chefTitleSublabel: document.getElementById('chef-title-sublabel'),
+      kitchenCanvas: document.getElementById('kitchen-canvas'),
+      chefShoutBanner: document.getElementById('chef-shout-banner'),
+      ordersServedCount: document.getElementById('orders-served-count'),
+
+      btnQuickChop: document.getElementById('btn-quick-chop'),
+      btnQuickCook: document.getElementById('btn-quick-cook'),
+      btnQuickPlate: document.getElementById('btn-quick-plate'),
+      btnQuickServe: document.getElementById('btn-quick-serve'),
+      btnServeLabel: document.getElementById('btn-serve-label'),
+      btnQuickDrop: document.getElementById('btn-quick-drop'),
+      btnQuickClearPlate: document.getElementById('btn-quick-clear-plate'),
+
+      btnStartPause: document.getElementById('btn-start-pause'),
+      btnRestartHeader: document.getElementById('btn-restart-header'),
+      btnTitleReturn: document.getElementById('btn-title-return'),
+      btnToggleSfx: document.getElementById('btn-toggle-sfx'),
+      btnToggleBgm: document.getElementById('btn-toggle-bgm'),
+      btnHelp: document.getElementById('btn-help'),
+      modalHelp: document.getElementById('modal-help'),
+      btnOkHelp: document.getElementById('btn-ok-help'),
+      btnCloseHelp: document.getElementById('btn-close-help'),
+
+      modalCelebration: document.getElementById('modal-celebration'),
+      celebrationConfettiCanvas: document.getElementById('celebration-confetti-canvas'),
+      celebrationTrophyIcons: document.getElementById('celebration-trophy-icons'),
+      celebrationHeadline: document.getElementById('celebration-headline'),
+      celebrationSubtitle: document.getElementById('celebration-subtitle'),
+      celebrationStarsRow: document.getElementById('celebration-stars-row'),
+      celebrationChefAvatarEmoji: document.getElementById('celebration-chef-avatar-emoji'),
+      celebrationQuoteText: document.getElementById('celebration-quote-text'),
+      celebrationScore: document.getElementById('celebration-score'),
+      celebrationServed: document.getElementById('celebration-served'),
+      celebrationCombo: document.getElementById('celebration-combo'),
+      celebrationFailed: document.getElementById('celebration-failed'),
+      btnCelebrationNext: document.getElementById('btn-celebration-next'),
+      btnCelebrationReplay: document.getElementById('btn-celebration-replay'),
+      btnCelebrationTitle: document.getElementById('btn-celebration-title')
+    };
+
+    const titleChefCtx = el.titleChefCanvas.getContext('2d');
+    const chefCtx = el.chefCanvas.getContext('2d');
+    const ctx = el.kitchenCanvas.getContext('2d');
+    const confettiCtx = el.celebrationConfettiCanvas.getContext('2d');
+
+    titleChefCtx.imageSmoothingEnabled = false;
+    chefCtx.imageSmoothingEnabled = false;
+    ctx.imageSmoothingEnabled = false;
+
+    function checkBossUnlockCondition() {
+      const isBossUnlocked = campaignProgress.bistro.michelinAwarded && campaignProgress.sushi.michelinAwarded;
+      if (isBossUnlocked) {
+        el.bossLevelSlot.classList.remove('hidden');
+      } else {
+        el.bossLevelSlot.classList.add('hidden');
+      }
+      return isBossUnlocked;
+    }
+
+    function updateMichelinCard() {
+      if (!el.michelinStatusCard || !el.michelinBadgeIcon || !el.michelinBadgeTitle || !el.michelinBadgeDesc || !el.michelinStampSlot) {
+        return;
+      }
+
+      checkBossUnlockCondition();
+
+      if (currentRestaurant === 'boss') {
+        el.michelinStatusCard.className = 'w-full max-w-md bg-gradient-to-r from-[#2c0b3d] to-[#451020] border-2 border-amber-400 rounded-lg p-2.5 flex items-center justify-between gap-3 shadow-lg ring-2 ring-amber-400/80';
+        el.michelinBadgeIcon.className = 'w-11 h-11 rounded-full bg-amber-500 border-2 border-white flex items-center justify-center text-xl shrink-0 shadow animate-pulse';
+        el.michelinBadgeIcon.textContent = '👑';
+        el.michelinBadgeTitle.className = 'text-[9px] sm:text-[10px] font-extrabold text-amber-200 tracking-wide';
+        el.michelinBadgeTitle.textContent = 'GRAND MASTER DUEL: 20 IN A ROW';
+        el.michelinBadgeDesc.className = 'text-[7px] sm:text-[8px] text-amber-100 font-bold leading-tight mt-0.5';
+        el.michelinBadgeDesc.textContent = campaignProgress.bossBeaten
+          ? 'MASTER CHEF CROWNED! You tamed Critique Glouton Prime!'
+          : 'Zero mistakes permitted! Any error triggers an instant Game Over. Can you reach 20?';
+
+        el.michelinStampSlot.innerHTML = `
+          <div class="px-2 py-1 bg-amber-500 text-stone-900 font-black text-[9px] rounded-sm border-2 border-white shadow-md tracking-wider flex items-center gap-1 transform rotate-[-2deg]">
+            <span>👑</span> MASTER
+          </div>
+        `;
+        return;
+      }
+
+      const progress = campaignProgress[currentRestaurant];
+      const isAwarded = progress && progress.michelinAwarded;
+
+      if (isAwarded) {
+        el.michelinStatusCard.className = 'w-full max-w-md bg-[#fff7d9] border-2 border-amber-500 rounded-lg p-2.5 flex items-center justify-between gap-3 shadow-md transition-all ring-2 ring-amber-400/50';
+        el.michelinBadgeIcon.className = 'w-11 h-11 rounded-full bg-red-600 border-2 border-amber-400 flex items-center justify-center text-xl shrink-0 shadow animate-pulse';
+        el.michelinBadgeIcon.textContent = '⭐';
+        el.michelinBadgeTitle.className = 'text-[9px] sm:text-[10px] font-extrabold text-red-900 tracking-wide flex items-center gap-1';
+        el.michelinBadgeTitle.innerHTML = 'MICHELIN GUIDE: ⭐ 1 STAR ACCREDITED!';
+        el.michelinBadgeDesc.className = 'text-[7px] sm:text-[8px] text-amber-950 font-bold leading-tight mt-0.5';
+        el.michelinBadgeDesc.textContent = 'Exceptional cuisine! The baby critic gave a perfect review on all 3 levels.';
+        
+        el.michelinStampSlot.innerHTML = `
+          <div class="px-2 py-1 bg-[#ba1c24] text-[#fff5b8] font-black text-[9px] rounded-sm border-2 border-[#fff5b8] shadow-md tracking-wider flex items-center gap-1 transform rotate-[-3deg]">
+            <span>⭐</span> MICHELIN
+          </div>
+        `;
+      } else {
+        const completed = progress ? progress.maxLevelCompleted : 0;
+        const currentTier = Math.min(3, completed + 1);
+
+        el.michelinStatusCard.className = 'w-full max-w-md bg-[#fff4dc] border-2 border-dashed border-[#bfa67a] rounded-lg p-2.5 flex items-center justify-between gap-3 shadow-inner transition-all';
+        el.michelinBadgeIcon.className = 'w-11 h-11 rounded-full bg-stone-200 border-2 border-stone-400 flex items-center justify-center text-xl shrink-0';
+        el.michelinBadgeIcon.textContent = '⏳';
+        el.michelinBadgeTitle.className = 'text-[9px] sm:text-[10px] font-extrabold text-stone-800 tracking-wide';
+        el.michelinBadgeTitle.textContent = 'MICHELIN INSPECTION: REVIEW PENDING';
+        el.michelinBadgeDesc.className = 'text-[7px] sm:text-[8px] text-stone-600 leading-tight mt-0.5';
+        el.michelinBadgeDesc.textContent = `Completed: ${completed}/3 Levels • Satisfy the baby critic across all shifts!`;
+
+        el.michelinStampSlot.innerHTML = `
+          <span class="text-[8px] font-bold text-stone-400 uppercase border border-dashed border-stone-300 px-1.5 py-1 rounded bg-stone-100">
+            TIER ${currentTier}
+          </span>
+        `;
+      }
+    }
+
+    function toggleBossPantryPage() {
+      if (currentRestaurant !== 'boss') return;
+      bossPantryPage = (bossPantryPage === 1) ? 2 : 1;
+      const theme = THEMES.boss.levels[1];
+      const pageData = theme.pantryPages[bossPantryPage];
+      
+      RAW_ITEMS = pageData.rawItems;
+      rebuildCanvasBins();
+      el.bossPantryPageLabel.textContent = pageData.name;
+      sound.playGrab();
+      setChefShout(`Flipped pantry to ${pageData.name}!`, 'talking');
+    }
+
+    function setRestaurantAndLevel(restaurantId, levelNum) {
+      if (!THEMES[restaurantId]) return;
+      currentRestaurant = restaurantId;
+      currentLevel = Math.max(1, Math.min(3, levelNum));
+
+      const theme = THEMES[restaurantId];
+      const levelData = theme.levels[currentLevel];
+
+      if (restaurantId === 'boss') {
+        bossPantryPage = 1;
+        RAW_ITEMS = levelData.pantryPages[1].rawItems;
+        PROCESSED_ITEMS = levelData.processedItems;
+        ITEM_CATALOG = { 
+          ...levelData.pantryPages[1].rawItems, 
+          ...levelData.pantryPages[2].rawItems, 
+          ...PROCESSED_ITEMS 
+        };
+        MENU_RECIPES = levelData.recipes;
+        el.bossPantrySwitcher.classList.remove('hidden');
+        el.bossStreakDisplayWrap.classList.remove('hidden');
+        el.standardTimerWrap.classList.add('hidden');
+        el.bossStreakCount.textContent = `${state.bossStreak} / 20`;
+        el.btnServeLabel.textContent = '👑 FEED GLOUTON PRIME [SPACE]';
+      } else {
+        RAW_ITEMS = levelData.rawItems;
+        PROCESSED_ITEMS = levelData.processedItems;
+        ITEM_CATALOG = { ...RAW_ITEMS, ...PROCESSED_ITEMS };
+        MENU_RECIPES = levelData.recipes;
+        el.bossPantrySwitcher.classList.add('hidden');
+        el.bossStreakDisplayWrap.classList.add('hidden');
+        el.standardTimerWrap.classList.remove('hidden');
+
+        if (restaurantId === 'sushi') {
+          el.btnServeLabel.textContent = '🫧 FEED BABY MOCHIKICHI [SPACE]';
+        } else {
+          el.btnServeLabel.textContent = '💖 FEED BABY BISTROTTE [SPACE]';
+        }
+      }
+
+      rebuildCanvasBins();
+
+      if (restaurantId === 'boss') {
+        el.headerRestaurantTitle.textContent = `👑 BOSS DUEL • 20 IN A ROW`;
+        el.chefNameLabel.textContent = 'PIERRE & KENJI';
+        el.chefTitleSublabel.textContent = 'ROYAL GRAND MASTERS';
+        el.titleChefName.textContent = 'DUO GRAND MASTERS SAY:';
+        el.titleChefQuote.textContent = levelData.chefQuote;
+        el.titleIcons.textContent = '👑 👾 🥩 🍣 👾 🏆';
+        el.btnQuickCook.innerHTML = '🔥 COOK / STEAM [V]';
+      } else {
+        el.headerRestaurantTitle.textContent = `${theme.name.toUpperCase()} • LVL ${currentLevel}`;
+        el.chefNameLabel.textContent = theme.chefName;
+        el.chefTitleSublabel.textContent = theme.chefTitle;
+        el.titleChefName.textContent = `CHEF ${theme.chefName} SAYS:`;
+        el.titleChefQuote.textContent = levelData.chefQuote;
+
+        if (restaurantId === 'sushi') {
+          el.titleIcons.textContent = '🍣 🫧 🍙 🥢 🥑';
+          el.btnQuickCook.innerHTML = '🍚 STEAM [V]';
+        } else {
+          el.titleIcons.textContent = '🍳 🎀 🍔 🥗 🥩';
+          el.btnQuickCook.innerHTML = '🍳 COOK [V]';
+        }
+      }
+
+      updateMichelinCard();
+
+      state.heldItem = null;
+      state.tickets = [];
+      state.cuttingStation = { item: null, chopProgress: 0, chopsNeeded: 4 };
+      state.stoveStation = { item: null, cookProgress: 0, isCooking: false, heat: 'med' };
+      state.plateStation = { items: [] };
+      renderTickets();
+      renderChefPortrait(titleChefCtx);
+    }
+
+    function grabItemFromBin(itemKey) {
+      if (!state.hasStarted || state.isGameOver || state.isPaused) return;
+      const item = RAW_ITEMS[itemKey] || ITEM_CATALOG[itemKey];
+      if (!item) return;
+
+      if (!state.heldItem) {
+        state.heldItem = item;
+        sound.playGrab();
+        setChefShout(`Grabbed ${item.name}!`, 'happy');
+      } else {
+        sound.playError();
+        setChefShout(`Hands are full holding ${state.heldItem.name}! Discard [X] or use it first.`, 'angry');
+      }
+    }
+
+    function spawnOrderTicket() {
+      if (state.tickets.length >= 4) return;
+
+      const recipe = MENU_RECIPES[Math.floor(Math.random() * MENU_RECIPES.length)];
+      const ticket = {
+        id: Math.random().toString(36).substring(2, 9),
+        recipe: recipe,
+        timeLeft: recipe.timeLimit,
+        totalTime: recipe.timeLimit
+      };
+      state.tickets.push(ticket);
+      renderTickets();
+      sound.playBell();
+      const critic = THEMES[currentRestaurant].criticShort;
+      setChefShout(`New Order: ${recipe.name}! ${critic} is hungry!`, 'talking');
+    }
+
+    function renderTickets() {
+      el.ticketsContainer.innerHTML = '';
+      if (state.tickets.length === 0) {
+        el.ticketsContainer.innerHTML = `
+          <div class="flex items-center justify-center w-full py-5 text-stone-600 font-bold italic text-[10px] sm:text-xs bg-amber-50/80 border-2 border-dashed border-stone-400 rounded-lg">
+            The critic is eagerly waiting for the next dish...
+          </div>
+        `;
+        return;
+      }
+
+      state.tickets.forEach(ticket => {
+        const pct = (ticket.timeLeft / ticket.totalTime) * 100;
+        const isUrgent = pct < 25;
+        const secondsLeft = Math.ceil(ticket.timeLeft);
+
+        const card = document.createElement('div');
+        card.className = `order-ticket px-2 py-1 rounded flex flex-col justify-between shrink-0 w-44 sm:w-56 transition-all ${isUrgent ? 'ticket-urgent ring-2 ring-red-500' : 'bg-white'}`;
+        
+        const header = document.createElement('div');
+        header.className = 'flex items-center justify-between border-b border-stone-300 pb-0.5 gap-1';
+        header.innerHTML = `
+          <div class="flex items-center gap-1 overflow-hidden">
+            <span class="text-base sm:text-lg">${ticket.recipe.icon}</span>
+            <span class="font-black text-[8px] sm:text-[9px] text-stone-900 leading-tight truncate">${ticket.recipe.name}</span>
+          </div>
+          <div class="flex flex-col items-end shrink-0 leading-none">
+            <span class="font-black text-[9px] sm:text-[10px] ${isUrgent ? 'text-red-700 animate-pulse' : 'text-stone-900'}">${secondsLeft}s</span>
+            <span class="text-[7px] text-amber-800 font-bold">+${ticket.recipe.points}p</span>
+          </div>
+        `;
+        card.appendChild(header);
+
+        const itemsRow = document.createElement('div');
+        itemsRow.className = 'flex flex-wrap items-center gap-1 my-0.5';
+        ticket.recipe.required.forEach(itemId => {
+          const itemDef = ITEM_CATALOG[itemId];
+          const hasInPlate = state.plateStation.items.includes(itemId);
+          const badge = document.createElement('span');
+          badge.className = `px-1 py-0.2 rounded flex items-center gap-0.5 border text-[7px] sm:text-[8px] transition-colors ${
+            hasInPlate 
+              ? 'bg-emerald-100 text-emerald-950 border-emerald-600 font-black' 
+              : 'bg-stone-50 text-stone-800 border-stone-400 font-bold'
+          }`;
+          badge.innerHTML = `
+            <span>${itemDef ? itemDef.icon : '❓'}</span>
+            <span>${itemDef ? itemDef.name : itemId}</span>
+            <span class="${hasInPlate ? 'text-emerald-700 font-black' : 'text-stone-400'}">${hasInPlate ? '✓' : '○'}</span>
+          `;
+          itemsRow.appendChild(badge);
+        });
+        card.appendChild(itemsRow);
+
+        const barWrap = document.createElement('div');
+        barWrap.className = 'w-full bg-stone-200 h-1.5 rounded-full overflow-hidden border border-stone-500';
+        const barFill = document.createElement('div');
+        barFill.className = `h-full ${pct < 25 ? 'bg-red-500' : (pct < 55 ? 'bg-amber-400' : 'bg-emerald-500')} transition-all`;
+        barFill.style.width = pct + '%';
+        barWrap.appendChild(barFill);
+        card.appendChild(barWrap);
+
+        el.ticketsContainer.appendChild(card);
+      });
+    }
+
+    function setChefShout(text, mood = 'talking') {
+      state.chefMood = mood;
+      state.chefShout = text;
+      el.chefShoutBanner.textContent = `"${text}"`;
+      setTimeout(() => {
+        if (state.chefMood === mood) state.chefMood = 'idle';
+      }, 2500);
+    }
+
+    function interactCuttingStation() {
+      if (!state.hasStarted || state.isPaused || state.isGameOver) return;
+      const station = state.cuttingStation;
+
+      // Pick up prepared item
+      if (station.item && station.chopProgress >= 100) {
+        if (!state.heldItem) {
+          const yieldId = station.item.chopYield;
+          state.heldItem = PROCESSED_ITEMS[yieldId] || station.item;
+          station.item = null;
+          station.chopProgress = 0;
+          sound.playGrab();
+          setChefShout(`Picked up prepared ingredients!`, 'happy');
+          return;
+        }
+      }
+
+      // Place choppable item
+      if (!station.item && state.heldItem) {
+        if (state.heldItem.canChop) {
+          station.item = state.heldItem;
+          state.heldItem = null;
+          station.chopProgress = 0;
+          sound.playPlace();
+        } else {
+          sound.playError();
+          setChefShout(`That item cannot be chopped!`, 'angry');
+        }
+        return;
+      }
+
+      // Chop
+      if (station.item && station.chopProgress < 100) {
+        sound.playChop();
+        state.knifeAnim = 1.0;
+        station.chopProgress += (100 / station.chopsNeeded);
+
+        const chopX = STATIONS.cutting.x + STATIONS.cutting.w / 2;
+        const chopY = STATIONS.cutting.y + 70;
+        const debrisColor = station.item.color || '#ff6b6b';
+        for (let i = 0; i < 7; i++) {
+          visualFX.chopDebris.push({
+            x: chopX + (Math.random() * 24 - 12),
+            y: chopY + (Math.random() * 12 - 6),
+            vx: (Math.random() - 0.5) * 4,
+            vy: -(Math.random() * 3.5 + 1.5),
+            size: Math.random() * 4 + 3,
+            color: debrisColor,
+            life: 1.0
+          });
+        }
+
+        if (station.chopProgress >= 100) {
+          sound.playGrab();
+          setChefShout(`Chop complete! Pick it up to cook or plate!`, 'happy');
+        }
+        return;
+      }
+    }
+
+    function interactStoveStation() {
+      if (!state.hasStarted || state.isPaused || state.isGameOver) return;
+      const station = state.stoveStation;
+
+      // Pick up cooked item
+      if (station.item && station.cookProgress >= 100) {
+        if (!state.heldItem) {
+          const cookedYieldId = station.item.cookYield;
+          state.heldItem = PROCESSED_ITEMS[cookedYieldId] || station.item;
+          station.item = null;
+          station.cookProgress = 0;
+          station.isCooking = false;
+          sound.playGrab();
+          setChefShout(`Cooked to perfection! Ready to plate!`, 'happy');
+          return;
+        }
+      }
+
+      // Place cookable item
+      if (!station.item && state.heldItem) {
+        if (state.heldItem.canCook) {
+          station.item = state.heldItem;
+          state.heldItem = null;
+          station.cookProgress = 0;
+          station.isCooking = true;
+          sound.playPlace();
+        } else {
+          sound.playError();
+          setChefShout(`That can't be cooked or steamed!`, 'angry');
+        }
+        return;
+      }
+
+      // Stir boost
+      if (station.item && station.isCooking && station.cookProgress < 100) {
+        sound.playSizzle();
+        station.cookProgress = Math.min(100, station.cookProgress + 18);
+        setChefShout(`Boosted cooking! Steaming hot!`, 'happy');
+      }
+    }
+
+    function interactPlateStation() {
+      if (!state.hasStarted || state.isPaused || state.isGameOver) return;
+      if (state.heldItem) {
+        sound.playPlace();
+        state.plateStation.items.push(state.heldItem.id);
+        state.heldItem = null;
+        setChefShout(`Added to plate! Keep building!`, 'happy');
+        renderTickets();
+      } else if (state.plateStation.items.length > 0) {
+        const poppedId = state.plateStation.items.pop();
+        state.heldItem = ITEM_CATALOG[poppedId];
+        sound.playGrab();
+        renderTickets();
+      }
+    }
+
+    function triggerBossGameOver(reasonMessage) {
+      state.isGameOver = true;
+      sound.playMonsterRoar(true);
+
+      state.monster.mood = 'roaring';
+      state.monster.animTimer = 3.0;
+
+      el.bossFailReason.textContent = reasonMessage;
+      el.bossFailStreak.textContent = `${state.bossStreak} / 20`;
+      el.bossFailScore.textContent = state.score;
+
+      el.modalBossGameOver.classList.remove('hidden');
+    }
+
+    function deliverActivePlate() {
+      if (!state.hasStarted || state.isPaused || state.isGameOver) return;
+      const criticShort = THEMES[currentRestaurant].criticShort;
+
+      if (state.plateStation.items.length === 0) {
+        sound.playError();
+        setChefShout(`The plate is empty! ${criticShort} will not eat empty air!`, 'angry');
+        return;
+      }
+
+      const plated = [...state.plateStation.items].sort();
+      let matchIdx = -1;
+
+      for (let i = 0; i < state.tickets.length; i++) {
+        const t = state.tickets[i];
+        const reqSorted = [...t.recipe.required].sort();
+        if (reqSorted.length === plated.length && reqSorted.every((val, idx) => val === plated[idx])) {
+          matchIdx = i;
+          break;
+        }
+      }
+
+      if (matchIdx !== -1) {
+        const matchedTicket = state.tickets.splice(matchIdx, 1)[0];
+        const pointsAwarded = Math.floor(matchedTicket.recipe.points * state.combo);
+        state.score += pointsAwarded;
+        state.servedCount++;
+        state.combo = Math.min(5, state.combo + 1);
+        if (state.combo > state.maxCombo) state.maxCombo = state.combo;
+
+        state.plateStation.items = [];
+
+        state.monster.mood = 'eating';
+        state.monster.animTimer = 2.0;
+        state.monster.chewCount = 6;
+
+        if (currentRestaurant === 'boss') {
+          sound.playGiantMonsterChomp();
+        } else {
+          sound.playBabyMonsterChomp(currentRestaurant);
+        }
+        sound.playSuccess();
+
+        const mx = STATIONS.monster.x + STATIONS.monster.w / 2;
+        const my = STATIONS.monster.y + 20;
+        const particleIcons = currentRestaurant === 'sushi' ? ['🫧', '⭐', '💖'] : ['❤️', '✨', '🎀'];
+        for (let i = 0; i < 9; i++) {
+          visualFX.monsterParticles.push({
+            x: mx + (Math.random() * 50 - 25),
+            y: my + (Math.random() * 20 - 10),
+            vx: (Math.random() - 0.5) * 3,
+            vy: -(Math.random() * 2.5 + 1.5),
+            text: particleIcons[Math.floor(Math.random() * particleIcons.length)],
+            life: 1.2
+          });
+        }
+
+        if (currentRestaurant === 'boss') {
+          state.bossStreak++;
+          el.bossStreakCount.textContent = `${state.bossStreak} / 20`;
+          setChefShout(`GLOUTON PRIME ROARS IN JOY! (${state.bossStreak}/20 STREAK!)`, 'happy');
+          
+          if (state.bossStreak >= 20) {
+            triggerGrandMasterVictory();
+            return;
+          }
+        } else {
+          setChefShout(`YUM! ${criticShort} squeals with joy! (+${pointsAwarded} pts)`, 'happy');
+        }
+
+        el.score.textContent = state.score;
+        el.score.classList.add('score-pop');
+        setTimeout(() => el.score.classList.remove('score-pop'), 250);
+
+        el.combo.textContent = `x${state.combo}`;
+        el.ordersServedCount.textContent = `Fed Critic: ${state.servedCount}`;
+        renderTickets();
+      } else {
+        const isBoss = (currentRestaurant === 'boss');
+        sound.playMonsterRoar(isBoss);
+        state.monster.mood = 'roaring';
+        state.monster.animTimer = 2.5;
+
+        const mx = STATIONS.monster.x + STATIONS.monster.w / 2;
+        const my = STATIONS.monster.y + 20;
+        for (let i = 0; i < 10; i++) {
+          visualFX.monsterParticles.push({
+            x: mx + (Math.random() * 50 - 25),
+            y: my + (Math.random() * 20 - 10),
+            vx: (Math.random() - 0.5) * 4,
+            vy: -(Math.random() * 3 + 1),
+            text: isBoss ? '💥' : '💢',
+            life: 1.0
+          });
+        }
+
+        if (isBoss) {
+          triggerBossGameOver(`You fed Critique Glouton Prime an incorrect dish! He destroyed the kitchen in titan fury!`);
+          return;
+        } else {
+          state.combo = 1;
+          el.combo.textContent = 'x1';
+          setChefShout(`OH NO! ${criticShort} pouted! Wrong ingredients on the plate!`, 'angry');
+        }
+      }
+    }
+
+    function dropHeldItem() {
+      if (!state.hasStarted || state.isPaused || state.isGameOver) return;
+      if (state.heldItem) {
+        const discardedName = state.heldItem.name;
+        state.heldItem = null;
+        sound.playTone(220, 'sawtooth', 0.12, 0.2);
+        setChefShout(`Dropped ${discardedName}! Hands are now empty.`, 'talking');
+      } else {
+        sound.playTone(180, 'sine', 0.06, 0.15);
+        setChefShout(`Hands are already empty!`, 'idle');
+      }
+    }
+
+    function clearEntirePlate() {
+      if (!state.hasStarted || state.isPaused || state.isGameOver) return;
+      if (state.plateStation.items.length > 0) {
+        state.plateStation.items = [];
+        sound.playTone(200, 'sawtooth', 0.15, 0.25);
+        setChefShout(`Cleared the whole plate! Ready for a fresh recipe!`, 'talking');
+        renderTickets();
+      } else {
+        sound.playTone(180, 'sine', 0.06, 0.15);
+        setChefShout(`Plate is already empty!`, 'idle');
+      }
+    }
+
+    function togglePause() {
+      if (!state.hasStarted || state.isGameOver) return;
+      state.isPaused = !state.isPaused;
+      if (state.isPaused) {
+        sound.playTone(280, 'sine', 0.1, 0.2);
+        el.btnStartPause.innerHTML = '▶️ RESUME';
+        el.btnStartPause.classList.remove('pixel-btn-primary');
+        el.btnStartPause.classList.add('pixel-btn-amber');
+        setChefShout('GAME PAUSED! Catch your breath!', 'idle');
+      } else {
+        sound.playTone(440, 'triangle', 0.1, 0.2);
+        el.btnStartPause.innerHTML = '⏸️ PAUSE';
+        el.btnStartPause.classList.remove('pixel-btn-amber');
+        el.btnStartPause.classList.add('pixel-btn-primary');
+        setChefShout('BACK TO FEEDING! Keep cooking!', 'happy');
+        lastTime = performance.now();
+      }
+    }
+
+    function triggerGrandMasterVictory() {
+      state.isGameOver = true;
+      campaignProgress.bossBeaten = true;
+      sound.playGrandMasterFanfare();
+
+      el.celebrationTrophyIcons.textContent = '👑 🏆 👾 👑';
+      el.celebrationHeadline.textContent = '👑 GRAND MASTER CHEF CROWNED! 👑';
+      el.celebrationSubtitle.textContent = '20 ORDERS IN A ROW CONQUERED! GLOUTON PRIME IS TAMED!';
+      el.celebrationChefAvatarEmoji.textContent = '👑';
+      el.celebrationQuoteText.textContent = `"EXTRAORDINAIRE! Chef Pierre and Master Kenji bow before you! 20 flawless dishes fed to the Monster Food Critic with zero mistakes! You are officially the Grand Master of Pixel Bistro!"`;
+
+      el.celebrationStarsRow.innerHTML = `
+        <span class="text-amber-400 scale-125 animate-bounce">👑</span>
+        <span class="text-amber-400 scale-150 animate-bounce">⭐</span>
+        <span class="text-amber-400 scale-150 animate-bounce">⭐</span>
+        <span class="text-amber-400 scale-150 animate-bounce">⭐</span>
+        <span class="text-amber-400 scale-125 animate-bounce">👑</span>
+      `;
+
+      el.celebrationScore.textContent = state.score;
+      el.celebrationServed.textContent = state.servedCount;
+      el.celebrationCombo.textContent = `x${state.maxCombo}`;
+      el.celebrationFailed.textContent = state.failedCount;
+
+      el.btnCelebrationNext.innerHTML = '<span>🏠</span> RETURN TO TITLE AS GRAND MASTER';
+
+      initCelebrationParticles();
+      el.modalCelebration.classList.remove('hidden');
+    }
+
+    function triggerCelebration(starsCount) {
+      if (currentRestaurant === 'boss') {
+        triggerBossGameOver(`Time expired before completing the 20-order streak!`);
+        return;
+      }
+
+      state.isGameOver = true;
+      sound.playVictoryFanfare();
+
+      const theme = THEMES[currentRestaurant];
+      const lvlData = theme.levels[currentLevel];
+
+      if (starsCount >= 1) {
+        if (currentLevel > campaignProgress[currentRestaurant].maxLevelCompleted) {
+          campaignProgress[currentRestaurant].maxLevelCompleted = currentLevel;
+        }
+        if (currentLevel === 3) {
+          campaignProgress[currentRestaurant].michelinAwarded = true;
+          checkBossUnlockCondition();
+        }
+      }
+
+      const isMaxCampaign = (currentLevel === 3 && starsCount >= 1);
+      if (isMaxCampaign) {
+        el.celebrationHeadline.textContent = '⭐ MICHELIN STAR AWARDED! ⭐';
+        el.celebrationSubtitle.textContent = `${theme.name.toUpperCase()} HAS ACHIEVED CULINARY PERFECTION!`;
+        
+        if (campaignProgress.bistro.michelinAwarded && campaignProgress.sushi.michelinAwarded) {
+          el.btnCelebrationNext.innerHTML = '<span>👑</span> CHALLENGE THE BOSS LEVEL!';
+        } else {
+          el.btnCelebrationNext.innerHTML = '<span>🏠</span> RETURN TO TITLE & VIEW STAMP';
+        }
+      } else {
+        el.celebrationHeadline.textContent = starsCount >= 1 ? '🎉 LEVEL COMPLETE! 🎉' : 'SHIFT FINISHED';
+        el.celebrationSubtitle.textContent = `${lvlData.title.toUpperCase()}`;
+        el.btnCelebrationNext.innerHTML = `<span>🚀</span> ADVANCE TO LEVEL ${currentLevel + 1}`;
+      }
+
+      el.celebrationStarsRow.innerHTML = '';
+      for (let s = 1; s <= 3; s++) {
+        const starSpan = document.createElement('span');
+        starSpan.textContent = '⭐';
+        starSpan.className = s <= starsCount ? 'text-amber-400 scale-125 transition-transform animate-bounce' : 'text-stone-300 opacity-30';
+        el.celebrationStarsRow.appendChild(starSpan);
+      }
+
+      if (currentLevel === 3 && starsCount >= 1) {
+        el.celebrationQuoteText.textContent = `"UNBELIEVABLE! ${theme.criticShort} gave us a standing ovation! Our Michelin Star is officially stamped on the front door!"`;
+      } else if (starsCount === 3) {
+        el.celebrationQuoteText.textContent = `"C'est magnifique! Three stars! ${theme.criticShort} gave a glowing review!"`;
+      } else if (starsCount === 2) {
+        el.celebrationQuoteText.textContent = `"Superb cooking! Two stars achieved! You kept the baby critic smiling and happy!"`;
+      } else if (starsCount === 1) {
+        el.celebrationQuoteText.textContent = `"Good effort! Shift completed with 1 star. Keep your combos rolling!"`;
+      } else {
+        el.celebrationQuoteText.textContent = `"${theme.criticShort} left grumpy! Let's try this tier again!"`;
+      }
+
+      el.celebrationScore.textContent = state.score;
+      el.celebrationServed.textContent = state.servedCount;
+      el.celebrationCombo.textContent = `x${state.maxCombo}`;
+      el.celebrationFailed.textContent = state.failedCount;
+
+      initCelebrationParticles();
+      el.modalCelebration.classList.remove('hidden');
+    }
+
+    function initCelebrationParticles() {
+      visualFX.confettiParticles = [];
+      const canvas = el.celebrationConfettiCanvas;
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+      const colors = ['#f4b41b', '#63c74d', '#2ce8f5', '#d95763', '#ffffff', '#e8786f', '#ffd700', '#ba1c24', '#f472b6'];
+      for (let i = 0; i < 140; i++) {
+        visualFX.confettiParticles.push({
+          x: Math.random() * canvas.width,
+          y: Math.random() * canvas.height * 0.4,
+          vx: (Math.random() - 0.5) * 7,
+          vy: Math.random() * 3 + 2,
+          size: Math.random() * 8 + 4,
+          color: colors[Math.floor(Math.random() * colors.length)],
+          rotation: Math.random() * 360,
+          rotSpeed: (Math.random() - 0.5) * 8
+        });
+      }
+    }
+
+    function renderCelebrationConfetti() {
+      if (el.modalCelebration.classList.contains('hidden')) return;
+      const canvas = el.celebrationConfettiCanvas;
+      confettiCtx.clearRect(0, 0, canvas.width, canvas.height);
+
+      visualFX.confettiParticles.forEach(p => {
+        p.x += p.vx;
+        p.y += p.vy;
+        p.rotation += p.rotSpeed;
+
+        if (p.y > canvas.height) {
+          p.y = -10;
+          p.x = Math.random() * canvas.width;
+        }
+
+        confettiCtx.save();
+        confettiCtx.translate(p.x, p.y);
+        confettiCtx.rotate((p.rotation * Math.PI) / 180);
+        confettiCtx.fillStyle = p.color;
+        confettiCtx.fillRect(-p.size / 2, -p.size / 2, p.size, p.size);
+        confettiCtx.restore();
+      });
+    }
+
+    let animTick = 0;
+
+    /* =====================================================================
+       MAIN KITCHEN CANVAS RENDERING: MULTI-CORNER & CENTER FLOOR
+       ===================================================================== */
+    function renderKitchenScene() {
+      const cw = el.kitchenCanvas.width;
+      const ch = el.kitchenCanvas.height;
+      ctx.clearRect(0, 0, cw, ch);
+      animTick++;
+
+      ctx.save();
+      if (visualFX.shakeTimer > 0) {
+        visualFX.shakeTimer -= 0.03;
+        const shakeMag = visualFX.shakeTimer * 8;
+        const ox = (Math.random() - 0.5) * shakeMag;
+        const oy = (Math.random() - 0.5) * shakeMag;
+        ctx.translate(ox, oy);
+      }
+
+      drawKitchenBackWall();
+      drawKitchenApplianceFixtures();
+      drawKitchenFloor();
+      drawTopBinCounterCanvas();
+
+      // Render the 4 Stations in their distinct Room Layout:
+      // Top-Left: Cutting Board
+      // Top-Right: Stove & Range
+      // Center Floor: Plating Island (Below Chef)
+      // Bottom Floor: Monster Food Critic (Across from Plate)
+      drawCuttingStationCanvas();
+      drawStoveStationCanvas();
+      drawPlatingStationCanvas();
+      drawMonsterCriticStation();
+
+      drawVisualFXParticles();
+
+      for (let i = visualFX.tantrumParticles.length - 1; i >= 0; i--) {
+        const tp = visualFX.tantrumParticles[i];
+        tp.x += tp.vx;
+        tp.y += tp.vy;
+        tp.life -= 0.03;
+        ctx.font = '16px monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText(tp.text, tp.x, tp.y);
+        if (tp.life <= 0) visualFX.tantrumParticles.splice(i, 1);
+      }
+
+      // Draw the Chef standing in the Upper-Center Kitchen Galley facing the player
+      const chefBaseY = isPortraitMobile ? 355 : 215;
+      if (currentRestaurant === 'boss') {
+        const chef1X = isPortraitMobile ? 180 : 435;
+        const chef2X = isPortraitMobile ? 340 : 505;
+        drawChefCharacter(chef1X, chefBaseY, 'pierre');
+        drawChefCharacter(chef2X, chefBaseY, 'kenji');
+      } else {
+        const chefX = isPortraitMobile ? 260 : 470;
+        drawChefCharacter(chefX, chefBaseY, currentRestaurant === 'sushi' ? 'kenji' : 'pierre');
+      }
+
+      drawLightingOverlays();
+      ctx.restore();
+
+      // Soft dim when paused (actual pause dialog is the modal)
+      if (state.isPaused && !state.isGameOver) {
+        ctx.fillStyle = 'rgba(15, 10, 25, 0.55)';
+        ctx.fillRect(0, 0, cw, ch);
+      }
+    }
+
+    function drawKitchenBackWall() {
+      const cw = el.kitchenCanvas.width;
+      const wallH = isPortraitMobile ? 185 : 125;
+      const theme = THEMES[currentRestaurant];
+      const isBoss = (currentRestaurant === 'boss');
+      const isSushi = (currentRestaurant === 'sushi');
+
+      ctx.fillStyle = theme.backWallColor;
+      ctx.fillRect(0, 0, cw, wallH);
+
+      const tw = 28, th = 14;
+      for (let y = 0; y < wallH - 10; y += th) {
+        const offset = (Math.floor(y / th) % 2 === 0) ? 0 : tw / 2;
+        for (let x = -tw; x < cw + tw; x += tw) {
+          if (isBoss) {
+            ctx.fillStyle = (Math.floor(x / tw) % 3 === 0) ? '#4a1259' : '#380c45';
+          } else if (isSushi) {
+            ctx.fillStyle = (Math.floor(x / tw) % 2 === 0) ? '#1f3a42' : '#172c32';
+          } else {
+            ctx.fillStyle = (Math.floor(x / tw) % 2 === 0) ? '#382a4a' : '#2d213c';
+          }
+          ctx.fillRect(x + offset + 1, y + 1, tw - 2, th - 2);
+
+          ctx.fillStyle = 'rgba(255,255,255,0.06)';
+          ctx.fillRect(x + offset + 1, y + 1, tw - 2, 2);
+        }
+      }
+
+      ctx.fillStyle = isBoss ? '#ffd700' : (isSushi ? '#433422' : '#5c3818');
+      ctx.fillRect(0, wallH - 14, cw, 10);
+      ctx.fillStyle = isBoss ? '#fff07a' : (isSushi ? '#6b5338' : '#8b5a2b');
+      ctx.fillRect(0, wallH - 12, cw, 4);
+      ctx.fillStyle = '#1c1006';
+      ctx.fillRect(0, wallH - 6, cw, 2);
+
+      const rackX = isPortraitMobile ? 24 : 340;
+      const rackY = isPortraitMobile ? 12 : 36;
+      ctx.fillStyle = '#1e1b2e';
+      ctx.fillRect(rackX, rackY + 14, 110, 4);
+      ['#ef4444', '#10b981', '#f59e0b', '#8b5cf6', '#ec4899'].forEach((spiceColor, sIdx) => {
+        const sx = rackX + 10 + sIdx * 20;
+        ctx.fillStyle = 'rgba(255,255,255,0.4)';
+        ctx.fillRect(sx, rackY + 2, 10, 12);
+        ctx.fillStyle = spiceColor;
+        ctx.fillRect(sx + 1, rackY + 5, 8, 8);
+        ctx.fillStyle = '#d97706';
+        ctx.fillRect(sx + 2, rackY, 6, 3);
+      });
+    }
+
+    function drawKitchenApplianceFixtures() {
+      const isBoss = (currentRestaurant === 'boss');
+      const isSushi = (currentRestaurant === 'sushi');
+
+      // Commercial Exhaust Hood over Top-Right Stove
+      const hx = STATIONS.stove.x - 8;
+      const hy = 0, hw = STATIONS.stove.w + 16, hh = 56;
+
+      ctx.fillStyle = isBoss ? '#380947' : (isSushi ? '#162b30' : '#1f2937');
+      ctx.beginPath();
+      ctx.moveTo(hx + 24, hy);
+      ctx.lineTo(hx + hw - 24, hy);
+      ctx.lineTo(hx + hw, hy + hh);
+      ctx.lineTo(hx, hy + hh);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.fillStyle = isBoss ? '#ffd700' : '#4b5563';
+      ctx.fillRect(hx + 6, hy + hh - 10, hw - 12, 8);
+      ctx.fillStyle = isBoss ? '#fff07a' : '#9ca3af';
+      ctx.fillRect(hx + 8, hy + hh - 9, hw - 16, 2);
+
+      for (let rx = hx + 14; rx < hx + hw - 14; rx += 28) {
+        ctx.fillStyle = '#d97706';
+        ctx.beginPath();
+        ctx.arc(rx, hy + hh - 6, 2, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // Overhead Pendant Lamp over Plating Island
+      const lampX = 470;
+      ctx.strokeStyle = '#111827';
+      ctx.lineWidth = 2;
+      ctx.beginPath();
+      ctx.moveTo(lampX, 0);
+      ctx.lineTo(lampX, 42);
+      ctx.stroke();
+
+      ctx.fillStyle = isBoss ? '#ffd700' : (isSushi ? '#0f766e' : '#dc2626');
+      ctx.beginPath();
+      ctx.moveTo(lampX - 22, 58);
+      ctx.lineTo(lampX + 22, 58);
+      ctx.lineTo(lampX + 14, 42);
+      ctx.lineTo(lampX - 14, 42);
+      ctx.closePath();
+      ctx.fill();
+
+      ctx.fillStyle = '#fef08a';
+      ctx.beginPath();
+      ctx.arc(lampX, 59, 7, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    function drawKitchenFloor() {
+      const cw = el.kitchenCanvas.width;
+      const ch = el.kitchenCanvas.height;
+      const startY = isPortraitMobile ? 180 : 120;
+      const theme = THEMES[currentRestaurant];
+      const tileSize = 32;
+      for (let y = startY; y < ch; y += tileSize) {
+        for (let x = 0; x < cw; x += tileSize) {
+          const isEven = (Math.floor(x / tileSize) + Math.floor(y / tileSize)) % 2 === 0;
+          ctx.fillStyle = isEven ? theme.floorTile1 : theme.floorTile2;
+          ctx.fillRect(x, y, tileSize, tileSize);
+          ctx.fillStyle = '#171120';
+          ctx.fillRect(x, y + tileSize - 1, tileSize, 1);
+          ctx.fillRect(x + tileSize - 1, y, 1, tileSize);
+        }
+      }
+    }
+
+    function drawTopBinCounterCanvas() {
+      const cw = el.kitchenCanvas.width;
+      const counterH = isPortraitMobile ? 172 : 92;
+      ctx.fillStyle = '#110b1a';
+      ctx.fillRect(10, 8, cw - 20, counterH);
+      ctx.fillStyle = currentRestaurant === 'boss' ? '#3c104d' : '#271b36';
+      ctx.fillRect(12, 6, cw - 24, counterH - 2);
+      ctx.fillStyle = currentRestaurant === 'boss' ? '#ffd700' : '#3d2b54';
+      ctx.fillRect(12, 6, cw - 24, 5);
+
+      CANVAS_BINS.forEach((bin, idx) => {
+        ctx.fillStyle = 'rgba(0,0,0,0.4)';
+        ctx.fillRect(bin.x + 2, bin.y + 4, bin.w, bin.h);
+
+        ctx.fillStyle = currentRestaurant === 'boss' ? '#591669' : (currentRestaurant === 'sushi' ? '#1d3330' : '#4a2810');
+        ctx.fillRect(bin.x, bin.y, bin.w, bin.h);
+        ctx.fillStyle = currentRestaurant === 'boss' ? '#801d96' : (currentRestaurant === 'sushi' ? '#2d4d49' : '#804f25');
+        ctx.fillRect(bin.x + 2, bin.y + 2, bin.w - 4, bin.h - 4);
+        ctx.fillStyle = currentRestaurant === 'boss' ? '#a629c4' : (currentRestaurant === 'sushi' ? '#3d635f' : '#a66b38');
+        ctx.fillRect(bin.x + 4, bin.y + 4, bin.w - 8, bin.h - 8);
+
+        ctx.fillStyle = '#2c1808';
+        ctx.fillRect(bin.x + 6, bin.y + 6, bin.w - 12, bin.h - 26);
+
+        ctx.fillStyle = currentRestaurant === 'boss' ? '#ffd700' : '#5c3518';
+        ctx.fillRect(bin.x + 4, bin.y + (bin.h / 2), bin.w - 8, 2);
+
+        const iconY = bin.y + (bin.h / 2) - 6 + Math.sin(animTick * 0.1 + idx) * 2;
+        ctx.font = isPortraitMobile ? '30px monospace' : '28px monospace';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(bin.item.icon, bin.x + bin.w / 2, iconY);
+
+        ctx.fillStyle = '#170f22';
+        ctx.fillRect(bin.x + 4, bin.y + bin.h - 18, bin.w - 8, 14);
+        ctx.fillStyle = '#fce3a2';
+        ctx.font = '8px "Press Start 2P"';
+        ctx.fillText(bin.item.name.substring(0, 8), bin.x + bin.w / 2, bin.y + bin.h - 8);
+
+        ctx.fillStyle = currentRestaurant === 'boss' ? '#ffd700' : '#f4b41b';
+        ctx.fillRect(bin.x + 3, bin.y + 3, 14, 12);
+        ctx.fillStyle = '#222034';
+        ctx.font = '8px "Press Start 2P"';
+        ctx.fillText(`${idx + 1}`, bin.x + 10, bin.y + 12);
+      });
+    }
+
+    // STATION 1: TOP-LEFT CORNER (Cutting Board)
+    function drawCuttingStationCanvas() {
+      const s = STATIONS.cutting;
+      const theme = THEMES[currentRestaurant];
+      const isSushi = (currentRestaurant === 'sushi');
+
+      // Corner Counter Base
+      ctx.fillStyle = 'rgba(0,0,0,0.4)';
+      ctx.fillRect(s.x + 4, s.y + 4, s.w, s.h);
+
+      ctx.fillStyle = isSushi ? '#233833' : '#4d2b15';
+      ctx.fillRect(s.x, s.y, s.w, s.h);
+      ctx.fillStyle = isSushi ? '#35544d' : '#6b3f1f';
+      ctx.fillRect(s.x + 3, s.y + 3, s.w - 6, s.h - 6);
+
+      // Wooden Butcher Block surface
+      ctx.fillStyle = isSushi ? '#a2b9a3' : '#b07943';
+      ctx.fillRect(s.x + 8, s.y + 26, s.w - 16, s.h - 34);
+
+      // Wood grain grooves
+      ctx.fillStyle = isSushi ? 'rgba(70,95,70,0.25)' : 'rgba(90,45,15,0.22)';
+      for (let gx = s.x + 24; gx < s.x + s.w - 20; gx += 26) {
+        ctx.fillRect(gx, s.y + 30, 2, s.h - 42);
+      }
+
+      // Title plaque
+      ctx.fillStyle = '#221509';
+      ctx.fillRect(s.x + 12, s.y + 6, s.w - 24, 16);
+      ctx.fillStyle = '#fce3a2';
+      ctx.font = '8px "Press Start 2P"';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(theme.boardName, s.x + s.w / 2, s.y + 14);
+
+      const item = state.cuttingStation.item;
+      if (item) {
+        ctx.font = '36px monospace';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(item.icon, s.x + s.w / 2, s.y + 70);
+
+        const pct = state.cuttingStation.chopProgress / 100;
+        ctx.fillStyle = '#1a101f';
+        ctx.fillRect(s.x + 20, s.y + 104, s.w - 40, 16);
+        ctx.fillStyle = '#3b2447';
+        ctx.fillRect(s.x + 22, s.y + 106, s.w - 44, 12);
+
+        ctx.fillStyle = pct >= 1 ? '#63c74d' : '#d95763';
+        ctx.fillRect(s.x + 22, s.y + 106, (s.w - 44) * pct, 12);
+
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '8px "Press Start 2P"';
+        ctx.textAlign = 'center';
+        ctx.fillText(pct >= 1 ? 'READY! (CLICK)' : 'CHOP [C]', s.x + s.w / 2, s.y + 138);
+      } else {
+        ctx.fillStyle = '#4a2c12';
+        ctx.font = '8px "Press Start 2P"';
+        ctx.textAlign = 'center';
+        ctx.fillText('SELECT INGREDIENT', s.x + s.w / 2, s.y + 74);
+        ctx.fillText('TO CHOP HERE', s.x + s.w / 2, s.y + 92);
+      }
+
+      // Animated Knife
+      const knifeAngle = state.knifeAnim > 0 ? -state.knifeAnim * 0.7 : -0.15;
+      const knifeYOffset = state.knifeAnim > 0 ? -state.knifeAnim * 16 : 0;
+      ctx.save();
+      ctx.translate(s.x + s.w / 2 + 38, s.y + 60 + knifeYOffset);
+      ctx.rotate(knifeAngle);
+
+      ctx.fillStyle = currentRestaurant === 'boss' ? '#ffd700' : '#e8ecf2';
+      ctx.fillRect(-30, -7, 44, 13);
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(-28, -7, 40, 4);
+      ctx.fillStyle = '#522b14';
+      ctx.fillRect(14, -6, 18, 11);
+      ctx.restore();
+
+      if (state.knifeAnim > 0) {
+        state.knifeAnim = Math.max(0, state.knifeAnim - 0.14);
+      }
+    }
+
+    // STATION 2: TOP-RIGHT CORNER (Stove & Range)
+    function drawStoveStationCanvas() {
+      const s = STATIONS.stove;
+      const theme = THEMES[currentRestaurant];
+      const isBoss = (currentRestaurant === 'boss');
+      const isSushi = (currentRestaurant === 'sushi');
+
+      // Corner Counter Base
+      ctx.fillStyle = 'rgba(0,0,0,0.4)';
+      ctx.fillRect(s.x + 4, s.y + 4, s.w, s.h);
+
+      ctx.fillStyle = isBoss ? '#1f0426' : (isSushi ? '#1a292b' : '#22252a');
+      ctx.fillRect(s.x, s.y, s.w, s.h);
+      ctx.fillStyle = isBoss ? '#ffd700' : '#4b5563';
+      ctx.fillRect(s.x + 3, s.y + 3, s.w - 6, s.h - 6);
+
+      // Stainless / dark interior
+      ctx.fillStyle = isBoss ? '#2e083a' : '#141619';
+      ctx.fillRect(s.x + 6, s.y + 24, s.w - 12, s.h - 30);
+
+      // Title plaque
+      ctx.fillStyle = '#111214';
+      ctx.fillRect(s.x + 12, s.y + 6, s.w - 24, 16);
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '8px "Press Start 2P"';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(theme.stoveName, s.x + s.w / 2, s.y + 14);
+
+      const cx = s.x + s.w / 2;
+      const cy = s.y + 70;
+
+      // Burner Grate
+      ctx.fillStyle = '#0a0b0d';
+      ctx.beginPath();
+      ctx.arc(cx, cy, 38, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Flame Jets
+      if (state.stoveStation.isCooking) {
+        for (let i = 0; i < 12; i++) {
+          const ang = (i / 12) * Math.PI * 2;
+          const dist = 30 + Math.sin(animTick * 0.4 + i) * 2;
+          const fx = cx + Math.cos(ang) * dist;
+          const fy = cy + Math.sin(ang) * dist;
+
+          ctx.fillStyle = isBoss ? '#ff3366' : '#2ce8f5';
+          ctx.beginPath();
+          ctx.arc(fx, fy, 5, 0, Math.PI * 2);
+          ctx.fill();
+
+          ctx.fillStyle = '#fef08a';
+          ctx.beginPath();
+          ctx.arc(fx, fy, 2, 0, Math.PI * 2);
+          ctx.fill();
+        }
+
+        if (animTick % 5 === 0) {
+          visualFX.steamParticles.push({
+            x: cx + (Math.random() * 32 - 16),
+            y: cy - 14,
+            vx: (Math.random() - 0.5) * 0.8,
+            vy: -(Math.random() * 1.5 + 1.2),
+            size: Math.random() * 7 + 6,
+            alpha: 0.8
+          });
+        }
+      }
+
+      // Pan / Pot surface
+      ctx.fillStyle = isSushi ? '#e2e8f0' : '#1f2126';
+      ctx.beginPath();
+      ctx.arc(cx, cy, 28, 0, Math.PI * 2);
+      ctx.fill();
+
+      // Pan Handle
+      ctx.fillStyle = '#111215';
+      ctx.fillRect(cx + 26, cy - 4, 22, 8);
+
+      const item = state.stoveStation.item;
+      if (item) {
+        ctx.font = '28px monospace';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(item.icon, cx, cy);
+
+        const pct = state.stoveStation.cookProgress / 100;
+        ctx.fillStyle = '#1a101f';
+        ctx.fillRect(s.x + 20, s.y + 112, s.w - 40, 16);
+        ctx.fillStyle = '#3b2447';
+        ctx.fillRect(s.x + 22, s.y + 114, s.w - 44, 12);
+
+        ctx.fillStyle = pct >= 1 ? '#63c74d' : '#f4b41b';
+        ctx.fillRect(s.x + 22, s.y + 114, (s.w - 44) * pct, 12);
+
+        ctx.fillStyle = '#ffffff';
+        ctx.font = '8px "Press Start 2P"';
+        ctx.textAlign = 'center';
+        ctx.fillText(pct >= 1 ? 'READY! (CLICK)' : 'COOKING [V]', cx, s.y + 144);
+      } else {
+        ctx.fillStyle = '#8a94a6';
+        ctx.font = '8px "Press Start 2P"';
+        ctx.textAlign = 'center';
+        ctx.fillText('PLACE INGREDIENT', cx, cy - 6);
+        ctx.fillText('TO COOK/STEAM', cx, cy + 12);
+      }
+    }
+
+    // STATION 3: CENTER FLOOR ISLAND (Plating Table Directly Below Chef)
+    function drawPlatingStationCanvas() {
+      const s = STATIONS.plate;
+      const theme = THEMES[currentRestaurant];
+      const isBoss = (currentRestaurant === 'boss');
+      const isSushi = (currentRestaurant === 'sushi');
+
+      // Center Island Table
+      ctx.fillStyle = 'rgba(0,0,0,0.35)';
+      ctx.fillRect(s.x + 4, s.y + 4, s.w, s.h);
+
+      ctx.fillStyle = isBoss ? '#380947' : (isSushi ? '#1b3236' : '#4d2b15');
+      ctx.fillRect(s.x, s.y, s.w, s.h);
+      ctx.fillStyle = isBoss ? '#ffd700' : (isSushi ? '#2d4d52' : '#6e3c1d');
+      ctx.fillRect(s.x + 3, s.y + 3, s.w - 6, s.h - 6);
+
+      // Prep mat / counter top
+      ctx.fillStyle = isSushi ? '#e0ceb1' : '#f0dfc8';
+      ctx.fillRect(s.x + 6, s.y + 6, s.w - 12, s.h - 12);
+
+      // Title badge
+      ctx.fillStyle = '#1c1007';
+      ctx.fillRect(s.x + 10, s.y + 8, 220, 16);
+      ctx.fillStyle = '#fce3a2';
+      ctx.font = '8px "Press Start 2P"';
+      ctx.textAlign = 'left';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(theme.plateName, s.x + 16, s.y + 16);
+
+      const cx = s.x + s.w / 2;
+      const cy = s.y + s.h / 2 + 10;
+
+      // Fine porcelain serving plate
+      ctx.fillStyle = 'rgba(0,0,0,0.25)';
+      ctx.beginPath();
+      ctx.ellipse(cx, cy + 4, 110, 26, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = '#ffffff';
+      ctx.beginPath();
+      ctx.ellipse(cx, cy, 106, 24, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.strokeStyle = isBoss ? '#ffd700' : (isSushi ? '#0d9488' : '#f4b41b');
+      ctx.lineWidth = 2.5;
+      ctx.beginPath();
+      ctx.ellipse(cx, cy, 94, 19, 0, 0, Math.PI * 2);
+      ctx.stroke();
+
+      if (state.plateStation.items.length === 0) {
+        ctx.fillStyle = '#9e8972';
+        ctx.font = '8px "Press Start 2P"';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('CENTER ISLAND: STACK ITEMS HERE [B]', cx, cy);
+      } else {
+        state.plateStation.items.forEach((itemId, idx) => {
+          const itemDef = ITEM_CATALOG[itemId];
+          if (itemDef) {
+            ctx.font = '26px monospace';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            const offset = (idx - (state.plateStation.items.length - 1) / 2) * 28;
+            ctx.fillText(itemDef.icon, cx + offset, cy);
+          }
+        });
+      }
+    }
+
+    // STATION 4: BOTTOM FLOOR DINING COUNTER (Across from Plating Island)
+    function drawMonsterCriticStation() {
+      const s = STATIONS.monster;
+      const cx = s.x + s.w / 2;
+      const cy = s.y + s.h / 2 - 12;
+      const theme = THEMES[currentRestaurant];
+      const isBoss = (currentRestaurant === 'boss');
+      const isSushi = (currentRestaurant === 'sushi');
+
+      if (state.monster.animTimer > 0) {
+        state.monster.animTimer -= 0.02;
+        if (state.monster.animTimer <= 0) {
+          state.monster.mood = 'hungry';
+        }
+      }
+
+      // Dining Counter Bar Frame
+      ctx.fillStyle = 'rgba(0,0,0,0.35)';
+      ctx.fillRect(s.x + 4, s.y + 4, s.w, s.h);
+
+      ctx.fillStyle = isBoss ? '#20052b' : (isSushi ? '#0f2024' : '#1e1124');
+      ctx.fillRect(s.x, s.y, s.w, s.h);
+
+      // Warm dining room backdrop
+      ctx.fillStyle = isBoss ? '#3b0d4f' : (isSushi ? '#163138' : '#331d3d');
+      ctx.fillRect(s.x + 4, s.y + 4, s.w - 8, s.h - 8);
+
+      // Striped awning overhead
+      const awningW = (s.w - 8) / 8;
+      for (let i = 0; i < 8; i++) {
+        ctx.fillStyle = (i % 2 === 0) ? (isBoss ? '#ffd700' : (isSushi ? '#0d9488' : '#e11d48')) : '#fff9ed';
+        ctx.fillRect(s.x + 4 + i * awningW, s.y + 4, awningW, 10);
+      }
+
+      // Wooden counter top
+      ctx.fillStyle = isBoss ? '#ffd700' : '#8b5a2b';
+      ctx.fillRect(s.x, s.y + s.h - 22, s.w, 8);
+      ctx.fillStyle = isBoss ? '#fff07a' : '#b87c42';
+      ctx.fillRect(s.x, s.y + s.h - 22, s.w, 2);
+
+      let bounce = Math.sin(animTick * 0.15) * 2.5;
+      let mouthOpen = 8;
+
+      if (state.monster.mood === 'eating') {
+        bounce = Math.sin(animTick * 0.45) * 5;
+        mouthOpen = 6 + Math.abs(Math.sin(animTick * 0.6)) * 14;
+      } else if (state.monster.mood === 'roaring') {
+        bounce = (Math.random() - 0.5) * 4;
+        mouthOpen = 22;
+      } else if (state.plateStation.items.length > 0) {
+        mouthOpen = 16;
+      }
+
+      const bodyY = cy + 4 + bounce;
+
+      // 1. BABY BISTRO CRITIC: "Bistrotte"
+      if (theme.criticType === 'baby_bistro') {
+        const earWiggle = Math.sin(animTick * 0.2) * 5;
+        ctx.fillStyle = state.monster.mood === 'roaring' ? '#fb7185' : '#f472b6';
+        ctx.beginPath();
+        ctx.ellipse(cx - 38, bodyY - 14 + earWiggle, 12, 18, -0.4, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#fbcfe8';
+        ctx.beginPath();
+        ctx.ellipse(cx - 38, bodyY - 14 + earWiggle, 7, 12, -0.4, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = state.monster.mood === 'roaring' ? '#fb7185' : '#f472b6';
+        ctx.beginPath();
+        ctx.ellipse(cx + 38, bodyY - 14 - earWiggle, 12, 18, 0.4, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#fbcfe8';
+        ctx.beginPath();
+        ctx.ellipse(cx + 38, bodyY - 14 - earWiggle, 7, 12, 0.4, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = state.monster.mood === 'roaring' ? '#f43f5e' : '#f9a8d4';
+        ctx.beginPath();
+        ctx.ellipse(cx, bodyY, 44, 28, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = '#dc2626';
+        ctx.beginPath();
+        ctx.ellipse(cx - 8, bodyY - 26, 18, 8, -0.2, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = 'rgba(244, 63, 94, 0.5)';
+        ctx.beginPath();
+        ctx.arc(cx - 20, bodyY + 4, 7, 0, Math.PI * 2);
+        ctx.arc(cx + 20, bodyY + 4, 7, 0, Math.PI * 2);
+        ctx.fill();
+
+        [-14, 14].forEach(ex => {
+          ctx.fillStyle = '#1e1b4b';
+          ctx.beginPath();
+          ctx.arc(cx + ex, bodyY - 6, 8, 0, Math.PI * 2);
+          ctx.fill();
+
+          if (state.monster.mood === 'roaring') {
+            ctx.fillStyle = '#dc2626';
+            ctx.fillRect(cx + ex - 3, bodyY - 8, 6, 6);
+          } else {
+            ctx.fillStyle = '#ffffff';
+            ctx.beginPath();
+            ctx.arc(cx + ex - 2, bodyY - 8, 3, 0, Math.PI * 2);
+            ctx.arc(cx + ex + 2, bodyY - 4, 2, 0, Math.PI * 2);
+          }
+        });
+
+        ctx.fillStyle = '#581c87';
+        ctx.beginPath();
+        ctx.ellipse(cx, bodyY + 10, 11, mouthOpen / 2, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = '#ffffff';
+        ctx.beginPath();
+        ctx.ellipse(cx, bodyY + 22, 18, 8, 0, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = '#e11d48';
+        ctx.fillRect(cx - 12, bodyY + 20, 24, 3);
+      }
+
+      // 2. BABY SUSHI CRITIC: "Mochikichi"
+      else if (theme.criticType === 'baby_sushi') {
+        const gillWiggle = Math.sin(animTick * 0.25) * 4;
+        ctx.fillStyle = '#f472b6';
+        [-1, 0, 1].forEach(i => {
+          ctx.beginPath();
+          ctx.ellipse(cx - 36 + i * 2, bodyY - 8 + i * 8 + gillWiggle, 10, 4, -0.3, 0, Math.PI * 2);
+          ctx.fill();
+          ctx.beginPath();
+          ctx.ellipse(cx + 36 - i * 2, bodyY - 8 + i * 8 - gillWiggle, 10, 4, 0.3, 0, Math.PI * 2);
+          ctx.fill();
+        });
+
+        ctx.fillStyle = state.monster.mood === 'roaring' ? '#38bdf8' : '#5eead4';
+        ctx.beginPath();
+        ctx.ellipse(cx, bodyY, 42, 28, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = '#134e4a';
+        ctx.fillRect(cx - 26, bodyY - 18, 52, 5);
+        ctx.fillStyle = '#facc15';
+        ctx.fillRect(cx - 4, bodyY - 22, 8, 8);
+
+        ctx.fillStyle = 'rgba(244, 114, 182, 0.55)';
+        ctx.beginPath();
+        ctx.arc(cx - 18, bodyY + 5, 6, 0, Math.PI * 2);
+        ctx.arc(cx + 18, bodyY + 5, 6, 0, Math.PI * 2);
+        ctx.fill();
+
+        [-13, 13].forEach(ex => {
+          ctx.fillStyle = '#0f172a';
+          ctx.beginPath();
+          ctx.arc(cx + ex, bodyY - 6, 7, 0, Math.PI * 2);
+          ctx.fill();
+
+          if (state.monster.mood === 'roaring') {
+            ctx.fillStyle = '#0ea5e9';
+            ctx.fillRect(cx + ex - 3, bodyY - 7, 5, 5);
+          } else {
+            ctx.fillStyle = '#ffffff';
+            ctx.fillRect(cx + ex - 2, bodyY - 8, 3, 3);
+            ctx.fillRect(cx + ex + 1, bodyY - 5, 2, 2);
+          }
+        });
+
+        ctx.fillStyle = '#115e59';
+        ctx.beginPath();
+        ctx.ellipse(cx, bodyY + 10, 9, mouthOpen / 2, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = '#15803d';
+        ctx.beginPath();
+        ctx.ellipse(cx, bodyY + 22, 16, 7, 0, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // 3. BOSS DUEL: "Critique Glouton Prime"
+      else {
+        ctx.fillStyle = '#ffd700';
+        ctx.fillRect(cx - 18, bodyY - 38, 36, 12);
+        ctx.fillRect(cx - 18, bodyY - 44, 6, 7);
+        ctx.fillRect(cx - 3, bodyY - 46, 6, 9);
+        ctx.fillRect(cx + 12, bodyY - 44, 6, 7);
+        ctx.fillStyle = '#e11d48';
+        ctx.fillRect(cx - 2, bodyY - 36, 4, 4);
+
+        const monsterColor = (state.monster.mood === 'roaring') ? '#e11d48' : '#9333ea';
+        ctx.fillStyle = monsterColor;
+        ctx.beginPath();
+        ctx.ellipse(cx, bodyY, 52, 32, 0, 0, Math.PI * 2);
+        ctx.fill();
+
+        [-22, 0, 22].forEach((xOff, idx) => {
+          ctx.fillStyle = '#ffffff';
+          ctx.beginPath();
+          ctx.arc(cx + xOff, bodyY - 10 - (idx === 1 ? 4 : 0), (idx === 1 ? 8 : 7), 0, Math.PI * 2);
+          ctx.fill();
+
+          let pupilX = cx + xOff;
+          let pupilY = bodyY - 10 - (idx === 1 ? 4 : 0);
+          if (state.monster.mood === 'roaring') {
+            ctx.fillStyle = '#ff0000';
+            ctx.fillRect(pupilX - 2, pupilY - 4, 4, 8);
+          } else {
+            ctx.fillStyle = '#1e1b4b';
+            ctx.beginPath();
+            ctx.arc(pupilX, pupilY, (idx === 1 ? 4 : 3), 0, Math.PI * 2);
+            ctx.fill();
+          }
+        });
+
+        const mouthY = bodyY + 12;
+        ctx.fillStyle = '#0f051d';
+        ctx.beginPath();
+        ctx.ellipse(cx, mouthY, 26, mouthOpen / 2, 0, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      // Action bar at bottom of counter
+      ctx.fillStyle = '#110617';
+      ctx.fillRect(s.x + 8, s.y + s.h - 14, s.w - 16, 12);
+      ctx.fillStyle = '#ffffff';
+      ctx.font = '7px "Press Start 2P"';
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      if (state.monster.mood === 'eating') {
+        ctx.fillText('YUMMY! ❤️✨', cx, s.y + s.h - 8);
+      } else if (state.monster.mood === 'roaring') {
+        ctx.fillStyle = '#f87171';
+        ctx.fillText('POUT! WRONG DISH!', cx, s.y + s.h - 8);
+      } else {
+        ctx.fillText(`FEED ${theme.criticShort.toUpperCase()} [SPACE]`, cx, s.y + s.h - 8);
+      }
+    }
+
+    function drawChefCharacter(cx, cy, chefType) {
+      const bounce = Math.sin(animTick * 0.2 + (chefType === 'kenji' ? 1 : 0)) * 2;
+      ctx.fillStyle = 'rgba(0,0,0,0.35)';
+      ctx.beginPath();
+      ctx.ellipse(cx, cy + 32, 22, 9, 0, 0, Math.PI * 2);
+      ctx.fill();
+
+      ctx.fillStyle = '#ffffff';
+      ctx.fillRect(cx - 17, cy - 2 + bounce, 34, 30);
+      ctx.fillStyle = '#e0dede';
+      ctx.fillRect(cx - 17, cy + 20 + bounce, 34, 8);
+
+      ctx.fillStyle = chefType === 'kenji' ? '#0099db' : '#d95763';
+      ctx.fillRect(cx - 8, cy - 4 + bounce, 16, 7);
+
+      ctx.fillStyle = '#f6b38c';
+      ctx.fillRect(cx - 15, cy - 22 + bounce, 30, 20);
+
+      ctx.fillStyle = '#222034';
+      ctx.fillRect(cx - 9, cy - 15 + bounce, 4, 4);
+      ctx.fillRect(cx + 6, cy - 15 + bounce, 4, 4);
+
+      if (chefType === 'kenji') {
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(cx - 16, cy - 25 + bounce, 32, 6);
+        ctx.fillStyle = '#d92525';
+        ctx.fillRect(cx - 4, cy - 24 + bounce, 8, 4);
+        ctx.fillStyle = '#222034';
+        ctx.fillRect(cx - 16, cy - 30 + bounce, 32, 5);
+      } else {
+        ctx.fillStyle = '#ffffff';
+        ctx.fillRect(cx - 17, cy - 38 + bounce, 34, 17);
+        ctx.fillRect(cx - 21, cy - 34 + bounce, 42, 13);
+      }
+
+      if (state.heldItem && (chefType === 'pierre' || currentRestaurant !== 'boss')) {
+        ctx.fillStyle = 'rgba(0,0,0,0.6)';
+        ctx.beginPath();
+        ctx.arc(cx, cy - 54 + bounce, 18, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.strokeStyle = '#ffd700';
+        ctx.lineWidth = 2;
+        ctx.stroke();
+
+        ctx.font = '26px monospace';
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText(state.heldItem.icon, cx, cy - 53 + bounce);
+      }
+    }
+
+    function drawVisualFXParticles() {
+      for (let i = visualFX.steamParticles.length - 1; i >= 0; i--) {
+        const p = visualFX.steamParticles[i];
+        p.x += p.vx;
+        p.y += p.vy;
+        p.alpha -= 0.02;
+        p.size += 0.2;
+        ctx.fillStyle = `rgba(235, 240, 245, ${Math.max(0, p.alpha)})`;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fill();
+        if (p.alpha <= 0) visualFX.steamParticles.splice(i, 1);
+      }
+
+      for (let i = visualFX.chopDebris.length - 1; i >= 0; i--) {
+        const d = visualFX.chopDebris[i];
+        d.x += d.vx;
+        d.y += d.vy;
+        d.vy += 0.3;
+        d.life -= 0.04;
+        ctx.fillStyle = d.color;
+        ctx.fillRect(d.x, d.y, d.size, d.size);
+        if (d.life <= 0) visualFX.chopDebris.splice(i, 1);
+      }
+
+      for (let i = visualFX.monsterParticles.length - 1; i >= 0; i--) {
+        const mp = visualFX.monsterParticles[i];
+        mp.x += mp.vx;
+        mp.y += mp.vy;
+        mp.life -= 0.025;
+        ctx.font = '18px monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText(mp.text, mp.x, mp.y);
+        if (mp.life <= 0) visualFX.monsterParticles.splice(i, 1);
+      }
+    }
+
+    function drawLightingOverlays() {
+      const lampGlow = ctx.createRadialGradient(470, 60, 10, 470, 180, 240);
+      lampGlow.addColorStop(0, currentRestaurant === 'boss' ? 'rgba(255, 215, 0, 0.25)' : 'rgba(255, 230, 150, 0.18)');
+      lampGlow.addColorStop(1, 'rgba(255, 230, 150, 0.0)');
+      ctx.fillStyle = lampGlow;
+      ctx.fillRect(200, 40, 540, 320);
+
+      if (state.stoveStation.isCooking) {
+        const stoveGlow = ctx.createRadialGradient(STATIONS.stove.x + STATIONS.stove.w / 2, STATIONS.stove.y + 70, 20, STATIONS.stove.x + STATIONS.stove.w / 2, STATIONS.stove.y + 70, 140);
+        stoveGlow.addColorStop(0, 'rgba(255, 120, 40, 0.28)');
+        stoveGlow.addColorStop(1, 'rgba(255, 120, 40, 0.0)');
+        ctx.fillStyle = stoveGlow;
+        ctx.fillRect(STATIONS.stove.x - 20, STATIONS.stove.y - 20, STATIONS.stove.w + 40, STATIONS.stove.h + 40);
+      }
+    }
+
+    function renderChefPortrait(targetCtx) {
+      targetCtx.clearRect(0, 0, 64, 64);
+      const bounce = (state.chefMood === 'talking' || state.chefMood === 'happy' || !state.hasStarted) ? Math.sin(animTick * 0.25) * 2 : 0;
+
+      targetCtx.fillStyle = currentRestaurant === 'boss' ? '#ffd700' : '#fceecb';
+      targetCtx.fillRect(0, 0, 64, 64);
+
+      const cx = 32;
+      const cy = 36 + bounce;
+
+      if (currentRestaurant === 'boss') {
+        targetCtx.fillStyle = '#ffffff';
+        targetCtx.fillRect(cx - 18, cy + 10, 36, 20);
+        targetCtx.fillStyle = '#ffd700';
+        targetCtx.fillRect(cx - 6, cy + 8, 12, 5);
+
+        targetCtx.fillStyle = '#f6b38c';
+        targetCtx.fillRect(cx - 14, cy - 10, 28, 20);
+
+        targetCtx.fillStyle = '#222034';
+        targetCtx.fillRect(cx - 9, cy - 4, 4, 4);
+        targetCtx.fillRect(cx + 5, cy - 4, 4, 4);
+
+        targetCtx.fillStyle = '#372b43';
+        targetCtx.fillRect(cx - 11, cy + 2, 22, 4);
+
+        targetCtx.fillStyle = '#ffd700';
+        targetCtx.fillRect(cx - 16, cy - 22, 32, 10);
+        targetCtx.fillRect(cx - 16, cy - 28, 6, 8);
+        targetCtx.fillRect(cx - 3, cy - 30, 6, 10);
+        targetCtx.fillRect(cx + 10, cy - 28, 6, 8);
+        targetCtx.fillStyle = '#d92525';
+        targetCtx.fillRect(cx - 2, cy - 20, 4, 4);
+      } else if (currentRestaurant === 'sushi') {
+        targetCtx.fillStyle = '#1e3848';
+        targetCtx.fillRect(cx - 18, cy + 10, 36, 20);
+        targetCtx.fillStyle = '#397893';
+        targetCtx.fillRect(cx - 6, cy + 8, 12, 5);
+
+        targetCtx.fillStyle = '#f6b38c';
+        targetCtx.fillRect(cx - 14, cy - 10, 28, 20);
+
+        targetCtx.fillStyle = '#222034';
+        targetCtx.fillRect(cx - 9, cy - 3, 4, 4);
+        targetCtx.fillRect(cx + 5, cy - 3, 4, 4);
+
+        targetCtx.fillStyle = '#ffffff';
+        targetCtx.fillRect(cx - 15, cy - 12, 30, 6);
+        targetCtx.fillStyle = '#d92525';
+        targetCtx.fillRect(cx - 3, cy - 11, 6, 4);
+        targetCtx.fillStyle = '#222034';
+        targetCtx.fillRect(cx - 15, cy - 18, 30, 7);
+      } else {
+        targetCtx.fillStyle = '#ffffff';
+        targetCtx.fillRect(cx - 18, cy + 10, 36, 20);
+        targetCtx.fillStyle = '#d95763';
+        targetCtx.fillRect(cx - 6, cy + 8, 12, 5);
+
+        targetCtx.fillStyle = '#f6b38c';
+        targetCtx.fillRect(cx - 14, cy - 10, 28, 20);
+
+        targetCtx.fillStyle = '#222034';
+        targetCtx.fillRect(cx - 9, cy - 4, 4, 4);
+        targetCtx.fillRect(cx + 5, cy - 4, 4, 4);
+
+        targetCtx.fillStyle = '#372b43';
+        targetCtx.fillRect(cx - 11, cy + 2, 22, 4);
+
+        targetCtx.fillStyle = '#ffffff';
+        targetCtx.fillRect(cx - 14, cy - 22, 28, 12);
+        targetCtx.fillRect(cx - 18, cy - 18, 36, 8);
+      }
+    }
+
+    el.btnSelectBistro.addEventListener('click', () => {
+      sound.playGrab();
+      const nextLvl = Math.min(3, campaignProgress.bistro.maxLevelCompleted + 1);
+      setRestaurantAndLevel('bistro', nextLvl);
+      el.btnSelectBistro.className = 'pixel-btn p-2 sm:p-2.5 rounded flex flex-col items-center gap-1 border-2 border-amber-600 ring-2 ring-amber-500 bg-[#ffea9f]';
+      el.btnSelectSushi.className = 'pixel-btn p-2 sm:p-2.5 rounded flex flex-col items-center gap-1 border-2 border-stone-400 opacity-75 hover:opacity-100 bg-[#e8e4db]';
+    });
+
+    el.btnSelectSushi.addEventListener('click', () => {
+      sound.playGrab();
+      const nextLvl = Math.min(3, campaignProgress.sushi.maxLevelCompleted + 1);
+      setRestaurantAndLevel('sushi', nextLvl);
+      el.btnSelectSushi.className = 'pixel-btn p-2 sm:p-2.5 rounded flex flex-col items-center gap-1 border-2 border-teal-600 ring-2 ring-teal-500 bg-[#c7ede8]';
+      el.btnSelectBistro.className = 'pixel-btn p-2 sm:p-2.5 rounded flex flex-col items-center gap-1 border-2 border-stone-400 opacity-75 hover:opacity-100 bg-[#e8e4db]';
+    });
+
+    el.btnSelectBoss.addEventListener('click', () => {
+      sound.playGrab();
+      setRestaurantAndLevel('boss', 1);
+      el.btnSelectBistro.className = 'pixel-btn p-2 sm:p-2.5 rounded flex flex-col items-center gap-1 border-2 border-stone-400 opacity-75 hover:opacity-100 bg-[#e8e4db]';
+      el.btnSelectSushi.className = 'pixel-btn p-2 sm:p-2.5 rounded flex flex-col items-center gap-1 border-2 border-stone-400 opacity-75 hover:opacity-100 bg-[#e8e4db]';
+    });
+
+    el.btnDevUnlock.addEventListener('click', () => {
+      campaignProgress.bistro.maxLevelCompleted = 3;
+      campaignProgress.bistro.michelinAwarded = true;
+      campaignProgress.sushi.maxLevelCompleted = 3;
+      campaignProgress.sushi.michelinAwarded = true;
+      checkBossUnlockCondition();
+      updateMichelinCard();
+      sound.playVictoryFanfare();
+      setRestaurantAndLevel('boss', 1);
+      el.btnDevUnlock.textContent = '[Boss Level Unlocked!]';
+    });
+
+    el.btnToggleBossPantry.addEventListener('click', toggleBossPantryPage);
+
+    function returnToTitleReset(targetRestaurant = 'bistro') {
+      state.hasStarted = false;
+      state.isPaused = false;
+      state.isGameOver = false;
+      state.bossStreak = 0;
+      state.heldItem = null;
+      state.tickets = [];
+      state.cuttingStation = { item: null, chopProgress: 0, chopsNeeded: 4 };
+      state.stoveStation = { item: null, cookProgress: 0, isCooking: false, heat: 'med' };
+      state.plateStation = { items: [] };
+
+      const nextLvl = targetRestaurant === 'boss' ? 1 : Math.min(3, (campaignProgress[targetRestaurant]?.maxLevelCompleted || 0) + 1);
+      setRestaurantAndLevel(targetRestaurant, nextLvl);
+
+      if (targetRestaurant === 'bistro') {
+        el.btnSelectBistro.className = 'pixel-btn p-2 sm:p-2.5 rounded flex flex-col items-center gap-1 border-2 border-amber-600 ring-2 ring-amber-500 bg-[#ffea9f]';
+        el.btnSelectSushi.className = 'pixel-btn p-2 sm:p-2.5 rounded flex flex-col items-center gap-1 border-2 border-stone-400 opacity-75 hover:opacity-100 bg-[#e8e4db]';
+      } else if (targetRestaurant === 'sushi') {
+        el.btnSelectSushi.className = 'pixel-btn p-2 sm:p-2.5 rounded flex flex-col items-center gap-1 border-2 border-teal-600 ring-2 ring-teal-500 bg-[#c7ede8]';
+        el.btnSelectBistro.className = 'pixel-btn p-2 sm:p-2.5 rounded flex flex-col items-center gap-1 border-2 border-stone-400 opacity-75 hover:opacity-100 bg-[#e8e4db]';
+      } else {
+        el.btnSelectBistro.className = 'pixel-btn p-2 sm:p-2.5 rounded flex flex-col items-center gap-1 border-2 border-stone-400 opacity-75 hover:opacity-100 bg-[#e8e4db]';
+        el.btnSelectSushi.className = 'pixel-btn p-2 sm:p-2.5 rounded flex flex-col items-center gap-1 border-2 border-stone-400 opacity-75 hover:opacity-100 bg-[#e8e4db]';
+      }
+
+      updateMichelinCard();
+      el.titleScreen.classList.remove('hidden');
+      renderChefPortrait(titleChefCtx);
+    }
+
+    el.btnBossReturnTitle.addEventListener('click', () => {
+      el.modalBossGameOver.classList.add('hidden');
+      returnToTitleReset('bistro');
+    });
+
+    el.btnStartCooking.addEventListener('click', () => {
+      sound.init();
+      el.titleScreen.classList.add('hidden');
+      startNewShift();
+      sound.playSuccess();
+      const theme = THEMES[currentRestaurant];
+      setChefShout(`${theme.name} Started! FEED ${theme.criticShort.toUpperCase()}!`, 'happy');
+    });
+
+    el.btnTitleHelp.addEventListener('click', () => el.modalHelp.classList.remove('hidden'));
+    el.btnStartPause.addEventListener('click', togglePause);
+    el.btnRestartHeader.addEventListener('click', () => {
+      startNewShift();
+      sound.playBell();
+    });
+
+    el.btnTitleReturn.addEventListener('click', () => {
+      returnToTitleReset(currentRestaurant === 'boss' ? 'bistro' : currentRestaurant);
+    });
+
+    el.btnQuickChop.addEventListener('click', interactCuttingStation);
+    el.btnQuickCook.addEventListener('click', interactStoveStation);
+    el.btnQuickPlate.addEventListener('click', interactPlateStation);
+    el.btnQuickServe.addEventListener('click', deliverActivePlate);
+    el.btnQuickDrop.addEventListener('click', dropHeldItem);
+    el.btnQuickClearPlate.addEventListener('click', clearEntirePlate);
+
+    el.kitchenCanvas.addEventListener('click', (e) => {
+      if (!state.hasStarted || state.isGameOver || state.isPaused) return;
+
+      const rect = el.kitchenCanvas.getBoundingClientRect();
+      const scaleX = el.kitchenCanvas.width / rect.width;
+      const scaleY = el.kitchenCanvas.height / rect.height;
+      const mx = (e.clientX - rect.left) * scaleX;
+      const my = (e.clientY - rect.top) * scaleY;
+
+      for (let i = 0; i < CANVAS_BINS.length; i++) {
+        const bin = CANVAS_BINS[i];
+        if (mx >= bin.x && mx <= bin.x + bin.w && my >= bin.y && my <= bin.y + bin.h) {
+          grabItemFromBin(bin.key);
+          return;
+        }
+      }
+
+      const hit = (s) => (mx >= s.x && mx <= s.x + s.w && my >= s.y && my <= s.y + s.h);
+      if (hit(STATIONS.cutting)) interactCuttingStation();
+      else if (hit(STATIONS.stove)) interactStoveStation();
+      else if (hit(STATIONS.plate)) interactPlateStation();
+      else if (hit(STATIONS.monster)) deliverActivePlate();
+    });
+
+    window.addEventListener('keydown', (e) => {
+      if (!state.hasStarted && !el.titleScreen.classList.contains('hidden')) {
+        if (e.code === 'Enter' || e.code === 'Space') {
+          e.preventDefault();
+          el.btnStartCooking.click();
+          return;
+        }
+      }
+
+      if (e.key === 'p' || e.key === 'P') {
+        togglePause();
+        return;
+      }
+      if (!state.hasStarted || state.isGameOver || state.isPaused) return;
+
+      if (e.code === 'Space') {
+        e.preventDefault();
+        deliverActivePlate();
+      } else if (e.key === 'c' || e.key === 'C') {
+        interactCuttingStation();
+      } else if (e.key === 'v' || e.key === 'V') {
+        interactStoveStation();
+      } else if (e.key === 'b' || e.key === 'B') {
+        interactPlateStation();
+      } else if (e.key === 'x' || e.key === 'X' || e.code === 'KeyX') {
+        e.preventDefault();
+        dropHeldItem();
+      } else if (e.key === 'z' || e.key === 'Z' || e.code === 'KeyZ') {
+        e.preventDefault();
+        clearEntirePlate();
+      } else if (e.key === 'Tab' || e.key === 'q' || e.key === 'Q') {
+        if (currentRestaurant === 'boss') {
+          e.preventDefault();
+          toggleBossPantryPage();
+        }
+      } else if (e.key >= '1' && e.key <= '7') {
+        const index = parseInt(e.key, 10) - 1;
+        if (index >= 0 && index < BIN_KEYS.length) {
+          grabItemFromBin(BIN_KEYS[index]);
+        }
+      }
+    });
+
+    el.btnCelebrationNext.addEventListener('click', () => {
+      el.modalCelebration.classList.add('hidden');
+      if (currentRestaurant === 'boss') {
+        returnToTitleReset('bistro');
+      } else if (currentLevel < 3) {
+        setRestaurantAndLevel(currentRestaurant, currentLevel + 1);
+        startNewShift();
+      } else {
+        if (campaignProgress.bistro.michelinAwarded && campaignProgress.sushi.michelinAwarded) {
+          checkBossUnlockCondition();
+        }
+        returnToTitleReset(currentRestaurant);
+      }
+    });
+
+    el.btnCelebrationReplay.addEventListener('click', () => {
+      el.modalCelebration.classList.add('hidden');
+      startNewShift();
+    });
+
+    el.btnCelebrationTitle.addEventListener('click', () => {
+      el.modalCelebration.classList.add('hidden');
+      returnToTitleReset(currentRestaurant === 'boss' ? 'bistro' : currentRestaurant);
+    });
+
+    el.btnToggleSfx.addEventListener('click', () => {
+      sound.sfxEnabled = !sound.sfxEnabled;
+      el.btnToggleSfx.textContent = sound.sfxEnabled ? '🔊 SFX' : '🔇 SFX';
+      if (sound.sfxEnabled) sound.playGrab();
+    });
+
+    el.btnToggleBgm.addEventListener('click', () => {
+      if (sound.bgmEnabled) {
+        sound.stopBGM();
+        el.btnToggleBgm.textContent = '🎵 BGM (OFF)';
+      } else {
+        sound.startBGM();
+        el.btnToggleBgm.textContent = '🎶 BGM (ON)';
+      }
+    });
+
+    el.btnHelp.addEventListener('click', () => el.modalHelp.classList.remove('hidden'));
+    el.btnOkHelp.addEventListener('click', () => el.modalHelp.classList.add('hidden'));
+    el.btnCloseHelp.addEventListener('click', () => el.modalHelp.classList.add('hidden'));
+
+    let lastTime = performance.now();
+
+    function startNewShift() {
+      state.score = 0;
+      state.combo = 1;
+      state.maxCombo = 1;
+      state.shiftTimeRemaining = (currentRestaurant === 'boss') ? 300 : 120;
+      state.isGameOver = false;
+      state.isPaused = false;
+      state.hasStarted = true;
+      state.servedCount = 0;
+      state.failedCount = 0;
+      state.bossStreak = 0;
+      state.heldItem = null;
+      state.tickets = [];
+      state.nextTicketSpawn = 0.5;
+
+      state.nextTantrumTime = (currentLevel >= 2 || currentRestaurant === 'boss') ? (12 + Math.random() * 5) : 9999;
+      state.isTantrumActive = false;
+
+      state.cuttingStation = { item: null, chopProgress: 0, chopsNeeded: 4 };
+      state.stoveStation = { item: null, cookProgress: 0, isCooking: false, heat: 'med' };
+      state.plateStation = { items: [] };
+
+      state.monster = {
+        mood: 'hungry',
+        animTimer: 0,
+        chewCount: 0
+      };
+
+      visualFX.steamParticles = [];
+      visualFX.chopDebris = [];
+      visualFX.monsterParticles = [];
+      visualFX.tantrumParticles = [];
+      visualFX.shakeTimer = 0;
+
+      el.btnStartPause.innerHTML = '⏸️ PAUSE';
+      el.btnStartPause.classList.remove('pixel-btn-amber');
+      el.btnStartPause.classList.add('pixel-btn-primary');
+
+      el.score.textContent = '0';
+      el.combo.textContent = 'x1';
+      el.ordersServedCount.textContent = 'Fed Critic: 0';
+
+      renderTickets();
+      spawnOrderTicket();
+      sound.playBell();
+      lastTime = performance.now();
+    }
+
+    function endGameShift() {
+      if (currentRestaurant === 'boss') {
+        triggerBossGameOver(`Shift time expired before reaching 20 consecutive orders!`);
+        return;
+      }
+
+      let stars = 0;
+      if (state.score >= 1000) stars = 3;
+      else if (state.score >= 600) stars = 2;
+      else if (state.score >= 350) stars = 1;
+
+      triggerCelebration(stars);
+    }
+
+    function gameLoop(now) {
+      const dt = (now - lastTime) / 1000;
+      lastTime = now;
+
+      if (state.hasStarted && !state.isGameOver && !state.isPaused) {
+        state.shiftTimeRemaining -= dt;
+        if (state.shiftTimeRemaining <= 0) {
+          state.shiftTimeRemaining = 0;
+          endGameShift();
+        }
+
+        const mins = Math.floor(state.shiftTimeRemaining / 60);
+        const secs = Math.floor(state.shiftTimeRemaining % 60);
+        el.shiftTimer.textContent = `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+
+        // Ticket expiration countdown
+        for (let i = state.tickets.length - 1; i >= 0; i--) {
+          const t = state.tickets[i];
+          t.timeLeft -= dt;
+          if (t.timeLeft <= 0) {
+            state.tickets.splice(i, 1);
+            state.failedCount++;
+            state.combo = 1;
+            el.combo.textContent = 'x1';
+            sound.playError();
+
+            if (currentRestaurant === 'boss') {
+              triggerBossGameOver(`Order ticket for ${t.recipe.name} expired! Critique Glouton Prime starved and rampaged!`);
+              return;
+            } else {
+              const critic = THEMES[currentRestaurant].criticShort;
+              setChefShout(`TICKET EXPIRED! ${critic} waited too long!`, 'angry');
+            }
+            renderTickets();
+          }
+        }
+
+        state.nextTicketSpawn -= dt;
+        if (state.nextTicketSpawn <= 0 && state.tickets.length < 4) {
+          spawnOrderTicket();
+          const spawnBase = (currentRestaurant === 'boss') ? 6 : 8;
+          state.nextTicketSpawn = spawnBase + Math.random() * 4;
+        }
+
+        // Tantrum countdown check for Level 2, Level 3 and Boss
+        if (currentLevel >= 2 || currentRestaurant === 'boss') {
+          state.nextTantrumTime -= dt;
+          if (state.nextTantrumTime <= 0) {
+            triggerMonsterTantrum();
+            const repeatDelay = (currentRestaurant === 'boss') ? 16 : (currentLevel === 3 ? 20 : 26);
+            state.nextTantrumTime = repeatDelay + Math.random() * 8;
+          }
+        }
+
+        // Automatic cooking progress on stove
+        const stove = state.stoveStation;
+        if (stove.item && stove.isCooking && stove.cookProgress < 100) {
+          stove.cookProgress = Math.min(100, stove.cookProgress + dt * 14);
+          if (animTick % 20 === 0) sound.playSizzle();
+          if (stove.cookProgress >= 100) {
+            renderTickets();
+          }
+        }
+      }
+
+      renderKitchenScene();
+      renderChefPortrait(chefCtx);
+      if (!state.hasStarted) {
+        renderChefPortrait(titleChefCtx);
+      }
+      renderCelebrationConfetti();
+
+      requestAnimationFrame(gameLoop);
+    }
+
+    window.addEventListener('load', () => {
+      checkAndApplyResponsiveCanvas(true);
+      setRestaurantAndLevel('bistro', 1);
+      el.score.textContent = '0';
+      el.combo.textContent = 'x1';
+      el.shiftTimer.textContent = '02:00';
+      renderTickets();
+      updateMichelinCard();
+      lastTime = performance.now();
+      requestAnimationFrame(gameLoop);
+    });
+  </script>
+</body>
+</html>
