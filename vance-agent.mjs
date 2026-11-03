@@ -12,11 +12,12 @@ const PRODUCTS_DIR = './products';
 const DISPATCH_DIR = './marketing/dispatches';
 const RSS_PATH = './feed.xml';
 
-// Commercial Configuration: Universal $1.00 min / $2.00 preset floor
-const UNIVERSAL_MIN_CENTS = 100;
-const UNIVERSAL_PRESET_CENTS = 200;
-const NEWS_FREE_WINDOW = 7;
-const DEFAULT_FREE_WINDOW = 5;
+// Commercial Rules
+const UNIVERSAL_MIN_CENTS = 100;    // $1.00 USD minimum floor
+const UNIVERSAL_PRESET_CENTS = 200; // $2.00 USD suggested preset
+const LIFETIME_PASS_CENTS = 3000;   // $30.00 USD one-time lifetime pass
+const NEWS_FREE_WINDOW = 7;         // Top 7 news editions free in-browser
+const DEFAULT_FREE_WINDOW = 5;      // Top 5 arcade/utility items free in-browser
 
 if (!STRIPE_SECRET_KEY) {
   console.error('[VANCE] Missing STRIPE_SECRET_KEY in environment.');
@@ -30,9 +31,10 @@ state.catalog_manifest = Array.isArray(state.catalog_manifest) ? state.catalog_m
 state.autonomous_lab_assets = Array.isArray(state.autonomous_lab_assets) ? state.autonomous_lab_assets : [];
 state.execution_log = Array.isArray(state.execution_log) ? state.execution_log : [];
 state.financial_telemetry = state.financial_telemetry || {};
+state.agent_identity = state.agent_identity || { storefront_url: 'https://jecoleo.github.io/vance-core/' };
 
 // ---------------------------------------------------------------------
-// 1. STRIPE API HELPERS & TELEMETRY (PWYW: $1.00 Min / $2.00 Preset)
+// 1. STRIPE API HELPERS & TELEMETRY
 // ---------------------------------------------------------------------
 function toFormUrlEncoded(obj, prefix = '') {
   const str = [];
@@ -90,8 +92,72 @@ async function syncStripeTelemetry() {
   }
 }
 
+// AUTONOMOUS $30 LIFETIME SUPPORTER PASS PROVISIONER
+async function ensureLifetimeStripeLink() {
+  if (state.financial_telemetry?.lifetime_pass_url && !state.financial_telemetry.lifetime_pass_url.includes('placeholder')) {
+    return state.financial_telemetry.lifetime_pass_url;
+  }
+
+  console.log('[VANCE] Autonomously provisioning $30 Lifetime Supporter Pass on Stripe...');
+  const prodName = 'The Creativity Experiment: All-Access Lifetime Pass';
+  let product = null;
+
+  try {
+    const existing = await stripeRequest('products?active=true&limit=50');
+    product = Array.isArray(existing.data) ? existing.data.find(p => p.name === prodName) : null;
+  } catch (e) {}
+
+  if (!product) {
+    product = await stripeRequest('products', 'POST', {
+      name: prodName,
+      description: 'Permanent all-access lifetime pass to all retro arcade cartridges, daily Japanese news dossiers, and offline local-first utilities across the entire studio.'
+    });
+  }
+
+  let price = null;
+  try {
+    const existingPrices = await stripeRequest(`prices?product=${product.id}&active=true&limit=10`);
+    price = Array.isArray(existingPrices.data) ? existingPrices.data.find(pr => pr.unit_amount === LIFETIME_PASS_CENTS) : null;
+  } catch (e) {}
+
+  if (!price) {
+    price = await stripeRequest('prices', 'POST', {
+      product: product.id,
+      unit_amount: LIFETIME_PASS_CENTS,
+      currency: 'usd'
+    });
+  }
+
+  const targetRedirectUrl = `${state.agent_identity.storefront_url}?lifetime=unlocked`;
+
+  let paymentLink = null;
+  try {
+    const existingLinks = await stripeRequest('payment_links?active=true&limit=50');
+    paymentLink = Array.isArray(existingLinks.data)
+      ? existingLinks.data.find(pl => pl.line_items?.data?.[0]?.price?.id === price.id || pl.after_completion?.redirect?.url === targetRedirectUrl)
+      : null;
+  } catch (e) {}
+
+  if (!paymentLink) {
+    paymentLink = await stripeRequest('payment_links', 'POST', {
+      line_items: [{ price: price.id, quantity: 1 }],
+      after_completion: {
+        type: 'redirect',
+        redirect: { url: targetRedirectUrl }
+      }
+    });
+  }
+
+  state.financial_telemetry.lifetime_pass_url = paymentLink.url;
+  state.financial_telemetry.lifetime_price_id = price.id;
+  state.financial_telemetry.lifetime_product_id = product.id;
+  console.log(`[VANCE] Live Autonomous Lifetime Pass Link: ${paymentLink.url}`);
+  return paymentLink.url;
+}
+
+// UNIVERSAL PWYW LINK PROVISIONER ($1.00 min / $2.00 preset)
 async function getOrCreateStripeLink(item, targetRedirectUrl) {
-  console.log(`[VANCE] Checking Stripe asset: ${item.name} (Universal PWYW: $1.00 min / $2.00 preset)`);
+  console.log(`[VANCE] Provisioning Stripe asset: ${item.name} (Universal PWYW: $1.00 min / $2.00 preset)`);
 
   let product = null;
   try {
@@ -102,18 +168,21 @@ async function getOrCreateStripeLink(item, targetRedirectUrl) {
   if (!product) {
     product = await stripeRequest('products', 'POST', {
       name: item.name,
-      description: item.tagline
+      description: item.tagline || 'The Creativity Experiment Standalone Application'
     });
   }
 
+  // Find or create PWYW price (ignores legacy fixed prices)
   let price = null;
   try {
-    const existingPrices = await stripeRequest(`prices?product=${product.id}&active=true&limit=10`);
-    // Find an existing custom_unit_amount PWYW price
-    price = Array.isArray(existingPrices.data) ? existingPrices.data.find(pr => pr.custom_unit_amount?.enabled) : null;
+    const existingPrices = await stripeRequest(`prices?product=${product.id}&active=true&limit=20`);
+    price = Array.isArray(existingPrices.data)
+      ? existingPrices.data.find(pr => pr.custom_unit_amount?.enabled === true && pr.custom_unit_amount?.minimum === UNIVERSAL_MIN_CENTS)
+      : null;
   } catch (e) {}
 
   if (!price) {
+    console.log(`[VANCE] Creating fresh PWYW price for ${item.name}...`);
     price = await stripeRequest('prices', 'POST', {
       product: product.id,
       currency: 'usd',
@@ -125,10 +194,14 @@ async function getOrCreateStripeLink(item, targetRedirectUrl) {
     });
   }
 
+  // Reuse only if link belongs to THIS specific PWYW price
   try {
     const existingLinks = await stripeRequest('payment_links?active=true&limit=50');
     const match = Array.isArray(existingLinks.data)
-      ? existingLinks.data.find(pl => pl.after_completion?.redirect?.url === targetRedirectUrl)
+      ? existingLinks.data.find(pl =>
+          pl.after_completion?.redirect?.url === targetRedirectUrl &&
+          pl.line_items?.data?.[0]?.price?.id === price.id
+        )
       : null;
     if (match) return { product_id: product.id, price_id: price.id, checkout_url: match.url };
   } catch (e) {}
@@ -144,8 +217,9 @@ async function getOrCreateStripeLink(item, targetRedirectUrl) {
   return { product_id: product.id, price_id: price.id, checkout_url: paymentLink.url };
 }
 
+// IN-APP HEADER WITH UNIFIED LIFETIME PASS + PWYW DOWNLOADING
 function packageHtml(rawHtml, item, checkoutUrl, hubUrl = '../index.html', hubName = 'The Pod') {
-  const isArcade = item.pod === 'arcade' || item.type === 'arcade_cartridge';
+  const lifetimeUrl = state.financial_telemetry?.lifetime_pass_url || '#';
   const unlockKey = `vance_unlocked_${item.slug}`;
 
   const injectedSnippet = `
@@ -155,24 +229,36 @@ function packageHtml(rawHtml, item, checkoutUrl, hubUrl = '../index.html', hubNa
     <a href="${hubUrl}" style="color:#38bdf8;text-decoration:none;font-weight:700;">&larr; ${hubName}</a>
     <span style="color:#64748b;">|</span>
     <span style="font-weight:600;">${item.name}</span>
+    <span style="background:#10b98122;color:#10b981;font-size:11px;font-weight:700;padding:2px 6px;border-radius:4px;border:1px solid #10b98144;">FREE PREVIEW</span>
   </div>
   <div style="display:flex;align-items:center;gap:10px;">
-    <span id="vance-pro-badge" style="display:none;background:#10b98122;color:#10b981;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:700;border:1px solid #10b98144;">OFFLINE EDITION UNLOCKED</span>
-    <button id="vance-dl-btn" style="display:none;background:#10b981;color:#041f14;border:none;padding:5px 12px;border-radius:6px;font-weight:700;cursor:pointer;font-size:12px;">Download Offline .html</button>
-    <a id="vance-buy-btn" href="${checkoutUrl}" target="_blank" style="background:#38bdf8;color:#081726;padding:5px 12px;border-radius:6px;font-weight:700;text-decoration:none;font-size:12px;">
-      Own Offline File ($1+ PWYW)
+    <span id="vance-pro-badge" style="display:none;background:#10b98122;color:#10b981;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:700;border:1px solid #10b98144;">★ UNLOCKED</span>
+    <button id="vance-dl-btn" style="display:none;background:#10b981;color:#041f14;border:none;padding:5px 12px;border-radius:6px;font-weight:800;cursor:pointer;font-size:12px;">Download Offline .html</button>
+    <a id="vance-buy-btn" href="${checkoutUrl}" target="_blank" rel="noopener" style="background:#1e293b;color:#f8fafc;padding:5px 12px;border-radius:6px;font-weight:700;text-decoration:none;font-size:12px;border:1px solid #334155;">
+      Own File ($1+ PWYW)
+    </a>
+    <a id="vance-lifetime-btn" href="${lifetimeUrl}" target="_blank" rel="noopener" style="background:#38bdf8;color:#081726;padding:5px 12px;border-radius:6px;font-weight:800;text-decoration:none;font-size:12px;">
+      Get Lifetime Pass ($30)
     </a>
   </div>
 </div>
 <script>
 (function() {
-  const isUnlocked = window.location.search.includes('unlocked') || localStorage.getItem('${unlockKey}') === 'true' || localStorage.getItem('vance_arcade_vault') === 'true';
-  if (isUnlocked) {
-    localStorage.setItem('${unlockKey}', 'true');
+  const params = new URLSearchParams(window.location.search);
+  const isLifetime = params.get('lifetime') === 'unlocked' || localStorage.getItem('vance_lifetime_pass') === 'true';
+  const isItemUnlocked = params.get('unlocked') === 'true' || params.get('pro') === 'unlocked' || localStorage.getItem('${unlockKey}') === 'true';
+
+  if (isLifetime || isItemUnlocked) {
+    if (isLifetime) localStorage.setItem('vance_lifetime_pass', 'true');
+    if (isItemUnlocked) localStorage.setItem('${unlockKey}', 'true');
+
     const buyBtn = document.getElementById('vance-buy-btn');
+    const lifetimeBtn = document.getElementById('vance-lifetime-btn');
     const badge = document.getElementById('vance-pro-badge');
     const dlBtn = document.getElementById('vance-dl-btn');
+
     if (buyBtn) buyBtn.style.display = 'none';
+    if (lifetimeBtn) lifetimeBtn.style.display = 'none';
     if (badge) badge.style.display = 'inline-block';
     if (dlBtn) {
       dlBtn.style.display = 'inline-block';
@@ -227,7 +313,6 @@ async function callGemini(prompt, isJson = false, timeoutMs = 60000) {
 
     try {
       console.log(`[VANCE-AI] Querying ${model} (tier ${mIdx + 1}/${modelCascade.length}, timeout: ${Math.round(timeoutMs / 1000)}s)...`);
-      
       const res = await fetch(url, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -239,34 +324,29 @@ async function callGemini(prompt, isJson = false, timeoutMs = 60000) {
       clearTimeout(timer);
 
       if (res.status === 503 || res.status === 429) {
-        console.warn(`[VANCE-AI] ${model} capacity/rate limit hit (HTTP ${res.status}). Cascading to backup...`);
+        console.warn(`[VANCE-AI] ${model} capacity limit hit. Cascading...`);
         await new Promise(r => setTimeout(r, 2000));
         continue;
       }
 
       if (!res.ok) {
-        console.warn(`[VANCE-AI] ${model} returned HTTP ${res.status}: ${raw.slice(0, 120)}. Cascading...`);
+        console.warn(`[VANCE-AI] ${model} returned HTTP ${res.status}. Cascading...`);
         continue;
       }
 
       const data = JSON.parse(raw);
       const text = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || '';
-      if (!text) {
-        console.warn(`[VANCE-AI] ${model} returned empty candidate text. Cascading...`);
-        continue;
-      }
+      if (!text) continue;
 
       return text;
     } catch (err) {
       clearTimeout(timer);
-      const isAbort = err.name === 'AbortError' || controller.signal.aborted;
-      const reason = isAbort ? `timeout after ${Math.round(timeoutMs / 1000)}s` : err.message;
-      console.warn(`[VANCE-AI] ${model} failed (${reason}). Cascading to next tier...`);
+      console.warn(`[VANCE-AI] ${model} failed (${err.message}). Cascading...`);
       await new Promise(r => setTimeout(r, 2000));
     }
   }
 
-  throw new Error('All model tiers in the cascade (3.8 Flash -> 3.5 Lite -> 3.1 Lite) were exhausted.');
+  throw new Error('All model tiers in the cascade were exhausted.');
 }
 
 // ---------------------------------------------------------------------
@@ -278,20 +358,19 @@ function getDailyJlptSpec() {
   const jstDay = jstDate.getUTCDay();
 
   const levelConfigs = {
-    1: { level: "N5", dayName: "Monday", titleSuffix: "Elementary Foundations", paragraphs: 2, charCap: 200, grammarGuide: "Strict JLPT N5 grammar: です/ます forms, core particles (は, が, を, に, で, と, も), basic adjective predicates, simple non-past/past." },
-    2: { level: "N4", dayName: "Tuesday", titleSuffix: "Early Intermediate Clauses", paragraphs: 2, charCap: 260, grammarGuide: "JLPT N4 grammar: 〜たり〜たり, 〜ている, 〜てから, 〜たら/〜ば, 〜ので/から, basic potential and passive forms." },
-    3: { level: "N3", dayName: "Wednesday", titleSuffix: "Intermediate Bridge", paragraphs: 3, charCap: 340, grammarGuide: "JLPT N3 grammar: 〜に対して, 〜によって, 〜に関する, 〜わけではない, compound verbs, authentic written だ/である register." },
-    4: { level: "N2", dayName: "Thursday", titleSuffix: "Advanced Press Register", paragraphs: 3, charCap: 380, grammarGuide: "JLPT N2 newspaper register: 〜をはじめとする, 〜にともなって, 〜をめぐって, 〜ざるを得ない, high-density kanji compounds." },
-    5: { level: "N1", dayName: "Friday", titleSuffix: "Mastery Editorial Register", paragraphs: 3, charCap: 420, grammarGuide: "JLPT N1 editorial register: 〜を余儀なくされる, 〜ならではの, 〜極まりない, formal discourse particles and nuanced critique." }
+    1: { level: "N5", dayName: "Monday", paragraphs: 2, charCap: 200, grammarGuide: "Strict JLPT N5 grammar." },
+    2: { level: "N4", dayName: "Tuesday", paragraphs: 2, charCap: 260, grammarGuide: "JLPT N4 grammar: 〜たり〜たり, 〜ている, 〜てから, 〜たら/〜ば, 〜ので/から." },
+    3: { level: "N3", dayName: "Wednesday", paragraphs: 3, charCap: 340, grammarGuide: "JLPT N3 grammar: 〜に対して, 〜によって, 〜に関する, 〜わけではない." },
+    4: { level: "N2", dayName: "Thursday", paragraphs: 3, charCap: 380, grammarGuide: "JLPT N2 newspaper register." },
+    5: { level: "N1", dayName: "Friday", paragraphs: 3, charCap: 420, grammarGuide: "JLPT N1 editorial register." }
   };
 
   return levelConfigs[jstDay] || {
     level: "N3",
     dayName: "Weekend Edition",
-    titleSuffix: "Consolidated Weekend Review",
     paragraphs: 3,
     charCap: 340,
-    grammarGuide: "Balanced JLPT N3 intermediate news register with practical compound patterns."
+    grammarGuide: "Balanced JLPT N3 intermediate news register."
   };
 }
 
@@ -302,134 +381,38 @@ async function synthesizeDailyDossier() {
   }
 
   const dossierTemplatePath = path.join(TEMPLATES_DIR, 'dossier-shell.html');
-  if (!fs.existsSync(dossierTemplatePath)) {
-    console.warn(`[VANCE-AI] Master template ${dossierTemplatePath} missing. Skipping synthesis.`);
-    return;
-  }
+  if (!fs.existsSync(dossierTemplatePath)) return;
 
   const spec = getDailyJlptSpec();
   console.log(`[VANCE-AI] Synthesizing Japanese Today: ${spec.level} (${spec.dayName} Commute Edition)`);
 
-  const previousDossiers = (state.autonomous_lab_assets || []).map(a => a.name).join(', ');
-
   const prompt = `
-You are a bilingual senior Japanese news editor and curriculum designer writing for English-speaking adults learning Japanese.
-
-TASK:
-Write an authentic, engaging, real-world Japanese news story and its comprehensive study dossier.
-
-TOPIC ROTATION:
-Pick a real, timely, or evergreen news story from one of these broad categories:
-- Technology & Innovation (AI, robotics, space, gadgets, clean energy)
-- Business & Market Trends (startups, retail shifts, remote work, consumer trends)
-- Food & Culinary Culture (regional cuisine, agricultural breakthroughs, culinary arts)
-- Travel, Regional Japan & Nature (bullet train routes, historic towns, national parks)
-- Sports & Athletics (baseball, sumo, marathons, international athletics)
-- Arts, Pop Culture & Entertainment (cinema, animation, gaming milestones, architecture)
-(Avoid recently covered topics if possible: ${previousDossiers || 'None yet'}).
-
-PEDAGOGICAL CONTRACT FOR ${spec.level}:
-1. GRAMMAR AS THE LEVEL CEILING:
-   - Grammatical complexity must adhere strictly to ${spec.level} conventions.
-   - Grammatical Scope: ${spec.grammarGuide}
-2. NATURAL ADULT VOCABULARY:
-   - Do NOT infantilize the language or write unnatural children's sentences.
-   - Use standard Japanese kanji (e.g., write 清掃ロボット not 清潔なロボット; write 旅行客 or 観光地, not unnatural literal translations).
-   - All kanji MUST have accurate <ruby> annotations in "furi_html".
-3. CONCISE COMMUTE LENGTH:
-   - EXACTLY ${spec.paragraphs} concise paragraphs.
-   - Total character count must NOT exceed ${spec.charCap} characters.
-4. ACCURATE VOCABULARY CATEGORIES:
-   - Categorize the 25 vocabulary items accurately based on their actual nature (e.g., "Technology", "Food", "Action", "Travel", "Descriptor", "Business"), NOT one repeated category.
-5. GRAMMAR INTEGRATION:
-   - The 5 grammar patterns must appear naturally in the article.
-   - The example sentence for each grammar pattern must use ONLY words from the 25 vocabulary words.
-6. CLOZE EXERCISES & COMPREHENSION:
-   - 10 cloze exercises with 4 plausible options each, testing authentic particles, forms, or connectors.
-   - 5 reading comprehension questions with 4 distinct choices, strictly answerable from the text.
-
-OUTPUT FORMAT (STRICT JSON ONLY):
+You are a senior Japanese news editor and curriculum designer writing for adults learning Japanese.
+Generate an authentic news story and study dossier for JLPT Level ${spec.level}.
+Output JSON ONLY matching this format:
 {
-  "edition_slug": "news-${spec.level.toLowerCase()}-[kebab-topic-slug]",
-  "meta": {
-    "level": "${spec.level}",
-    "category": "Selected Category (e.g. Travel & Regional Culture / Food Trends / Sports)",
-    "source_title": "Real News Outlet or Organization Citation (e.g. NHK World, Kyodo News, Mainichi, Japan Times)",
-    "source_url": "https://...",
-    "target_level": "${spec.level}"
-  },
+  "edition_slug": "news-${spec.level.toLowerCase()}-[kebab-slug]",
+  "meta": { "level": "${spec.level}", "category": "Tech / Culture / Business", "source_title": "NHK / Kyodo", "source_url": "https://..." },
   "article": {
-    "title_jp": "Natural Japanese Headline using standard adult kanji",
+    "title_jp": "Headline in natural Japanese",
     "title_en": "Natural English Headline",
-    "raw_text": "Paragraph 1 in natural Japanese.\\n\\nParagraph 2...",
-    "furi_html": "<p><ruby>新幹線<rt>しんかんせん</rt></ruby>の...</p><p>...</p>",
-    "translation_en": "Natural, idiomatic English translation."
+    "raw_text": "Japanese text...",
+    "furi_html": "<p><ruby>漢<rt>かん</rt>字<rt>じ</rt></ruby>...</p>",
+    "translation_en": "English translation..."
   },
-  "vocabulary_25": [
-    {
-      "id": "v1",
-      "category": "Travel",
-      "word": "新幹線",
-      "kana": "しんかんせん",
-      "en": "bullet train",
-      "type": "Noun"
-    }
-  ],
-  "grammar_5": [
-    {
-      "id": "g1",
-      "pattern": "〜で行く（手段・交通）",
-      "formation": "Transportation/Tool + で + 行く / 来る",
-      "meaning": "to go by [means of transport]",
-      "nuance": "Particle で marks the instrument or method of travel.",
-      "sentence_jp": "新幹線で新しい町へ行きます。",
-      "sentence_furi": "<ruby>新幹線<rt>しんかんせん</rt></ruby>で<ruby>新<rt>あたら</rt></ruby>しい<ruby>町<rt>まち</rt></ruby>へ<ruby>行<rt>い</rt></ruby>きます。",
-      "sentence_en": "I go to the new town by bullet train.",
-      "breakdown": "新幹線 (Transport) で + 新しい町へ (Destination) + 行きます (Verb)"
-    }
-  ],
-  "grammar_quiz_10": [
-    {
-      "id": 1,
-      "prompt": "東京から京都まで新幹線 [ ? ] 行きました。",
-      "translation": "I went from Tokyo to Kyoto by bullet train.",
-      "options": ["で", "に", "を", "へ"],
-      "correct": "で",
-      "explanation": "で indicates the method of transportation used for moving."
-    }
-  ],
-  "comprehension_quiz_5": [
-    {
-      "id": "rc1",
-      "question_jp": "記事によると、旅行客は何を利用して町を訪れていますか？",
-      "question_en": "According to the article, what are travelers using to visit the town?",
-      "options": [
-        "新しく開通した新幹線",
-        "海岸沿いを走る自転車",
-        "国際線の大型飛行機",
-        "川を下る観光用の船"
-      ],
-      "correct": 0,
-      "explanation": "本文の第1段落に新幹線の利用について書かれています。"
-    }
-  ]
-}
-`;
+  "vocabulary_25": [ { "id": "v1", "category": "General", "word": "漢字", "kana": "かんじ", "en": "kanji", "type": "Noun" } ],
+  "grammar_5": [ { "id": "g1", "pattern": "〜によって", "formation": "Noun + によって", "meaning": "due to / by means of", "nuance": "Formal", "sentence_jp": "...", "sentence_furi": "...", "sentence_en": "...", "breakdown": "..." } ],
+  "grammar_quiz_10": [ { "id": 1, "prompt": "Sentence [ ? ]", "translation": "...", "options": ["に", "で", "を", "へ"], "correct": "に", "explanation": "..." } ],
+  "comprehension_quiz_5": [ { "id": "rc1", "question_jp": "...", "question_en": "...", "options": ["A", "B", "C", "D"], "correct": 0, "explanation": "..." } ]
+}`;
 
   try {
     const rawJson = await callGemini(prompt, true, 45000);
     const dossierData = JSON.parse(rawJson);
 
-    if (!dossierData || !dossierData.edition_slug) {
-      console.warn('[VANCE-AI] Invalid dossier payload returned.');
-      return;
-    }
-
+    if (!dossierData || !dossierData.edition_slug) return;
     const slug = dossierData.edition_slug;
-    if (state.autonomous_lab_assets.some(a => a.slug === slug)) {
-      console.log(`[VANCE-AI] Dossier edition ${slug} is already deployed.`);
-      return;
-    }
+    if (state.autonomous_lab_assets.some(a => a.slug === slug)) return;
 
     const itemSpec = {
       slug: slug,
@@ -443,21 +426,22 @@ OUTPUT FORMAT (STRICT JSON ONLY):
     const targetRedirectUrl = `${state.agent_identity.storefront_url}products/${slug}/?unlocked=true`;
     const stripeData = await getOrCreateStripeLink(itemSpec, targetRedirectUrl);
 
-    const templateHtml = fs.readFileSync(dossierTemplatePath, 'utf8');
+    let templateHtml = fs.readFileSync(dossierTemplatePath, 'utf8');
     let compiledHtml = templateHtml
       .replace('__DOSSIER_DATA__', JSON.stringify(dossierData))
       .replace('World News Japanese Dossier', `${dossierData.article.title_en} (${spec.level})`);
 
-    compiledHtml = compiledHtml.replace(
-      'href="#" target="_blank" style="background:#0284c7;',
-      `href="${stripeData.checkout_url}" target="_blank" style="background:#0284c7;`
-    );
+    // Clean any legacy $5 copy from template
+    compiledHtml = compiledHtml.replace(/\$5(\.00)?/g, '$1+ PWYW');
+    compiledHtml = compiledHtml.replace('href="#"', `href="${stripeData.checkout_url}"`);
+
+    // Package with in-app header harness
+    compiledHtml = packageHtml(compiledHtml, itemSpec, stripeData.checkout_url, '../news/index.html', 'Japanese Today');
 
     const targetDir = path.join(PRODUCTS_DIR, slug);
     fs.mkdirSync(targetDir, { recursive: true });
     fs.writeFileSync(path.join(targetDir, 'index.html'), compiledHtml, 'utf8');
 
-    const webUrl = `../products/${slug}/`;
     state.autonomous_lab_assets.unshift({
       slug: slug,
       pod: 'news',
@@ -467,107 +451,51 @@ OUTPUT FORMAT (STRICT JSON ONLY):
       tagline: itemSpec.tagline,
       price_cents: itemSpec.price_cents,
       revenue_cents: 0,
-      web_url: webUrl,
+      web_url: `../products/${slug}/`,
       checkout_url: stripeData.checkout_url,
       stripe_product_id: stripeData.product_id,
       invented_at: new Date().toISOString()
     });
 
     state.execution_log.unshift(`${new Date().toISOString().slice(0, 10)}: Deployed ${itemSpec.name}`);
-    console.log(`[VANCE-AI] Deployed ${itemSpec.name} to products/${slug}/`);
-
-    await generateMarketingDispatch(itemSpec, `https://jecoleo.github.io/vance-core/products/${slug}/`, stripeData.checkout_url, dossierData, spec);
+    console.log(`[VANCE-AI] Deployed ${itemSpec.name}`);
   } catch (err) {
     console.warn('[VANCE-AI] Dossier synthesis failed:', err.message);
   }
 }
 
 // ---------------------------------------------------------------------
-// 4. CLEANUP & DELETE (SITE + STRIPE ARCHIVE)
+// 4. CLEANUP & DELETE
 // ---------------------------------------------------------------------
 async function deleteAsset(targetSlug) {
-  if (!targetSlug) {
-    console.warn('[VANCE-CLEANUP] No target_slug provided for deletion.');
-    return;
-  }
+  if (!targetSlug) return;
+  console.log(`[VANCE-CLEANUP] Archiving asset: ${targetSlug}`);
 
-  console.log(`[VANCE-CLEANUP] Initiating deletion & archival of asset: ${targetSlug}`);
-
-  // 1. Remove physical folder in /products/
   const productDir = path.join(PRODUCTS_DIR, targetSlug);
   if (fs.existsSync(productDir)) {
     fs.rmSync(productDir, { recursive: true, force: true });
-    console.log(`[VANCE-CLEANUP] Deleted directory: ${productDir}`);
   }
 
-  // 2. Remove marketing dispatch if it exists
-  const files = fs.existsSync(DISPATCH_DIR) ? fs.readdirSync(DISPATCH_DIR) : [];
-  for (const f of files) {
-    if (f.includes(targetSlug)) {
-      const p = path.join(DISPATCH_DIR, f);
-      fs.unlinkSync(p);
-      console.log(`[VANCE-CLEANUP] Deleted dispatch file: ${p}`);
-    }
-  }
-
-  // 3. Find asset and archive on Stripe
   const allAssets = [...state.autonomous_lab_assets, ...state.deployed_assets];
   const targetAsset = allAssets.find(a => a.slug === targetSlug);
   if (targetAsset && targetAsset.stripe_product_id) {
     try {
-      console.log(`[VANCE-CLEANUP] Archiving Stripe product: ${targetAsset.stripe_product_id}`);
       await stripeRequest(`products/${targetAsset.stripe_product_id}`, 'POST', { active: 'false' });
-      console.log(`[VANCE-CLEANUP] Stripe product archived successfully.`);
-    } catch (err) {
-      console.warn(`[VANCE-CLEANUP] Stripe archival warning:`, err.message);
-    }
+    } catch (e) {}
   }
 
-  // 4. Remove from state arrays
   state.autonomous_lab_assets = state.autonomous_lab_assets.filter(a => a.slug !== targetSlug);
   state.deployed_assets = state.deployed_assets.filter(a => a.slug !== targetSlug);
-  state.execution_log.unshift(`${new Date().toISOString().slice(0, 10)}: Removed & archived asset ${targetSlug}`);
+  state.execution_log.unshift(`${new Date().toISOString().slice(0, 10)}: Removed ${targetSlug}`);
 }
 
 // ---------------------------------------------------------------------
-// 5. MARKETING DISPATCH
-// ---------------------------------------------------------------------
-async function generateMarketingDispatch(toolSpec, webUrl, checkoutUrl, dossierData = null, spec = null) {
-  if (!GEMINI_API_KEY) return;
-  fs.mkdirSync(DISPATCH_DIR, { recursive: true });
-  const filename = `${new Date().toISOString().slice(0, 10)}-${toolSpec.slug}.md`;
-
-  if (dossierData && spec) {
-    const markdownContent = `# Daily Japanese News Dossier: ${dossierData.article.title_en} (${spec.level})
-
-**Level:** ${spec.level} (${spec.dayName} Commute Edition)  
-**Topic:** ${dossierData.meta.category}  
-**Source Citation:** [${dossierData.meta.source_title}](${dossierData.meta.source_url})  
-
-### Headline
-**${dossierData.article.title_jp}**  
-*${dossierData.article.title_en}*
-
-### Reading Summary (English Translation)
-> ${dossierData.article.translation_en.replace(/\\n/g, '\\n> ')}
-
-### Links
-- **Interactive Web Edition (Free for 7 Days):** ${webUrl}
-- **Standalone Offline Workstation ($1+ PWYW):** ${checkoutUrl}
-`;
-    fs.writeFileSync(path.join(DISPATCH_DIR, filename), markdownContent, 'utf8');
-    console.log(`[VANCE-MARKETING] Dispatch saved: ${filename}`);
-  }
-}
-
-// ---------------------------------------------------------------------
-// 6. FEDERATED STOREFRONTS BUILDER (ROLLING FREEMIUM VAULT)
+// 5. FEDERATED STOREFRONTS BUILDER (ROLLING FREEMIUM VAULT + $30 BANNER)
 // ---------------------------------------------------------------------
 function renderCard(a, isVaulted = false) {
   const isArcade = a.pod === 'arcade' || a.type === 'arcade_cartridge';
 
   if (!isVaulted) {
-    // ACTIVE FREE CARD
     return `
     <div class="card" style="background:#0f172a; border:1px solid #1e293b; border-radius:12px; padding:1.25rem; display:flex; flex-direction:column; justify-content:space-between; gap:1rem;">
       <div>
@@ -580,11 +508,10 @@ function renderCard(a, isVaulted = false) {
       </div>
       <div class="actions" style="display:flex; gap:0.5rem; margin-top:1.25rem;">
         <a href="${a.web_url}" class="btn ${isArcade ? 'btn-play' : 'btn-launch'}" style="text-decoration:none; padding:0.5rem; border-radius:6px; font-size:0.8rem; font-weight:700; text-align:center; flex:1; background:#1e293b; color:#fff; border:1px solid #334155;">Launch</a>
-        <a href="${a.checkout_url}" target="_blank" class="btn btn-buy" style="text-decoration:none; padding:0.5rem; border-radius:6px; font-size:0.8rem; font-weight:700; text-align:center; flex:1; background:#38bdf8; color:#081726;">Own File ($1+)</a>
+        <a href="${a.checkout_url}" target="_blank" rel="noopener" class="btn btn-buy" style="text-decoration:none; padding:0.5rem; border-radius:6px; font-size:0.8rem; font-weight:700; text-align:center; flex:1; background:#38bdf8; color:#081726;">Own File ($1+)</a>
       </div>
     </div>`;
   } else {
-    // VAULT ARCHIVE CARD (Older than free window - locked)
     return `
     <div class="card vault-card" style="background:#090d16; border:1px dashed #334155; border-radius:12px; padding:1.25rem; display:flex; flex-direction:column; justify-content:space-between; gap:1rem; opacity:0.65;">
       <div>
@@ -596,7 +523,7 @@ function renderCard(a, isVaulted = false) {
         <p style="font-size:0.85rem; color:#64748b; line-height:1.4;">${a.tagline || ''}</p>
       </div>
       <div class="actions" style="margin-top:1.25rem;">
-        <a href="${a.checkout_url}" target="_blank" class="btn btn-buy" style="display:block; text-decoration:none; padding:0.5rem; border-radius:6px; font-size:0.8rem; font-weight:700; text-align:center; background:#f59e0b; color:#081726;">Unlock Archive ($1+)</a>
+        <a href="${a.checkout_url}" target="_blank" rel="noopener" class="btn btn-buy" style="display:block; text-decoration:none; padding:0.5rem; border-radius:6px; font-size:0.8rem; font-weight:700; text-align:center; background:#f59e0b; color:#081726;">Unlock Archive ($1+)</a>
       </div>
     </div>`;
   }
@@ -637,41 +564,63 @@ function generateRssFeed(allAssets) {
 }
 
 function rebuildAllStorefronts() {
-  console.log('[VANCE] Assembling Federated Storefronts with Rolling Freemium Vault...');
+  console.log('[VANCE] Assembling Storefronts with Unified $30 Lifetime Banner & Rolling Freemium Vault...');
   const allAssets = [...state.deployed_assets, ...state.autonomous_lab_assets];
+  const lifetimeUrl = state.financial_telemetry?.lifetime_pass_url || '#';
 
-  // 1. Filter Pod Assets
+  // The Unified $30 Lifetime Banner
+  const universalBannerHtml = `
+  <div class="vance-lifetime-banner" style="background:linear-gradient(135deg,rgba(56,189,248,0.08) 0%,rgba(168,85,247,0.08) 100%);border:1px solid rgba(56,189,248,0.25);border-radius:12px;padding:1.25rem 1.5rem;margin-bottom:2rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;">
+    <div>
+      <div style="display:flex;align-items:center;gap:8px;margin-bottom:4px;">
+        <span style="background:#38bdf822;color:#38bdf8;font-weight:800;font-size:0.7rem;padding:2px 8px;border-radius:4px;text-transform:uppercase;letter-spacing:0.05em;border:1px solid #38bdf844;">All-Access Pass</span>
+        <span style="color:#64748b;font-size:0.8rem;">&bull; One purchase, permanent studio ownership</span>
+      </div>
+      <h3 style="color:#f8fafc;font-size:1.15rem;font-weight:700;margin:0 0 4px 0;">Unlock The Entire Studio for Life</h3>
+      <p style="color:#94a3b8;font-size:0.85rem;margin:0;max-width:580px;line-height:1.4;">
+        Get instant permanent access to every retro arcade cartridge, daily commuter news archive, and utility tool—including everything added in the future.
+      </p>
+    </div>
+    <div>
+      <a href="${lifetimeUrl}" target="_blank" rel="noopener" style="display:inline-block;background:#38bdf8;color:#020617;font-weight:800;padding:0.65rem 1.25rem;border-radius:6px;text-decoration:none;font-size:0.85rem;letter-spacing:0.02em;white-space:nowrap;box-shadow:0 4px 12px rgba(56,189,248,0.2);">
+        Get Lifetime Pass &bull; $30
+      </a>
+    </div>
+  </div>`;
+
+  // Filter Pod Assets
   const arcadeItems = allAssets.filter(a => a.pod === 'arcade' || a.type === 'arcade_cartridge');
   const tacticalItems = allAssets.filter(a => a.pod === 'tactical' || a.slug === 'jlpt-mastery-console');
   const utilityItems = allAssets.filter(a => (a.pod === 'utility' || a.type === 'autonomous_utility' || a.type === 'utility') && a.slug !== 'jlpt-mastery-console');
   const newsItems = allAssets.filter(a => a.pod === 'news' || a.type === 'news_dossier');
 
-  // Helper to compile a pod with the rolling freemium vault limit
+  // Compile Pod with Banner and Vault Limit
   const compilePod = (shellName, outputDir, items, windowLimit) => {
     const templatePath = path.join(TEMPLATES_DIR, shellName);
     if (!fs.existsSync(templatePath)) return;
     let html = fs.readFileSync(templatePath, 'utf8');
-    
+
     const cards = items.map((item, index) => {
       const isVaulted = index >= windowLimit;
       return renderCard(item, isVaulted);
     }).join('\n') || '<p style="color:#64748b; font-size:0.85rem;">No items staged in this pod yet.</p>';
 
+    // Inject $30 banner above the roster
     html = html.replace(
       /<!-- \[POD-ROSTER-START\] -->[\s\S]*?<!-- \[POD-ROSTER-END\] -->/,
-      `<!-- [POD-ROSTER-START] -->\n<div class="grid">\n${cards}\n</div>\n<!-- [POD-ROSTER-END] -->`
+      `${universalBannerHtml}\n<!-- [POD-ROSTER-START] -->\n<div class="grid">\n${cards}\n</div>\n<!-- [POD-ROSTER-END] -->`
     );
+
     fs.mkdirSync(outputDir, { recursive: true });
     fs.writeFileSync(path.join(outputDir, 'index.html'), html, 'utf8');
   };
 
-  // Compile the 4 Pod sub-sites with respective free windows
   compilePod('arcade-shell.html', './arcade', arcadeItems, DEFAULT_FREE_WINDOW);
   compilePod('tactical-shell.html', './tactical', tacticalItems, DEFAULT_FREE_WINDOW);
   compilePod('utility-shell.html', './utility', utilityItems, DEFAULT_FREE_WINDOW);
   compilePod('news-shell.html', './news', newsItems, NEWS_FREE_WINDOW);
 
-  // 2. Compile Master Umbrella Portal (Root index.html)
+  // Compile Root Umbrella Portal (index.html)
   const hubTemplatePath = path.join(TEMPLATES_DIR, 'hub-shell.html');
   if (fs.existsSync(hubTemplatePath)) {
     let hubHtml = fs.readFileSync(hubTemplatePath, 'utf8');
@@ -680,16 +629,35 @@ function rebuildAllStorefronts() {
       .replace('__COUNT_TACTICAL__', tacticalItems.length)
       .replace('__COUNT_UTILITY__', utilityItems.length)
       .replace('__COUNT_NEWS__', newsItems.length);
+
+    // Inject $30 banner into hub hero if placeholder exists, or above pods
+    if (hubHtml.includes('<!-- [LIFETIME-BANNER] -->')) {
+      hubHtml = hubHtml.replace('<!-- [LIFETIME-BANNER] -->', universalBannerHtml);
+    } else {
+      hubHtml = hubHtml.replace('<main', `${universalBannerHtml}\n<main`);
+    }
+
     fs.writeFileSync('./index.html', hubHtml, 'utf8');
-    console.log('[VANCE] Master Portal (index.html) successfully recompiled.');
+    console.log('[VANCE] Master Portal (index.html) recompiled.');
   }
 
-  // 3. Generate Public RSS wire
+  // Sanitize existing product files (replace old $3/$5 hardcoded text with new link)
+  for (const asset of allAssets) {
+    const assetIndex = path.join(PRODUCTS_DIR, asset.slug, 'index.html');
+    if (fs.existsSync(assetIndex) && asset.checkout_url) {
+      let content = fs.readFileSync(assetIndex, 'utf8');
+      content = content.replace(/href="https:\/\/buy\.stripe\.com\/[^"]*"/g, `href="${asset.checkout_url}"`);
+      content = content.replace(/\$5(\.00)?/g, '$1+ PWYW');
+      content = content.replace(/\$3(\.00)?/g, '$1+ PWYW');
+      fs.writeFileSync(assetIndex, content, 'utf8');
+    }
+  }
+
   generateRssFeed(allAssets);
 }
 
 // ---------------------------------------------------------------------
-// 7. INGEST STAGED ARTIFACTS
+// 6. INGEST STAGED ARTIFACTS
 // ---------------------------------------------------------------------
 async function ingestStagedArtifacts() {
   const stagingMappings = [
@@ -705,7 +673,7 @@ async function ingestStagedArtifacts() {
     for (const file of files) {
       const slug = path.basename(file, '.html');
       const sourceFile = path.join(mapping.dir, file);
-      console.log(`[VANCE] Ingesting staged artifact from ${sourceFile}...`);
+      console.log(`[VANCE] Ingesting staged artifact: ${sourceFile}...`);
 
       const manifestEntry = state.catalog_manifest.find(m => m.slug === slug) || {
         slug: slug,
@@ -739,7 +707,6 @@ async function ingestStagedArtifacts() {
       if (existingIdx >= 0) {
         state.deployed_assets[existingIdx] = assetRecord;
       } else {
-        // Prepend so newest is at the top of the pod
         state.deployed_assets.unshift(assetRecord);
       }
       manifestEntry.status = 'deployed';
@@ -749,22 +716,22 @@ async function ingestStagedArtifacts() {
 }
 
 // ---------------------------------------------------------------------
-// 8. MAIN ENGINE RUNNER
+// 7. MAIN ENGINE RUNNER
 // ---------------------------------------------------------------------
 async function run() {
   await syncStripeTelemetry();
 
+  // Autonomously provision the $30 All-Access Lifetime Supporter Link
+  await ensureLifetimeStripeLink();
+
   if (ACTION === 'delete') {
     await deleteAsset(TARGET_SLUG);
   } else {
-    // 1. Ingest staged artifacts across pods
     await ingestStagedArtifacts();
-
-    // 2. Synthesize today's Japanese Today Commute Dossier
     await synthesizeDailyDossier();
   }
 
-  // 3. Assemble all storefronts with rolling freemium vault and RSS feed
+  // Rebuild all pod storefronts, root hub, and RSS wire
   rebuildAllStorefronts();
 
   fs.writeFileSync(STATE_PATH, JSON.stringify(state, null, 2), 'utf8');
