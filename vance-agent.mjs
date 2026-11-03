@@ -3,7 +3,8 @@ import path from 'path';
 
 const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY;
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
-const ACTION = process.env.ACTION || 'generate';
+const ACTION = process.env.ACTION || 'build';
+const TARGET_LEVEL = (process.env.TARGET_LEVEL || 'auto').trim();
 const TARGET_SLUG = (process.env.TARGET_SLUG || '').trim();
 
 const STATE_PATH = './vance.state.json';
@@ -92,7 +93,6 @@ async function syncStripeTelemetry() {
   }
 }
 
-// AUTONOMOUS $30 LIFETIME SUPPORTER PASS PROVISIONER
 async function ensureLifetimeStripeLink() {
   if (state.financial_telemetry?.lifetime_pass_url && !state.financial_telemetry.lifetime_pass_url.includes('placeholder')) {
     return state.financial_telemetry.lifetime_pass_url;
@@ -155,7 +155,6 @@ async function ensureLifetimeStripeLink() {
   return paymentLink.url;
 }
 
-// UNIVERSAL PWYW LINK PROVISIONER ($1.00 min / $2.00 preset) FOR ROSTER CARDS
 async function getOrCreateStripeLink(item, targetRedirectUrl) {
   let product = null;
   try {
@@ -213,25 +212,24 @@ async function getOrCreateStripeLink(item, targetRedirectUrl) {
 }
 
 // ---------------------------------------------------------------------
-// 2. IN-APP HARNESS SCRUBBER (UNIFIED $30 LIFETIME BANNER + CORRECT BACKLINKS)
+// 2. IN-APP HARNESS (WITH CREATOR DEBUG BYPASS)
 // ---------------------------------------------------------------------
 function scrubAndApplyUniversalHarness(filePath, item, lifetimeUrl) {
   if (!fs.existsSync(filePath)) return;
   let html = fs.readFileSync(filePath, 'utf8');
 
-  // Strip all legacy banners, old harnesses, and previous injected headers
+  // Strip all legacy banners and injected code
   html = html.replace(/<!--\s*\[VANCE-MERCHANT-HARNESS:\s*START\]\s*-->[\s\S]*?<!--\s*\[VANCE-MERCHANT-HARNESS:\s*END\]\s*-->/gi, '');
   html = html.replace(/<!--\s*BEGIN VANCE OFFLINE LICENSE HARNESS\s*-->[\s\S]*?<!--\s*END VANCE OFFLINE LICENSE HARNESS\s*-->/gi, '');
   html = html.replace(/<div id="vance-header"[\s\S]*?<\/script>/gi, '');
   html = html.replace(/<div id="vance-license-bar"[\s\S]*?<\/div>/gi, '');
 
-  // Sanitize internal template links and references
   html = html.replace(/href="https:\/\/buy\.stripe\.com\/[^"]*"/g, `href="${lifetimeUrl}"`);
   html = html.replace(/\$5(\.00)?/g, '$30 Lifetime');
   html = html.replace(/\$3(\.00)?/g, '$30 Lifetime');
   html = html.replace(/Unlock Standalone[^<]*/gi, 'Get Lifetime Pass ($30)');
 
-  // Determine navigation backlink with two hops (../../) to escape /products/<slug>/
+  // Correct backlink with two hops (../../)
   const isArcade = item.pod === 'arcade' || item.type === 'arcade_cartridge' || filePath.includes('pixel-bistro');
   const isNews = item.pod === 'news' || item.type === 'news_dossier' || filePath.includes('news-');
   const hubUrl = isArcade ? '../../arcade/index.html' : isNews ? '../../news/index.html' : '../../index.html';
@@ -244,10 +242,11 @@ function scrubAndApplyUniversalHarness(filePath, item, lifetimeUrl) {
     <a href="${hubUrl}" style="color:#38bdf8;text-decoration:none;font-weight:700;">&larr; ${hubName}</a>
     <span style="color:#64748b;">|</span>
     <span style="font-weight:600;color:#f8fafc;">${item.name || item.slug}</span>
-    <span style="background:#10b98122;color:#10b981;font-size:11px;font-weight:700;padding:2px 6px;border-radius:4px;border:1px solid #10b98144;">FREE PREVIEW</span>
+    <span id="vance-mode-tag" style="background:#10b98122;color:#10b981;font-size:11px;font-weight:700;padding:2px 6px;border-radius:4px;border:1px solid #10b98144;">FREE PREVIEW</span>
   </div>
   <div style="display:flex;align-items:center;gap:10px;">
     <span id="vance-supporter-badge" style="display:none;background:#38bdf822;color:#38bdf8;padding:4px 8px;border-radius:4px;font-size:11px;font-weight:800;border:1px solid #38bdf844;">★ ALL-ACCESS SUPPORTER</span>
+    <span id="vance-debug-badge" style="display:none;background:#f59e0b22;color:#f59e0b;padding:4px 8px;border-radius:4px;font-size:11px;font-weight:800;border:1px solid #f59e0b44;">⚙ CREATOR DEBUG MODE</span>
     <button id="vance-dl-btn" style="display:none;background:#10b981;color:#041f14;border:none;padding:6px 14px;border-radius:6px;font-weight:800;cursor:pointer;font-size:12px;">Download Offline .html</button>
     <a id="vance-lifetime-btn" href="${lifetimeUrl}" target="_blank" rel="noopener" style="background:#38bdf8;color:#020617;padding:6px 14px;border-radius:6px;font-weight:800;text-decoration:none;font-size:12px;box-shadow:0 2px 8px rgba(56,189,248,0.3);">
       Get Studio Lifetime Pass &bull; $30
@@ -257,16 +256,33 @@ function scrubAndApplyUniversalHarness(filePath, item, lifetimeUrl) {
 <script>
 (function() {
   const params = new URLSearchParams(window.location.search);
-  const isLifetime = params.get('lifetime') === 'unlocked' || localStorage.getItem('vance_lifetime_pass') === 'true';
+  
+  // 1. Creator Debug Check
+  if (params.get('debug') === 'creator') {
+    localStorage.setItem('vance_creator_debug', 'true');
+  }
+  const isDebug = localStorage.getItem('vance_creator_debug') === 'true';
+
+  // 2. Paid / Lifetime Check
+  const isLifetime = params.get('lifetime') === 'unlocked' || localStorage.getItem('vance_lifetime_pass') === 'true' || isDebug;
 
   if (isLifetime) {
-    localStorage.setItem('vance_lifetime_pass', 'true');
+    if (!isDebug) localStorage.setItem('vance_lifetime_pass', 'true');
     const lifetimeBtn = document.getElementById('vance-lifetime-btn');
-    const badge = document.getElementById('vance-supporter-badge');
+    const supporterBadge = document.getElementById('vance-supporter-badge');
+    const debugBadge = document.getElementById('vance-debug-badge');
     const dlBtn = document.getElementById('vance-dl-btn');
+    const modeTag = document.getElementById('vance-mode-tag');
 
     if (lifetimeBtn) lifetimeBtn.style.display = 'none';
-    if (badge) badge.style.display = 'inline-block';
+
+    if (isDebug) {
+      if (debugBadge) debugBadge.style.display = 'inline-block';
+      if (modeTag) { modeTag.innerText = 'DEBUG UNLOCKED'; modeTag.style.color = '#f59e0b'; modeTag.style.borderColor = '#f59e0b44'; }
+    } else {
+      if (supporterBadge) supporterBadge.style.display = 'inline-block';
+    }
+
     if (dlBtn) {
       dlBtn.style.display = 'inline-block';
       dlBtn.onclick = function() {
@@ -290,11 +306,10 @@ function scrubAndApplyUniversalHarness(filePath, item, lifetimeUrl) {
   }
 
   fs.writeFileSync(filePath, html, 'utf8');
-  console.log(`[HARNESS-SCRUBBER] Successfully scrubbed & stamped: ${filePath}`);
 }
 
 // ---------------------------------------------------------------------
-// 3. GEMINI CASCADE INFERENCE (3.5 FLASH LITE PRIORITY)
+// 3. GEMINI CASCADE INFERENCE
 // ---------------------------------------------------------------------
 async function callGemini(prompt, isJson = false, timeoutMs = 90000) {
   const modelCascade = [
@@ -341,7 +356,7 @@ async function callGemini(prompt, isJson = false, timeoutMs = 90000) {
       }
 
       if (!res.ok) {
-        console.warn(`[VANCE-AI] ${model} returned HTTP ${res.status}: ${raw.slice(0, 100)}. Cascading...`);
+        console.warn(`[VANCE-AI] ${model} returned HTTP ${res.status}. Cascading...`);
         continue;
       }
 
@@ -363,29 +378,29 @@ async function callGemini(prompt, isJson = false, timeoutMs = 90000) {
 // ---------------------------------------------------------------------
 // 4. DAILY COMMUTE DOSSIER SYNTHESIS (JAPANESE TODAY POD)
 // ---------------------------------------------------------------------
-function getDailyJlptSpec() {
+function getJlptSpec(requestedLevel = 'auto') {
+  const levelConfigs = {
+    N5: { level: "N5", dayName: "Monday", paragraphs: 2, charCap: 200, grammarGuide: "Strict JLPT N5 grammar." },
+    N4: { level: "N4", dayName: "Tuesday", paragraphs: 2, charCap: 260, grammarGuide: "JLPT N4 grammar: 〜たり〜たり, 〜ている, 〜てから, 〜たら/〜ば, 〜ので/から." },
+    N3: { level: "N3", dayName: "Wednesday", paragraphs: 3, charCap: 340, grammarGuide: "JLPT N3 grammar: 〜に対して, 〜によって, 〜に関する, 〜わけではない." },
+    N2: { level: "N2", dayName: "Thursday", paragraphs: 3, charCap: 380, grammarGuide: "JLPT N2 newspaper register." },
+    N1: { level: "N1", dayName: "Friday", paragraphs: 3, charCap: 420, grammarGuide: "JLPT N1 editorial register." }
+  };
+
+  if (requestedLevel !== 'auto' && levelConfigs[requestedLevel]) {
+    return levelConfigs[requestedLevel];
+  }
+
   const now = new Date();
   const jstDate = new Date(now.getTime() + (9 * 60 * 60 * 1000));
   const jstDay = jstDate.getUTCDay();
+  const dayMap = { 1: 'N5', 2: 'N4', 3: 'N3', 4: 'N2', 5: 'N1' };
+  const level = dayMap[jstDay] || 'N3';
 
-  const levelConfigs = {
-    1: { level: "N5", dayName: "Monday", paragraphs: 2, charCap: 200, grammarGuide: "Strict JLPT N5 grammar." },
-    2: { level: "N4", dayName: "Tuesday", paragraphs: 2, charCap: 260, grammarGuide: "JLPT N4 grammar: 〜たり〜たり, 〜ている, 〜てから, 〜たら/〜ば, 〜ので/から." },
-    3: { level: "N3", dayName: "Wednesday", paragraphs: 3, charCap: 340, grammarGuide: "JLPT N3 grammar: 〜に対して, 〜によって, 〜に関する, 〜わけではない." },
-    4: { level: "N2", dayName: "Thursday", paragraphs: 3, charCap: 380, grammarGuide: "JLPT N2 newspaper register." },
-    5: { level: "N1", dayName: "Friday", paragraphs: 3, charCap: 420, grammarGuide: "JLPT N1 editorial register." }
-  };
-
-  return levelConfigs[jstDay] || {
-    level: "N3",
-    dayName: "Weekend Edition",
-    paragraphs: 3,
-    charCap: 340,
-    grammarGuide: "Balanced JLPT N3 intermediate news register."
-  };
+  return levelConfigs[level];
 }
 
-async function synthesizeDailyDossier(lifetimeUrl) {
+async function synthesizeDailyDossier(lifetimeUrl, requestedLevel = 'auto') {
   if (!GEMINI_API_KEY) {
     console.log('[VANCE-AI] No GEMINI_API_KEY detected. Skipping Japanese Today synthesis.');
     return;
@@ -394,8 +409,8 @@ async function synthesizeDailyDossier(lifetimeUrl) {
   const dossierTemplatePath = path.join(TEMPLATES_DIR, 'dossier-shell.html');
   if (!fs.existsSync(dossierTemplatePath)) return;
 
-  const spec = getDailyJlptSpec();
-  console.log(`[VANCE-AI] Synthesizing Japanese Today: ${spec.level} (${spec.dayName} Commute Edition)`);
+  const spec = getJlptSpec(requestedLevel);
+  console.log(`[VANCE-AI] Synthesizing Japanese Today: ${spec.level} Edition (Target: ${spec.level})`);
 
   const prompt = `
 You are a senior Japanese news editor and curriculum designer writing for adults learning Japanese.
@@ -423,7 +438,10 @@ Output JSON ONLY matching this format:
 
     if (!dossierData || !dossierData.edition_slug) return;
     const slug = dossierData.edition_slug;
-    if (state.autonomous_lab_assets.some(a => a.slug === slug)) return;
+    if (state.autonomous_lab_assets.some(a => a.slug === slug)) {
+      console.log(`[VANCE-AI] Slug ${slug} already exists. Skipping duplicate.`);
+      return;
+    }
 
     const itemSpec = {
       slug: slug,
@@ -500,7 +518,7 @@ async function deleteAsset(targetSlug) {
 }
 
 // ---------------------------------------------------------------------
-// 6. FEDERATED STOREFRONTS BUILDER & FLEET-WIDE IN-APP SCRUBBER
+// 6. FEDERATED STOREFRONTS BUILDER (CREATOR DEBUG BYPASS ENABLED)
 // ---------------------------------------------------------------------
 function renderCard(a, isVaulted = false) {
   const isArcade = a.pod === 'arcade' || a.type === 'arcade_cartridge';
@@ -523,7 +541,7 @@ function renderCard(a, isVaulted = false) {
     </div>`;
   } else {
     return `
-    <div class="card vault-card" style="background:#090d16; border:1px dashed #334155; border-radius:12px; padding:1.25rem; display:flex; flex-direction:column; justify-content:space-between; gap:1rem; opacity:0.65;">
+    <div class="card vault-card" style="background:#090d16; border:1px dashed #334155; border-radius:12px; padding:1.25rem; display:flex; flex-direction:column; justify-content:space-between; gap:1rem; opacity:0.65; position:relative;">
       <div>
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
           <div class="badge" style="background:#f59e0b22; color:#f59e0b; font-weight:700; font-size:0.75rem; padding:2px 8px; border-radius:4px; text-transform:uppercase;">Vault Archive</div>
@@ -532,8 +550,9 @@ function renderCard(a, isVaulted = false) {
         <h3 style="font-size:1.05rem; font-weight:700; margin-bottom:0.35rem; color:#cbd5e1;">${a.name}</h3>
         <p style="font-size:0.85rem; color:#64748b; line-height:1.4;">${a.tagline || ''}</p>
       </div>
-      <div class="actions" style="margin-top:1.25rem;">
-        <a href="${a.checkout_url}" target="_blank" rel="noopener" class="btn btn-buy" style="display:block; text-decoration:none; padding:0.5rem; border-radius:6px; font-size:0.8rem; font-weight:700; text-align:center; background:#f59e0b; color:#081726;">Unlock Archive ($1+)</a>
+      <div class="actions" style="margin-top:1.25rem; display:flex; gap:0.5rem;">
+        <a href="${a.checkout_url}" target="_blank" rel="noopener" class="btn btn-buy" style="flex:1; text-decoration:none; padding:0.5rem; border-radius:6px; font-size:0.8rem; font-weight:700; text-align:center; background:#f59e0b; color:#081726;">Unlock Archive ($1+)</a>
+        <a href="${a.web_url}" class="vance-debug-launch-btn" style="display:none; text-decoration:none; padding:0.5rem; border-radius:6px; font-size:0.75rem; font-weight:800; text-align:center; background:#10b981; color:#041f14;">[DEBUG]</a>
       </div>
     </div>`;
   }
@@ -596,6 +615,35 @@ function rebuildAllStorefronts(lifetimeUrl) {
     </div>
   </div>`;
 
+  const debugClientScript = `
+<script>
+(function() {
+  const params = new URLSearchParams(window.location.search);
+  if (params.get('debug') === 'creator') {
+    localStorage.setItem('vance_creator_debug', 'true');
+  }
+  const isDebug = localStorage.getItem('vance_creator_debug') === 'true';
+
+  if (isDebug) {
+    // Unhide debug launch buttons on vaulted cards
+    document.querySelectorAll('.vance-debug-launch-btn').forEach(btn => btn.style.display = 'inline-block');
+    document.querySelectorAll('.vault-card').forEach(card => card.style.opacity = '0.9');
+
+    // Add discreet floating creator badge
+    const badge = document.createElement('div');
+    badge.innerHTML = '⚙ CREATOR DEBUG [ON] <span style="cursor:pointer;margin-left:6px;text-decoration:underline;">(Reset)</span>';
+    badge.style.cssText = 'position:fixed;bottom:12px;right:12px;background:#f59e0b;color:#041f14;padding:6px 12px;font-family:monospace;font-size:11px;font-weight:bold;border-radius:6px;z-index:999999;box-shadow:0 4px 12px rgba(0,0,0,0.5);';
+    badge.querySelector('span').onclick = function() {
+      localStorage.removeItem('vance_creator_debug');
+      localStorage.removeItem('vance_lifetime_pass');
+      window.location.reload();
+    };
+    document.body.appendChild(badge);
+  }
+})();
+</script>
+`;
+
   const arcadeItems = allAssets.filter(a => a.pod === 'arcade' || a.type === 'arcade_cartridge');
   const tacticalItems = allAssets.filter(a => a.pod === 'tactical' || a.slug === 'jlpt-mastery-console');
   const utilityItems = allAssets.filter(a => (a.pod === 'utility' || a.type === 'autonomous_utility' || a.type === 'utility') && a.slug !== 'jlpt-mastery-console');
@@ -615,6 +663,8 @@ function rebuildAllStorefronts(lifetimeUrl) {
       /<!-- \[POD-ROSTER-START\] -->[\s\S]*?<!-- \[POD-ROSTER-END\] -->/,
       `${universalBannerHtml}\n<!-- [POD-ROSTER-START] -->\n<div class="grid">\n${cards}\n</div>\n<!-- [POD-ROSTER-END] -->`
     );
+
+    html = html.replace('</body>', `${debugClientScript}\n</body>`);
 
     fs.mkdirSync(outputDir, { recursive: true });
     fs.writeFileSync(path.join(outputDir, 'index.html'), html, 'utf8');
@@ -639,6 +689,8 @@ function rebuildAllStorefronts(lifetimeUrl) {
     } else {
       hubHtml = hubHtml.replace('<main', `${universalBannerHtml}\n<main`);
     }
+
+    hubHtml = hubHtml.replace('</body>', `${debugClientScript}\n</body>`);
 
     fs.writeFileSync('./index.html', hubHtml, 'utf8');
     console.log('[VANCE] Master Portal (index.html) recompiled.');
@@ -727,9 +779,10 @@ async function ingestStagedArtifacts(lifetimeUrl) {
 }
 
 // ---------------------------------------------------------------------
-// 8. MAIN ENGINE RUNNER
+// 8. MAIN ENGINE RUNNER (DECOUPLED ACTION DISPATCHER)
 // ---------------------------------------------------------------------
 async function run() {
+  console.log(`[VANCE-OPS] Action: "${ACTION}" | Target Level: "${TARGET_LEVEL}"`);
   await syncStripeTelemetry();
 
   // 1. Verify or provision the $30 All-Access Lifetime Supporter Link
@@ -737,15 +790,19 @@ async function run() {
 
   if (ACTION === 'delete') {
     await deleteAsset(TARGET_SLUG);
-  } else {
-    // 2. Ingest staged cartridges/utilities
+  } else if (ACTION === 'synthesize_news') {
+    // Isolated editorial generation of a specific JLPT level
+    await synthesizeDailyDossier(lifetimeUrl, TARGET_LEVEL);
+  } else if (ACTION === 'daily_heartbeat') {
+    // The cron scheduled run: ingest + synthesize + compile
     await ingestStagedArtifacts(lifetimeUrl);
-
-    // 3. Synthesize today's Japanese Today Commute Dossier
-    await synthesizeDailyDossier(lifetimeUrl);
+    await synthesizeDailyDossier(lifetimeUrl, TARGET_LEVEL);
+  } else {
+    // Default 'build': Ingest staging and recompile without generating accidental news
+    await ingestStagedArtifacts(lifetimeUrl);
   }
 
-  // 4. Rebuild all pod storefronts, root hub, and scrub ALL deployed product headers
+  // Rebuild all pod storefronts, root hub, and scrub ALL deployed product headers
   rebuildAllStorefronts(lifetimeUrl);
 
   fs.writeFileSync(STATE_PATH, JSON.stringify(state, null, 2), 'utf8');
