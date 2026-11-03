@@ -103,6 +103,7 @@
     }
   ],
   "execution_log": [
+    "2026-11-03: Deployed World News Japanese: New smartphones are popular (N5)",
     "2026-11-03: Deployed World News Japanese: Smartphone Payments Increasing in Japanese Supermarkets (N4)",
     "2026-11-03: Deployed World News Japanese: Hotel with Robot Staff Opens Anew (N4)",
     "2026-11-03: Deployed World News Japanese: Robot-staffed cafe in Tokyo gains popularity (N4)",
@@ -123,6 +124,20 @@
     "2026-11-01: Staging ingest established for utilities and Substack creative arcade experiments."
   ],
   "autonomous_lab_assets": [
+    {
+      "slug": "news-n5-smartphone-popularity",
+      "pod": "news",
+      "type": "news_dossier",
+      "level": "N5",
+      "name": "World News Japanese: New smartphones are popular (N5)",
+      "tagline": "Monday Commute Edition &bull; 25-Word Match, 5 Grammar Cloze & Reading Check.",
+      "price_cents": 200,
+      "revenue_cents": 0,
+      "web_url": "../products/news-n5-smartphone-popularity/",
+      "checkout_url": "https://buy.stripe.com/3cIeVe3OY8tb1vm5UJ0Ny0o",
+      "stripe_product_id": "prod_VYp3Y9nO1bKJ8N",
+      "invented_at": "2026-11-03T13:06:02.932Z"
+    },
     {
       "slug": "news-n4-smartphone-payment",
       "pod": "news",

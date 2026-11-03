@@ -1,0 +1,1040 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title id="doc-title">New smartphones are popular (N5)</title>
+  <style>
+    /* Zero external dependencies - 100% offline standalone styles */
+    :root {
+      --bg-main: #020617; /* slate-950 */
+      --bg-panel: #0f172a; /* slate-900 */
+      --bg-card: #1e293b; /* slate-800 */
+      --border-color: #334155; /* slate-700 */
+      --border-subtle: #1e293b; /* slate-800 */
+      --text-main: #f8fafc; /* slate-50 */
+      --text-muted: #94a3b8; /* slate-400 */
+      --text-dim: #64748b; /* slate-500 */
+      --accent-blue: #0284c7; /* sky-600 */
+      --accent-blue-hover: #0369a1;
+      --accent-sky: #38bdf8; /* sky-400 */
+      --accent-sky-bg: rgba(56, 189, 248, 0.12);
+      --accent-emerald: #10b981;
+      --accent-emerald-bg: rgba(16, 185, 129, 0.12);
+      --accent-rose: #f43f5e;
+      --accent-rose-bg: rgba(244, 63, 94, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+      background-color: var(--bg-main);
+      color: var(--text-main);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      line-height: 1.5;
+      -webkit-font-smoothing: antialiased;
+    }
+
+    .font-jp {
+      font-family: "Hiragino Sans", "Hiragino Kaku Gothic ProN", "Yu Gothic", "Meiryo", "BIZ UDPGothic", sans-serif;
+    }
+
+    /* Furigana Display Options */
+    .furi-all ruby rt { opacity: 1; }
+    .furi-hover ruby rt { opacity: 0; transition: opacity 0.18s ease-in-out; }
+    .furi-hover ruby:hover rt { opacity: 1; }
+    .furi-hidden ruby rt { display: none; }
+
+    /* Flip Card 3D */
+    .perspective-1000 { perspective: 1000px; }
+    .transform-style-3d { transform-style: preserve-3d; }
+    .backface-hidden {
+      backface-visibility: hidden;
+      -webkit-backface-visibility: hidden;
+    }
+    .rotate-y-180 { transform: rotateY(180deg); }
+    .flip-active { transform: rotateY(180deg); }
+
+    /* Layout & Containers */
+    header {
+      background-color: rgba(15, 23, 42, 0.95);
+      border-bottom: 1px solid var(--border-subtle);
+      position: sticky;
+      top: 0;
+      z-index: 50;
+      padding: 0.75rem 1rem;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 920px;
+      margin: 0 auto;
+    }
+
+    main {
+      flex: 1;
+      padding: 1.25rem 1rem 3rem;
+      display: flex;
+      flex-direction: column;
+      gap: 1.5rem;
+    }
+
+    /* Badges & Nav */
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.35rem;
+      padding: 0.2rem 0.6rem;
+      border-radius: 9999px;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+    .badge-sky {
+      background: var(--accent-sky-bg);
+      color: var(--accent-sky);
+      border: 1px solid rgba(56, 189, 248, 0.3);
+    }
+    .badge-offline {
+      background: var(--accent-emerald-bg);
+      color: var(--accent-emerald);
+      border: 1px solid rgba(16, 185, 129, 0.3);
+    }
+
+    .tab-nav {
+      display: flex;
+      background: var(--bg-panel);
+      padding: 0.35rem;
+      border: 1px solid var(--border-subtle);
+      border-radius: 0.85rem;
+      overflow-x: auto;
+      gap: 0.35rem;
+    }
+
+    .tab-btn {
+      padding: 0.5rem 0.9rem;
+      border-radius: 0.6rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      white-space: nowrap;
+      border: none;
+      background: transparent;
+      color: var(--text-muted);
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+    .tab-btn:hover {
+      color: var(--text-main);
+      background: rgba(255, 255, 255, 0.05);
+    }
+    .tab-btn.active {
+      background: var(--accent-blue);
+      color: #ffffff;
+      box-shadow: 0 2px 6px rgba(2, 132, 199, 0.3);
+    }
+
+    /* Cards & Panels */
+    .card {
+      background-color: var(--bg-panel);
+      border: 1px solid var(--border-subtle);
+      border-radius: 1rem;
+      padding: 1.25rem;
+    }
+
+    .hidden { display: none !important; }
+
+    /* Buttons */
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.4rem;
+      padding: 0.5rem 0.85rem;
+      border-radius: 0.6rem;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: background 0.15s, border-color 0.15s;
+      border: 1px solid transparent;
+    }
+    .btn-primary {
+      background-color: var(--accent-blue);
+      color: #fff;
+    }
+    .btn-primary:hover {
+      background-color: var(--accent-blue-hover);
+    }
+    .btn-secondary {
+      background-color: var(--bg-card);
+      border-color: var(--border-color);
+      color: var(--text-main);
+    }
+    .btn-secondary:hover {
+      background-color: #334155;
+    }
+    .btn-danger {
+      background-color: rgba(244, 63, 94, 0.2);
+      border-color: rgba(244, 63, 94, 0.4);
+      color: #fda4af;
+    }
+    .btn-danger:hover {
+      background-color: rgba(244, 63, 94, 0.3);
+    }
+
+    /* Grids */
+    .vocab-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+      gap: 0.75rem;
+    }
+
+    .grammar-grid {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+    }
+
+    .quiz-options {
+      display: grid;
+      grid-template-columns: 1fr;
+      gap: 0.5rem;
+    }
+    @media (min-width: 640px) {
+      .quiz-options-2col {
+        grid-template-columns: 1fr 1fr;
+      }
+      .quiz-options-4col {
+        grid-template-columns: repeat(4, 1fr);
+      }
+    }
+
+    .quiz-opt-btn {
+      text-align: left;
+      padding: 0.75rem 1rem;
+      background: var(--bg-panel);
+      border: 1px solid var(--border-subtle);
+      border-radius: 0.65rem;
+      color: var(--text-main);
+      cursor: pointer;
+      font-size: 0.85rem;
+      transition: all 0.15s ease;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .quiz-opt-btn:hover {
+      border-color: var(--accent-sky);
+      background-color: var(--bg-card);
+    }
+
+    /* Mistake Review Box */
+    .review-item {
+      background: rgba(2, 6, 23, 0.6);
+      border: 1px solid var(--border-subtle);
+      border-left: 3px solid var(--accent-rose);
+      border-radius: 0.6rem;
+      padding: 0.85rem;
+      margin-bottom: 0.6rem;
+      font-size: 0.82rem;
+    }
+    .review-item.correct-item {
+      border-left-color: var(--accent-emerald);
+    }
+  </style>
+</head>
+<body>
+
+<!-- [VANCE-MERCHANT-HARNESS: START] -->
+<div id="vance-header" style="background:#090d16;color:#e2e8f0;padding:10px 18px;font-family:system-ui,-apple-system,sans-serif;font-size:13px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #1e293b;position:sticky;top:0;z-index:999999;">
+  <div style="display:flex;align-items:center;gap:14px;">
+    <a href="../../news/index.html" style="color:#38bdf8;text-decoration:none;font-weight:700;">&larr; Japanese Today</a>
+    <span style="color:#64748b;">|</span>
+    <span style="font-weight:600;color:#f8fafc;">World News Japanese: New smartphones are popular (N5)</span>
+    <span id="vance-mode-tag" style="background:#10b98122;color:#10b981;font-size:11px;font-weight:700;padding:2px 6px;border-radius:4px;border:1px solid #10b98144;">FREE PREVIEW</span>
+  </div>
+  <div style="display:flex;align-items:center;gap:10px;">
+    <span id="vance-supporter-badge" style="display:none;background:#38bdf822;color:#38bdf8;padding:4px 8px;border-radius:4px;font-size:11px;font-weight:800;border:1px solid #38bdf844;">★ ALL-ACCESS SUPPORTER</span>
+    <span id="vance-debug-badge" style="display:none;background:#f59e0b22;color:#f59e0b;padding:4px 8px;border-radius:4px;font-size:11px;font-weight:800;border:1px solid #f59e0b44;">⚙ CREATOR DEBUG MODE</span>
+    <button id="vance-dl-btn" style="display:none;background:#10b981;color:#041f14;border:none;padding:6px 14px;border-radius:6px;font-weight:800;cursor:pointer;font-size:12px;">Download Offline .html</button>
+    <a id="vance-lifetime-btn" href="https://buy.stripe.com/7sYcN61GQ24N7TK6YN0Ny0f" target="_blank" rel="noopener" style="background:#38bdf8;color:#020617;padding:6px 14px;border-radius:6px;font-weight:800;text-decoration:none;font-size:12px;box-shadow:0 2px 8px rgba(56,189,248,0.3);">
+      Get Studio Lifetime Pass &bull; $30
+    </a>
+  </div>
+</div>
+<script>
+(function() {
+  const params = new URLSearchParams(window.location.search);
+  
+  // 1. Creator Debug Check
+  if (params.get('debug') === 'creator') {
+    localStorage.setItem('vance_creator_debug', 'true');
+  }
+  const isDebug = localStorage.getItem('vance_creator_debug') === 'true';
+
+  // 2. Paid / Lifetime Check
+  const isLifetime = params.get('lifetime') === 'unlocked' || localStorage.getItem('vance_lifetime_pass') === 'true' || isDebug;
+
+  if (isLifetime) {
+    if (!isDebug) localStorage.setItem('vance_lifetime_pass', 'true');
+    const lifetimeBtn = document.getElementById('vance-lifetime-btn');
+    const supporterBadge = document.getElementById('vance-supporter-badge');
+    const debugBadge = document.getElementById('vance-debug-badge');
+    const dlBtn = document.getElementById('vance-dl-btn');
+    const modeTag = document.getElementById('vance-mode-tag');
+
+    if (lifetimeBtn) lifetimeBtn.style.display = 'none';
+
+    if (isDebug) {
+      if (debugBadge) debugBadge.style.display = 'inline-block';
+      if (modeTag) { modeTag.innerText = 'DEBUG UNLOCKED'; modeTag.style.color = '#f59e0b'; modeTag.style.borderColor = '#f59e0b44'; }
+    } else {
+      if (supporterBadge) supporterBadge.style.display = 'inline-block';
+    }
+
+    if (dlBtn) {
+      dlBtn.style.display = 'inline-block';
+      dlBtn.onclick = function() {
+        const blob = new Blob([document.documentElement.outerHTML], { type: 'text/html' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob);
+        a.download = 'news-n5-smartphone-popularity.offline.html';
+        a.click();
+      };
+    }
+  }
+})();
+</script>
+<!-- [VANCE-MERCHANT-HARNESS: END] -->
+
+
+
+
+
+  
+
+  <!-- App Header -->
+  <header>
+    <div class="container" style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
+      <div style="display:flex; align-items:center; gap:0.5rem;">
+        <span class="badge badge-sky" id="badge-level">LEVEL • DOSSIER</span>
+        <span class="badge badge-offline">⚡ 100% OFFLINE</span>
+      </div>
+      <div style="display:flex; align-items:center; gap:0.75rem;">
+        <a id="source-link" href="#" target="_blank" style="color:var(--accent-sky); font-size:0.75rem; text-decoration:none; font-weight:500;">
+          Source: <span id="source-name" style="text-decoration:underline;">News Report</span> &nearr;
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <main class="container">
+    
+    <!-- Title & Learning Step Tabs -->
+    <div style="display:flex; flex-direction:column; gap:0.75rem; border-bottom:1px solid var(--border-subtle); padding-bottom:1rem;">
+      <div>
+        <h1 class="font-jp" id="article-headline-jp" style="font-size:1.4rem; font-weight:800; color:#ffffff;">
+          ニュース見出し
+        </h1>
+        <p id="article-headline-en" style="color:var(--text-muted); font-size:0.8rem; margin-top:0.2rem;">
+          English Headline • Step-by-Step Mastery Dossier
+        </p>
+      </div>
+
+      <!-- Clean Tab Navigation -->
+      <nav class="tab-nav">
+        <button onclick="switchTab('vocab')" id="tab-btn-vocab" class="tab-btn active">
+          Vocabulary
+        </button>
+        <button onclick="switchTab('grammar')" id="tab-btn-grammar" class="tab-btn">
+          Grammar
+        </button>
+        <button onclick="switchTab('article')" id="tab-btn-article" class="tab-btn">
+          Reading
+        </button>
+      </nav>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- TAB 1: VOCABULARY FIRST                   -->
+    <!-- ========================================== -->
+    <section id="section-vocab" class="tab-pane" style="display:flex; flex-direction:column; gap:1.25rem;">
+      <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
+        <div>
+          <h2 style="font-size:1rem; font-weight:700;">Vocabulary</h2>
+          <p style="font-size:0.75rem; color:var(--text-muted);">Step 1: Master the building blocks. Click cards to flip. 🔊 uses device offline TTS.</p>
+        </div>
+        <div id="vocab-filters" style="display:flex; gap:0.25rem; overflow-x:auto;"></div>
+      </div>
+
+      <!-- Vocab Card Grid -->
+      <div class="vocab-grid" id="vocab-grid"></div>
+
+      <!-- 25-Card Recall Drill -->
+      <div class="card" style="margin-top:0.5rem;">
+        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border-subtle); padding-bottom:0.75rem; margin-bottom:1rem;">
+          <div>
+            <h3 style="font-size:0.95rem; font-weight:700;">⚡ 25-Card Vocabulary Recall Drill</h3>
+            <p style="font-size:0.75rem; color:var(--text-muted);">Test all 25 words. Wrong answers are recorded for deep review.</p>
+          </div>
+          <span id="vocab-score-badge" style="font-size:0.75rem; font-family:monospace; font-weight:700; color:var(--accent-sky);">Card: 1 / 25</span>
+        </div>
+        <div id="vocab-quiz-container"></div>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- TAB 2: GRAMMAR PRACTICE SECOND            -->
+    <!-- ========================================== -->
+    <section id="section-grammar" class="tab-pane hidden" style="display:flex; flex-direction:column; gap:1.25rem;">
+      <div>
+        <h2 style="font-size:1rem; font-weight:700;">Grammar</h2>
+        <p style="font-size:0.75rem; color:var(--text-muted);">Core patterns used in today's news passage. Tap cards for breakdown.</p>
+      </div>
+
+      <!-- Grammar Patterns -->
+      <div class="grammar-grid" id="grammar-list"></div>
+
+      <!-- 10-Question Cloze Drill -->
+      <div class="card" style="margin-top:0.5rem;">
+        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border-subtle); padding-bottom:0.75rem; margin-bottom:1rem;">
+          <div>
+            <h3 style="font-size:0.95rem; font-weight:700;">✏️ 10-Question Particle & Cloze Drill</h3>
+            <p style="font-size:0.75rem; color:var(--text-muted);">Select the correct particle or helper form for each blank.</p>
+          </div>
+          <span id="grammar-score-badge" style="font-size:0.75rem; font-family:monospace; font-weight:700; color:var(--accent-sky);">Card: 1 / 10</span>
+        </div>
+        <div id="grammar-quiz-container"></div>
+      </div>
+    </section>
+
+    <!-- ========================================== -->
+    <!-- TAB 3: READING COMPREHENSION THIRD        -->
+    <!-- ========================================== -->
+    <section id="section-article" class="tab-pane hidden" style="display:flex; flex-direction:column; gap:1.25rem;">
+      <!-- Toolbar for Furigana & Audio -->
+      <div class="card" style="padding:0.75rem 1rem; display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
+        <div style="display:inline-flex; background:var(--bg-main); border:1px solid var(--border-subtle); border-radius:0.5rem; padding:0.2rem;">
+          <button onclick="setFuri('all')" id="furi-all" class="btn" style="padding:0.25rem 0.6rem; font-size:0.75rem; background:var(--accent-blue); color:#fff;">All Furi</button>
+          <button onclick="setFuri('hover')" id="furi-hover" class="btn" style="padding:0.25rem 0.6rem; font-size:0.75rem; background:transparent; color:var(--text-muted);">Hover</button>
+          <button onclick="setFuri('hidden')" id="furi-hidden" class="btn" style="padding:0.25rem 0.6rem; font-size:0.75rem; background:transparent; color:var(--text-muted);">Off</button>
+        </div>
+        <button onclick="toggleReadAloud()" id="read-aloud-btn" class="btn btn-secondary" style="font-size:0.75rem;">
+          🔊 Read Full Passage
+        </button>
+      </div>
+
+      <!-- Article Canvas -->
+      <div class="card" style="padding:1.5rem; line-height:2.2; font-size:1.15rem;">
+        <div id="story-container" class="font-jp furi-all" style="display:flex; flex-direction:column; gap:1rem;"></div>
+
+        <div style="margin-top:1.25rem; padding-top:1rem; border-top:1px solid var(--border-subtle);">
+          <button onclick="toggleTranslation()" class="btn" style="background:transparent; color:var(--accent-sky); padding:0; font-size:0.8rem;">
+            👁️ <span id="trans-btn-label">Show English Translation</span>
+          </button>
+          <div id="translation-box" class="hidden" style="margin-top:0.75rem; font-size:0.85rem; color:var(--text-muted); background:var(--bg-main); padding:0.85rem; border-radius:0.5rem; border:1px solid var(--border-subtle); line-height:1.6;"></div>
+        </div>
+      </div>
+
+      <!-- 5-Question Reading Gauntlet -->
+      <div class="card">
+        <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border-subtle); padding-bottom:0.75rem; margin-bottom:1rem;">
+          <div>
+            <h3 style="font-size:0.95rem; font-weight:700;">読解 (5-Question Reading Comprehension)</h3>
+            <p style="font-size:0.75rem; color:var(--text-muted);">Synthesize what you learned from the vocab and grammar drills.</p>
+          </div>
+          <span id="rc-score-badge" style="font-size:0.75rem; font-family:monospace; font-weight:700; color:var(--accent-emerald);">Card: 1 / 5</span>
+        </div>
+        <div id="rc-quiz-container"></div>
+      </div>
+    </section>
+
+  </main>
+
+  <footer style="border-top:1px solid var(--border-subtle); background:var(--bg-main); padding:1rem; text-align:center; font-size:0.75rem; color:var(--text-dim);">
+    World News Japanese Dossier • Autonomous Commute Edition • 100% Offline
+  </footer>
+
+  <script>
+    // INJECTED BY VANCE ENGINE
+    const DATA = {"edition_slug":"news-n5-smartphone-popularity","meta":{"level":"N5","category":"Tech / Culture / Business","source_title":"NHK Web News","source_url":"https://www3.nhk.or.jp/news/easy/"},"article":{"title_jp":"あたらしいスマートフォンが人気です","title_en":"New smartphones are popular","raw_text":"まいにち、多くの人がスマートフォンを使っています。きょねん、あたらしいスマートフォンが出ました。このスマートフォンは、カメラがとてもきれいです。そして、バッテリーも長持ちします。だから、いま若い人にとても人気があります。きのう、デパートでスマートフォンを見ました。たくさんの人が店にいました。私もほしいです。","furi_html":"<p><ruby>毎<rt>まい</rt></ruby><ruby>日<rt>にち</rt></ruby>、<ruby>多<rt>おお</rt></ruby>くの<ruby>人<rt>ひと</rt></ruby>がスマートフォンを<ruby>使<rt>つか</rt></ruby>っています。<ruby>去<rt>きょ</rt></ruby><ruby>年<rt>ねん</rt></ruby>、あたらしいスマートフォンが<ruby>出<rt>で</rt></ruby>ました。このスマートフォンは、カメラがとてもきれいです。そして、バッテリーも<ruby>長<rt>なが</rt></ruby><ruby>持<rt>もち</rt></ruby>ちします。だから、いま<ruby>若<rt>わか</rt></ruby>い<ruby>人<rt>ひと</rt></ruby>にとても<ruby>人気<rt>にんき</rt></ruby>があります。<ruby>昨<rt>きの</rt></ruby><ruby>日<rt>にち</rt></ruby>、デパートでスマートフォンを<ruby>見<rt>み</rt></ruby>ました。たくさんの<ruby>人<rt>ひと</rt></ruby>が<ruby>店<rt>みせ</rt></ruby>にいました。<ruby>私<rt>わたし</rt></ruby>もほしいです。</p>","translation_en":"Every day, many people use smartphones. Last year, a new smartphone came out. This smartphone's camera is very pretty. Also, the battery lasts a long time. Therefore, it is very popular among young people now. Yesterday, I saw smartphones at the department store. There were many people in the shop. I want one too."},"vocabulary_25":[{"id":"v1","category":"General","word":"毎日","kana":"まいにち","en":"every day","type":"Noun"},{"id":"v2","category":"General","word":"多い","kana":"おおい","en":"many / numerous","type":"Adjective"},{"id":"v3","category":"General","word":"人","kana":"ひと","en":"person","type":"Noun"},{"id":"v4","category":"Tech","word":"使う","kana":"つかう","en":"to use","type":"Verb"},{"id":"v5","category":"General","word":"去年","kana":"きょねん","en":"last year","type":"Noun"},{"id":"v6","category":"Tech","word":"出る","kana":"でる","en":"to appear / to come out","type":"Verb"},{"id":"v7","category":"General","word":"新しい","kana":"あたらしい","en":"new","type":"Adjective"},{"id":"v8","category":"Tech","word":"カメラ","kana":"かめら","en":"camera","type":"Noun"},{"id":"v9","category":"General","word":"とても","kana":"とても","en":"very","type":"Adverb"},{"id":"v10","category":"General","word":"きれい","kana":"きれい","en":"pretty / clean","type":"Adjective"},{"id":"v11","category":"General","word":"そして","kana":"そして","en":"and / moreover","type":"Conjunction"},{"id":"v12","category":"Tech","word":"バッテリー","kana":"ばってりー","en":"battery","type":"Noun"},{"id":"v13","category":"General","word":"長持ち","kana":"ながもち","en":"long-lasting","type":"Noun"},{"id":"v14","category":"General","word":"だから","kana":"だから","en":"therefore / so","type":"Conjunction"},{"id":"v15","category":"General","word":"いま","kana":"いま","en":"now","type":"Noun"},{"id":"v16","category":"General","word":"若い","kana":"わかい","en":"young","type":"Adjective"},{"id":"v17","category":"General","word":"人気","kana":"にんき","en":"popularity","type":"Noun"},{"id":"v18","category":"General","word":"昨日","kana":"きのう","en":"yesterday","type":"Noun"},{"id":"v19","category":"General","word":"デパート","kana":"でぱーと","en":"department store","type":"Noun"},{"id":"v20","category":"General","word":"見る","kana":"みる","en":"to see / to look","type":"Verb"},{"id":"v21","category":"General","word":"たくさん","kana":"たくさん","en":"a lot / many","type":"Adverb"},{"id":"v22","category":"General","word":"店","kana":"みせ","en":"shop / store","type":"Noun"},{"id":"v23","category":"General","word":"いる","kana":"いる","en":"to exist (animate)","type":"Verb"},{"id":"v24","category":"General","word":"私","kana":"わたし","en":"I","type":"Noun"},{"id":"v25","category":"General","word":"ほしい","kana":"ほしい","en":"desiring / want","type":"Adjective"}],"grammar_5":[{"id":"g1","pattern":"〜が (Subject marker)","formation":"Noun + が","meaning":"Subject marker for describing attributes or new information","nuance":"Standard descriptive marker","sentence_jp":"カメラがとてもきれいです。","sentence_furi":"カメラがとてもきれいです。","sentence_en":"The camera is very pretty.","breakdown":"カメラ (camera) + が (subject marker) + とても (very) + きれいです (is pretty)."},{"id":"g2","pattern":"〜も (Also / Too)","formation":"Noun + も","meaning":"Also / too / as well","nuance":"Inclusive particle","sentence_jp":"バッテリーも長持ちします。","sentence_furi":"バッテリーも<ruby>長<rt>なが</rt></ruby><ruby>持<rt>もち</rt></ruby>ちします。","sentence_en":"The battery lasts a long time too.","breakdown":"バッテリー (battery) + も (also) + 長持ちします (lasts a long time)."},{"id":"g3","pattern":"だから (Therefore / So)","formation":"Sentence 1. だから、Sentence 2.","meaning":"Therefore / so","nuance":"Casual/Standard causal conjunction","sentence_jp":"人気があります。だから、買いたいです。","sentence_furi":"<ruby>人気<rt>にんき</rt></ruby>があります。だから、<ruby>買<rt>か</rt></ruby>いたいです。","sentence_en":"It is popular. Therefore, I want to buy it.","breakdown":"人気があります (It is popular) + だだから (therefore) + 買いたいです (want to buy)."},{"id":"g4","pattern":"に (Location of existence)","formation":"Noun (place) + に + Noun (animate/inanimate) + が + いる/ある","meaning":"In / at (indicating where something/someone is)","nuance":"Locational marker","sentence_jp":"たくさんの人が店にいました。","sentence_furi":"たくさんの<ruby>人<rt>ひと</rt></ruby>が<ruby>店<rt>みせ</rt></ruby>にいました。","sentence_en":"There were many people in the shop.","breakdown":"たくさん的人 (many people) + が + 店 (shop) + に (in) + いました (were)."},{"id":"g5","pattern":"〜たい (Want to do)","formation":"Verb-stem + たい","meaning":"Want to do [verb]","nuance":"Expressing personal desire","sentence_jp":"私もほしいです。","sentence_furi":"<ruby>私<rt>わたし</rt></ruby>もほしいです。","sentence_en":"I want [it] too.","breakdown":"私 (I) + も (too) + ほしい (want)."}],"grammar_quiz_10":[{"id":1,"prompt":"まいにち、多くの人 [ ? ] スマートフォンを使っています。","translation":"Every day, many people use smartphones.","options":["が","を","に","で"],"correct":"が","explanation":"「多くの人が」 uses the subject marker が to indicate who is doing the action."},{"id":2,"prompt":"このスマートフォンは、カメラ [ ? ] とてもきれいです。","translation":"As for this smartphone, the camera is very pretty.","options":["は","が","を","に"],"correct":"が","explanation":"When describing a specific attribute of a topic, が marks the subject of the description."},{"id":3,"prompt":"バッテリー [ ? ] 長持ちします。","translation":"The battery lasts a long time too.","options":["も","を","に","で"],"correct":"も","explanation":"「も」 means 'also' or 'too', adding to the positive features mentioned."},{"id":4,"prompt":"若い人 [ ? ] とても人気があります。","translation":"It is very popular among young people.","options":["に","を","で","と"],"correct":"に","explanation":"「人気がある」 takes the particle に to indicate the target or group toward which it is popular."},{"id":5,"prompt":"きのう、デパート [ ? ] スマートフォンを見ました。","translation":"Yesterday, I saw smartphones at the department store.","options":["で","に","を","が"],"correct":"で","explanation":"「で」 indicates the location where an action (seeing/looking) takes place."},{"id":6,"prompt":"たくさんの人が店 [ ? ] いました。","translation":"There were many people in the shop.","options":["に","で","を","が"],"correct":"に","explanation":"The particle に is used with existence verbs (いる/ある) to show where someone/something is located."},{"id":7,"prompt":"きょねん、あたらしいスマートフォンが [ ? ]。","translation":"Last year, a new smartphone came out.","options":["出ました","出ます","出る","出て"],"correct":"出ました","explanation":"The sentence begins with 「きょねん」 (last year), requiring the past tense polite form 出ました."},{"id":8,"prompt":"カメラがきれいです。 [ ? ] 、人気があります。","translation":"The camera is pretty. Therefore, it is popular.","options":["だから","そして","しかし","から"],"correct":"だから","explanation":"「だから」 expresses a logical result or consequence ('therefore' / 'so')."},{"id":9,"prompt":"私もスマートフォンが [ ? ] 。","translation":"I want a smartphone too.","options":["ほしいです","ほしかったです","ほしい","ほしくない"],"correct":"ほしいです","explanation":"ほしい expresses desire for an object, made polite with です."},{"id":10,"prompt":"まいにち、多くの人がスマートフォンを [ ? ] 。","translation":"Every day, many people use smartphones.","options":["使っています","使います","使った","使う"],"correct":"使っています","explanation":"「使っています」 indicates an ongoing action or habitual state in the present."}],"comprehension_quiz_5":[{"id":"rc1","question_jp":"スマートフォンはいつ出ましたか。","question_en":"When did the smartphone come out?","options":["まいにち","きょねん","きのう","いま"],"correct":1,"explanation":"The text states: 「きょねん、あたらしいスマートフォンが出ました。」"},{"id":"rc2","question_jp":"このスマートフォンのカメラはどうですか。","question_en":"How is this smartphone's camera?","options":["きたないです","とてもきれいです","古いです","よくありません"],"correct":1,"explanation":"The text states: 「このスマートフォンは、カメラがとてもきれいです。」"},{"id":"rc3","question_jp":"だれにとても人気がありますか。","question_en":"Who is it very popular among?","options":["古い人","若い人","子ども","せんせい"],"correct":1,"explanation":"The text states: 「いま若い人にとても人気があります。」"},{"id":"rc4","question_jp":"きのう、どこでスマートフォンを見ましたか。","question_en":"Where did you see smartphones yesterday?","options":["学校","デパート","公園","駅"],"correct":1,"explanation":"The text states: 「きのう、デパートでスマートフォンを見ました。」"},{"id":"rc5","question_jp":"筆者（ひっしゃ）はスマートフォンがほしいですか。","question_en":"Does the author want a smartphone?","options":["はい、ほしいです。","いいえ、ほしくありません。","わかりません。","持っています。"],"correct":0,"explanation":"The text ends with: 「私もほしいです。」"}]};
+
+    // Global States
+    let currentVocabFilter = "ALL";
+    let isTranslationVisible = false;
+
+    // Vocab Drill State
+    let vIndex = 0, vScore = 0, vDone = false;
+    let vQuestions = [];
+    let vMistakes = [];
+
+    // Grammar Drill State
+    let gIndex = 0, gScore = 0, gDone = false;
+    let gQuestions = [];
+    let gMistakes = [];
+
+    // Reading Drill State
+    let rcIndex = 0, rcScore = 0, rcDone = false;
+    let rcQuestions = [];
+    let rcMistakes = [];
+
+    // Text to Speech (Offline Browser Native)
+    let isReadingArticle = false;
+
+    function resetReadAloudBtn() {
+      isReadingArticle = false;
+      const btn = document.getElementById("read-aloud-btn");
+      if (btn) {
+        btn.innerHTML = "🔊 Read Full Passage";
+        btn.className = "btn btn-secondary";
+      }
+    }
+
+    function speak(text) {
+      if (!('speechSynthesis' in window)) return;
+      window.speechSynthesis.cancel();
+      resetReadAloudBtn();
+      const u = new SpeechSynthesisUtterance(text);
+      u.lang = 'ja-JP';
+      u.rate = 0.85;
+      window.speechSynthesis.speak(u);
+    }
+
+    function toggleReadAloud() {
+      if (!('speechSynthesis' in window)) return;
+      const btn = document.getElementById("read-aloud-btn");
+
+      if (isReadingArticle || window.speechSynthesis.speaking) {
+        window.speechSynthesis.cancel();
+        resetReadAloudBtn();
+        return;
+      }
+
+      window.speechSynthesis.cancel();
+      const u = new SpeechSynthesisUtterance(DATA.article.raw_text);
+      u.lang = 'ja-JP';
+      u.rate = 0.85;
+
+      u.onend = () => resetReadAloudBtn();
+      u.onerror = () => resetReadAloudBtn();
+
+      isReadingArticle = true;
+      if (btn) {
+        btn.innerHTML = "⏹️ Stop Reading";
+        btn.className = "btn btn-danger";
+      }
+      window.speechSynthesis.speak(u);
+    }
+
+    function flipCard(id) {
+      const el = document.getElementById(id);
+      if (el) el.classList.toggle("flip-active");
+    }
+
+    function setFuri(mode) {
+      const c = document.getElementById("story-container");
+      c.classList.remove("furi-all", "furi-hover", "furi-hidden");
+      ["all", "hover", "hidden"].forEach(m => {
+        const btn = document.getElementById(`furi-${m}`);
+        if (m === mode) {
+          btn.style.background = "var(--accent-blue)";
+          btn.style.color = "#ffffff";
+        } else {
+          btn.style.background = "transparent";
+          btn.style.color = "var(--text-muted)";
+        }
+      });
+      if (mode === "hover") c.classList.add("furi-hover");
+      if (mode === "hidden") c.classList.add("furi-hidden");
+      if (mode === "all") c.classList.add("furi-all");
+    }
+
+    function toggleTranslation() {
+      isTranslationVisible = !isTranslationVisible;
+      const box = document.getElementById("translation-box");
+      const lbl = document.getElementById("trans-btn-label");
+      if (isTranslationVisible) {
+        box.classList.remove("hidden");
+        lbl.textContent = "Hide English Translation";
+      } else {
+        box.classList.add("hidden");
+        lbl.textContent = "Show English Translation";
+      }
+    }
+
+    function switchTab(name) {
+      document.querySelectorAll(".tab-pane").forEach(p => p.classList.add("hidden"));
+      document.querySelectorAll(".tab-btn").forEach(b => b.classList.remove("active"));
+      document.getElementById(`section-${name}`).classList.remove("hidden");
+      document.getElementById(`tab-btn-${name}`).classList.add("active");
+    }
+
+    // Populate Headers from DATA
+    function initHeader() {
+      if (!DATA) return;
+      document.getElementById("doc-title").textContent = (DATA.article.title_en || "Daily Dossier") + " // Japanese Commute Edition";
+      document.getElementById("badge-level").textContent = (DATA.meta.level || "JLPT") + " • " + (DATA.meta.category || "NEWS");
+      document.getElementById("source-name").textContent = DATA.meta.source_title || "News Source";
+      if (DATA.meta.source_url) {
+        document.getElementById("source-link").href = DATA.meta.source_url;
+      }
+      document.getElementById("article-headline-jp").textContent = DATA.article.title_jp;
+      document.getElementById("article-headline-en").textContent = DATA.article.title_en;
+    }
+
+    // ==========================================
+    // 1. VOCABULARY ENGINE (STEP 1)
+    // ==========================================
+    function renderVocabGrid() {
+      const cats = ["ALL", ...new Set(DATA.vocabulary_25.map(v => v.category))];
+      document.getElementById("vocab-filters").innerHTML = cats.map(c => `
+        <button onclick="setVocabFilter('${c}')" class="btn" style="padding:0.25rem 0.55rem; font-size:0.7rem; ${currentVocabFilter === c ? 'background:var(--accent-blue); color:#fff;' : 'background:var(--bg-panel); border:1px solid var(--border-subtle); color:var(--text-muted);'}">
+          ${c}
+        </button>
+      `).join('');
+
+      const filtered = currentVocabFilter === "ALL" ? DATA.vocabulary_25 : DATA.vocabulary_25.filter(v => v.category === currentVocabFilter);
+      document.getElementById("vocab-grid").innerHTML = filtered.map(v => `
+        <div class="perspective-1000" style="height:150px; cursor:pointer;" onclick="flipCard('vf-${v.id}')">
+          <div id="vf-${v.id}" class="transform-style-3d" style="position:relative; width:100%; height:100%; transition: transform 0.45s ease; border-radius:0.75rem;">
+            <!-- Front -->
+            <div class="backface-hidden" style="position:absolute; inset:0; background:var(--bg-panel); border:1px solid var(--border-subtle); border-radius:0.75rem; padding:0.75rem; display:flex; flex-direction:column; justify-content:space-between; align-items:center; text-align:center;">
+              <span style="font-size:0.65rem; color:var(--accent-sky); font-weight:700; background:var(--bg-card); padding:0.15rem 0.4rem; border-radius:0.35rem;">${v.category}</span>
+              <div class="font-jp" style="font-size:1.45rem; font-weight:700; color:#fff;">${v.word}</div>
+              <div style="font-size:0.65rem; color:var(--text-dim);">Tap to flip</div>
+              <button onclick="event.stopPropagation(); speak('${v.word}')" class="btn btn-secondary" style="padding:0.2rem 0.5rem; font-size:0.7rem; width:100%;">🔊 Listen</button>
+            </div>
+            <!-- Back -->
+            <div class="backface-hidden rotate-y-180" style="position:absolute; inset:0; background:var(--bg-panel); border:1px solid rgba(56,189,248,0.5); border-radius:0.75rem; padding:0.75rem; display:flex; flex-direction:column; justify-content:space-between; text-align:center;">
+              <span class="font-jp" style="font-size:0.8rem; color:var(--accent-sky); font-weight:700;">${v.kana}</span>
+              <div style="margin:auto 0;">
+                <div style="font-size:0.78rem; font-weight:600; color:var(--text-main);">${v.en}</div>
+                <div style="font-size:0.65rem; color:var(--text-dim); margin-top:0.2rem;">${v.type}</div>
+              </div>
+              <button onclick="event.stopPropagation(); speak('${v.word}')" class="btn btn-secondary" style="padding:0.2rem 0.5rem; font-size:0.7rem; width:100%; color:var(--accent-sky);">🔊 Pronounce</button>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function setVocabFilter(c) {
+      currentVocabFilter = c;
+      renderVocabGrid();
+    }
+
+    function initVocabQuiz(customItems = null) {
+      vIndex = 0;
+      vScore = 0;
+      vDone = false;
+      vMistakes = [];
+      const pool = customItems || DATA.vocabulary_25;
+      const shuffled = [...pool].sort(() => 0.5 - Math.random());
+      
+      vQuestions = shuffled.map(item => {
+        const others = DATA.vocabulary_25.filter(v => v.id !== item.id).sort(() => 0.5 - Math.random()).slice(0, 3);
+        const options = [
+          { en: item.en, isCorrect: true, text: item.en },
+          ...others.map(o => ({ en: o.en, isCorrect: false, text: o.en }))
+        ].sort(() => 0.5 - Math.random());
+        return {
+          id: item.id,
+          target: item.word,
+          correctKana: item.kana,
+          correctEn: item.en,
+          options
+        };
+      });
+      renderVocabQuiz();
+    }
+
+    function renderVocabQuiz() {
+      const container = document.getElementById("vocab-quiz-container");
+      const badge = document.getElementById("vocab-score-badge");
+
+      if (vDone) {
+        badge.textContent = `Completed! ${vScore} / ${vQuestions.length}`;
+        const hasMistakes = vMistakes.length > 0;
+        container.innerHTML = `
+          <div style="background:rgba(2, 6, 23, 0.7); border:1px solid var(--border-subtle); border-radius:0.75rem; padding:1.25rem; text-align:center;">
+            <h4 style="font-size:1.1rem; font-weight:700; color:#fff;">Vocab Drill Completed</h4>
+            <div style="font-family:monospace; font-size:1.75rem; font-weight:800; color:${hasMistakes ? 'var(--accent-sky)' : 'var(--accent-emerald)'}; margin:0.5rem 0;">
+              Score: ${vScore} / ${vQuestions.length}
+            </div>
+
+            <!-- Review Section -->
+            ${hasMistakes ? `
+              <div style="margin:1rem 0; text-align:left;">
+                <div style="font-weight:700; font-size:0.85rem; color:var(--accent-rose); margin-bottom:0.5rem;">
+                  ⚠️ Review Wrong Answers (${vMistakes.length}):
+                </div>
+                <div>
+                  ${vMistakes.map((m, idx) => `
+                    <div class="review-item">
+                      <div style="font-weight:700; font-size:1rem; color:#fff; display:flex; justify-content:space-between;">
+                        <span>${idx + 1}. ${m.target}</span>
+                        <button onclick="speak('${m.target}')" style="background:none; border:none; color:var(--accent-sky); cursor:pointer; font-size:0.75rem;">🔊 Audio</button>
+                      </div>
+                      <div style="color:#fca5a5; margin-top:0.25rem;">✖ Your Answer: ${m.userChoice}</div>
+                      <div style="color:#86efac; font-weight:600;">✔ Correct Meaning: ${m.correctEn}</div>
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+              <div style="display:flex; justify-content:center; gap:0.5rem; flex-wrap:wrap; margin-top:1rem;">
+                <button onclick="retestVocabMistakes()" class="btn btn-danger">↻ Retest Missed Only (${vMistakes.length})</button>
+                <button onclick="initVocabQuiz()" class="btn btn-primary">↻ Restart Full 25 Drill</button>
+              </div>
+            ` : `
+              <p style="color:var(--accent-emerald); font-size:0.85rem; margin-bottom:1rem;">🎉 Perfect Score! You mastered every word.</p>
+              <button onclick="initVocabQuiz()" class="btn btn-primary">↻ Practice Full Drill Again</button>
+            `}
+          </div>`;
+        return;
+      }
+
+      const q = vQuestions[vIndex];
+      badge.textContent = `Card: ${vIndex + 1} / ${vQuestions.length} (Score: ${vScore})`;
+      container.innerHTML = `
+        <div style="background:rgba(2, 6, 23, 0.7); border:1px solid var(--border-subtle); border-radius:0.75rem; padding:1.25rem; display:flex; flex-direction:column; gap:1rem;">
+          <div style="text-align:center; padding:1.25rem; background:rgba(15, 23, 42, 0.6); border-radius:0.75rem; border:1px solid var(--border-subtle);">
+            <div class="font-jp" style="font-size:2.2rem; font-weight:800; color:#fff;">${q.target}</div>
+            <button onclick="speak('${q.target}')" class="btn" style="background:transparent; color:var(--accent-sky); font-size:0.75rem; padding:0.25rem; margin-top:0.25rem;">
+              🔊 Pronounce Target Word
+            </button>
+          </div>
+          <div class="quiz-options quiz-options-2col">
+            ${q.options.map((opt, i) => `
+              <button onclick="answerVocab(${i})" class="quiz-opt-btn" style="justify-content:flex-start;">
+                <span style="color:var(--text-main); font-size:0.85rem; font-weight:500;">${opt.en}</span>
+              </button>
+            `).join('')}
+          </div>
+        </div>`;
+    }
+
+    function answerVocab(i) {
+      const q = vQuestions[vIndex];
+      const chosen = q.options[i];
+      if (chosen.isCorrect) {
+        vScore++;
+      } else {
+        vMistakes.push({
+          target: q.target,
+          userChoice: chosen.text,
+          correctKana: q.correctKana,
+          correctEn: q.correctEn,
+          rawItem: DATA.vocabulary_25.find(v => v.word === q.target)
+        });
+      }
+
+      if (vIndex + 1 < vQuestions.length) {
+        vIndex++;
+      } else {
+        vDone = true;
+      }
+      renderVocabQuiz();
+    }
+
+    function retestVocabMistakes() {
+      const itemsToTest = vMistakes.map(m => m.rawItem).filter(Boolean);
+      initVocabQuiz(itemsToTest);
+    }
+
+    // ==========================================
+    // 2. GRAMMAR ENGINE (STEP 2)
+    // ==========================================
+    function renderGrammar() {
+      document.getElementById("grammar-list").innerHTML = DATA.grammar_5.map((g, i) => `
+        <div class="card" style="padding:1rem; display:flex; flex-direction:column; gap:0.75rem;">
+          <div style="display:flex; justify-content:space-between; align-items:center; border-bottom:1px solid var(--border-subtle); padding-bottom:0.5rem;">
+            <div style="display:flex; align-items:center; gap:0.5rem;">
+              <span style="font-size:0.75rem; font-family:monospace; color:var(--accent-sky); font-weight:700;">#${i + 1}</span>
+              <h3 class="font-jp" style="font-size:0.95rem; font-weight:700; color:#fff;">${g.pattern}</h3>
+            </div>
+            <span style="font-size:0.7rem; font-family:monospace; background:var(--bg-card); padding:0.2rem 0.5rem; border-radius:0.35rem; color:var(--text-muted);">${g.formation}</span>
+          </div>
+          <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:0.5rem;">
+            <p style="font-size:0.8rem; color:var(--text-main); margin:0;">
+              ${g.meaning} &bull; <span style="color:var(--text-muted);">${g.nuance}</span>
+            </p>
+            <button onclick="speak('${g.sentence_jp}')" class="btn btn-secondary" style="font-size:0.7rem; padding:0.2rem 0.5rem;">
+              🔊 Listen Example
+            </button>
+          </div>
+
+          <div class="perspective-1000" style="height:110px; cursor:pointer;" onclick="flipCard('gf-${g.id}')">
+            <div id="gf-${g.id}" class="transform-style-3d" style="position:relative; width:100%; height:100%; transition: transform 0.45s ease; border-radius:0.5rem;">
+              <!-- Front -->
+              <div class="backface-hidden" style="position:absolute; inset:0; background:var(--bg-main); border:1px solid var(--border-subtle); border-radius:0.5rem; padding:0.75rem; display:flex; flex-direction:column; justify-content:space-between;">
+                <span style="font-size:0.65rem; color:var(--accent-sky); text-transform:uppercase; letter-spacing:0.05em; font-weight:700;">Example Sentence</span>
+                <div class="font-jp" style="font-size:0.95rem; color:#fff; font-weight:500;">${g.sentence_jp}</div>
+                <span style="font-size:0.65rem; color:var(--text-dim);">Tap to flip • Furigana & Breakdown</span>
+              </div>
+              <!-- Back -->
+              <div class="backface-hidden rotate-y-180" style="position:absolute; inset:0; background:var(--bg-main); border:1px solid rgba(56,189,248,0.4); border-radius:0.5rem; padding:0.65rem; display:flex; flex-direction:column; justify-content:space-between;">
+                <div class="font-jp" style="font-size:0.85rem; color:var(--accent-sky);">${g.sentence_furi}</div>
+                <div style="font-size:0.75rem; color:var(--text-muted); font-style:italic;">${g.sentence_en}</div>
+                <div style="font-size:0.7rem; color:var(--text-dim); font-family:monospace; background:var(--bg-card); padding:0.2rem 0.4rem; border-radius:0.25rem;">${g.breakdown}</div>
+              </div>
+            </div>
+          </div>
+        </div>
+      `).join('');
+    }
+
+    function initGrammarQuiz(customQuestions = null) {
+      gIndex = 0;
+      gScore = 0;
+      gDone = false;
+      gMistakes = [];
+      const pool = customQuestions || DATA.grammar_quiz_10;
+      // Shuffle questions AND randomize options per question
+      gQuestions = [...pool].sort(() => 0.5 - Math.random()).map(q => {
+        const correctVal = q.correct;
+        const shuffledOpts = [...q.options].sort(() => 0.5 - Math.random());
+        return {
+          ...q,
+          correctVal,
+          shuffledOpts
+        };
+      });
+      renderGrammarQuiz();
+    }
+
+    function renderGrammarQuiz() {
+      const container = document.getElementById("grammar-quiz-container");
+      const badge = document.getElementById("grammar-score-badge");
+
+      if (gDone) {
+        badge.textContent = `Completed! ${gScore} / ${gQuestions.length}`;
+        const hasMistakes = gMistakes.length > 0;
+        container.innerHTML = `
+          <div style="background:rgba(2, 6, 23, 0.7); border:1px solid var(--border-subtle); border-radius:0.75rem; padding:1.25rem; text-align:center;">
+            <h4 style="font-size:1.1rem; font-weight:700; color:#fff;">Cloze Drill Complete</h4>
+            <div style="font-family:monospace; font-size:1.75rem; font-weight:800; color:${hasMistakes ? 'var(--accent-sky)' : 'var(--accent-emerald)'}; margin:0.5rem 0;">
+              Score: ${gScore} / ${gQuestions.length}
+            </div>
+
+            <!-- Review Section -->
+            ${hasMistakes ? `
+              <div style="margin:1rem 0; text-align:left;">
+                <div style="font-weight:700; font-size:0.85rem; color:var(--accent-rose); margin-bottom:0.5rem;">
+                  ⚠️ Review Wrong Answers (${gMistakes.length}):
+                </div>
+                <div>
+                  ${gMistakes.map((m, idx) => `
+                    <div class="review-item">
+                      <div class="font-jp" style="font-weight:700; font-size:0.95rem; color:#fff;">${idx + 1}. ${m.prompt}</div>
+                      <div style="font-size:0.75rem; color:var(--text-muted); font-style:italic;">${m.translation}</div>
+                      <div style="color:#fca5a5; margin-top:0.25rem;">✖ Your Choice: ${m.userChoice}</div>
+                      <div style="color:#86efac; font-weight:600;">✔ Correct Answer: ${m.correct}</div>
+                      <div style="font-size:0.75rem; color:var(--text-dim); margin-top:0.2rem;">💡 Note: ${m.explanation}</div>
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+              <div style="display:flex; justify-content:center; gap:0.5rem; flex-wrap:wrap; margin-top:1rem;">
+                <button onclick="retestGrammarMistakes()" class="btn btn-danger">↻ Retest Missed Only (${gMistakes.length})</button>
+                <button onclick="initGrammarQuiz()" class="btn btn-primary">↻ Restart Full 10 Drill</button>
+              </div>
+            ` : `
+              <p style="color:var(--accent-emerald); font-size:0.85rem; margin-bottom:1rem;">🎉 Perfect Score! All grammar particles correct.</p>
+              <button onclick="initGrammarQuiz()" class="btn btn-primary">↻ Practice Full Drill Again</button>
+            `}
+          </div>`;
+        return;
+      }
+
+      const q = gQuestions[gIndex];
+      badge.textContent = `Card: ${gIndex + 1} / ${gQuestions.length} (Score: ${gScore})`;
+      container.innerHTML = `
+        <div style="background:rgba(2, 6, 23, 0.7); border:1px solid var(--border-subtle); border-radius:0.75rem; padding:1.25rem; display:flex; flex-direction:column; gap:1rem;">
+          <div style="text-align:center; padding:1.25rem; background:rgba(15, 23, 42, 0.6); border-radius:0.75rem; border:1px solid var(--border-subtle);">
+            <div class="font-jp" style="font-size:1.4rem; font-weight:700; color:#fff; margin-bottom:0.3rem;">${q.prompt}</div>
+            <div style="font-size:0.8rem; color:var(--text-muted); font-style:italic;">${q.translation}</div>
+            <button onclick="speak('${q.prompt.replace('[ ? ]', '、')}')" class="btn" style="background:transparent; color:var(--accent-sky); font-size:0.75rem; padding:0.25rem; margin-top:0.35rem;">
+              🔊 Pronounce Sentence
+            </button>
+          </div>
+          <div class="quiz-options quiz-options-4col">
+            ${q.shuffledOpts.map(opt => `
+              <button onclick="answerGrammar('${opt}')" class="quiz-opt-btn font-jp" style="justify-content:center; font-size:1.1rem; font-weight:700; color:var(--accent-sky);">
+                ${opt}
+              </button>
+            `).join('')}
+          </div>
+        </div>`;
+    }
+
+    function answerGrammar(opt) {
+      const q = gQuestions[gIndex];
+      if (opt === q.correctVal) {
+        gScore++;
+      } else {
+        gMistakes.push({
+          prompt: q.prompt,
+          translation: q.translation,
+          userChoice: opt,
+          correct: q.correctVal,
+          explanation: q.explanation,
+          rawItem: q
+        });
+      }
+
+      if (gIndex + 1 < gQuestions.length) {
+        gIndex++;
+      } else {
+        gDone = true;
+      }
+      renderGrammarQuiz();
+    }
+
+    function retestGrammarMistakes() {
+      const itemsToTest = gMistakes.map(m => m.rawItem);
+      initGrammarQuiz(itemsToTest);
+    }
+
+    // ==========================================
+    // 3. READING COMPREHENSION ENGINE (STEP 3)
+    // ==========================================
+    function initArticle() {
+      document.getElementById("story-container").innerHTML = DATA.article.furi_html;
+      document.getElementById("translation-box").textContent = DATA.article.translation_en;
+    }
+
+    function initRCQuiz(customQuestions = null) {
+      rcIndex = 0;
+      rcScore = 0;
+      rcDone = false;
+      rcMistakes = [];
+      const pool = customQuestions || DATA.comprehension_quiz_5;
+      // Shuffle questions AND randomize options per question
+      rcQuestions = [...pool].sort(() => 0.5 - Math.random()).map(q => {
+        const correctText = q.options[q.correct];
+        const shuffledOpts = [...q.options].sort(() => 0.5 - Math.random());
+        return {
+          ...q,
+          correctText,
+          shuffledOpts
+        };
+      });
+      renderRC();
+    }
+
+    function renderRC() {
+      const container = document.getElementById("rc-quiz-container");
+      const badge = document.getElementById("rc-score-badge");
+
+      if (rcDone) {
+        badge.textContent = `Completed! ${rcScore} / ${rcQuestions.length}`;
+        const hasMistakes = rcMistakes.length > 0;
+        container.innerHTML = `
+          <div style="background:rgba(2, 6, 23, 0.7); border:1px solid var(--border-subtle); border-radius:0.75rem; padding:1.25rem; text-align:center;">
+            <h4 style="font-size:1.1rem; font-weight:700; color:#fff;">Reading Comprehension Complete</h4>
+            <div style="font-family:monospace; font-size:1.75rem; font-weight:800; color:${hasMistakes ? 'var(--accent-sky)' : 'var(--accent-emerald)'}; margin:0.5rem 0;">
+              Score: ${rcScore} / ${rcQuestions.length}
+            </div>
+
+            <!-- Review Section -->
+            ${hasMistakes ? `
+              <div style="margin:1rem 0; text-align:left;">
+                <div style="font-weight:700; font-size:0.85rem; color:var(--accent-rose); margin-bottom:0.5rem;">
+                  ⚠️ Review Reading Questions Missed (${rcMistakes.length}):
+                </div>
+                <div>
+                  ${rcMistakes.map((m, idx) => `
+                    <div class="review-item">
+                      <div class="font-jp" style="font-weight:700; font-size:0.95rem; color:#fff;">${idx + 1}. ${m.question_jp}</div>
+                      <div style="font-size:0.75rem; color:var(--text-muted); font-style:italic;">${m.question_en}</div>
+                      <div style="color:#fca5a5; margin-top:0.25rem;">✖ Your Choice: ${m.userChoice}</div>
+                      <div style="color:#86efac; font-weight:600;">✔ Correct Answer: ${m.correctAnswer}</div>
+                      <div style="font-size:0.75rem; color:var(--text-dim); margin-top:0.2rem;">📖 Reference: ${m.explanation}</div>
+                    </div>
+                  `).join('')}
+                </div>
+              </div>
+              <div style="display:flex; justify-content:center; gap:0.5rem; flex-wrap:wrap; margin-top:1rem;">
+                <button onclick="retestRCMistakes()" class="btn btn-danger">↻ Retest Missed Only (${rcMistakes.length})</button>
+                <button onclick="initRCQuiz()" class="btn btn-primary">↻ Restart Full Reading Drill</button>
+              </div>
+            ` : `
+              <p style="color:var(--accent-emerald); font-size:0.85rem; margin-bottom:1rem;">🎉 Full comprehension! You understand the article completely.</p>
+              <button onclick="initRCQuiz()" class="btn btn-primary">↻ Practice Again</button>
+            `}
+          </div>`;
+        return;
+      }
+
+      const q = rcQuestions[rcIndex];
+      badge.textContent = `Card: ${rcIndex + 1} / ${rcQuestions.length} (Score: ${rcScore})`;
+      container.innerHTML = `
+        <div style="background:rgba(2, 6, 23, 0.7); border:1px solid var(--border-subtle); border-radius:0.75rem; padding:1.25rem; display:flex; flex-direction:column; gap:1rem;">
+          <div style="padding:1rem; background:rgba(15, 23, 42, 0.6); border-radius:0.75rem; border:1px solid var(--border-subtle);">
+            <div class="font-jp" style="font-size:1.05rem; font-weight:700; color:#fff; margin-bottom:0.25rem;">${q.question_jp}</div>
+            <div style="font-size:0.8rem; color:var(--text-muted); font-style:italic;">${q.question_en}</div>
+          </div>
+          <div class="quiz-options">
+            ${q.shuffledOpts.map((opt, i) => `
+              <button onclick="answerRC(${i})" class="quiz-opt-btn font-jp">
+                <span style="display:inline-flex; align-items:center; justify-content:center; width:22px; height:22px; border-radius:50%; background:var(--bg-card); font-size:0.7rem; font-weight:700; color:var(--accent-sky); border:1px solid var(--border-color);">${i + 1}</span>
+                <span>${opt}</span>
+              </button>
+            `).join('')}
+          </div>
+        </div>`;
+    }
+
+    function answerRC(i) {
+      const q = rcQuestions[rcIndex];
+      const chosen = q.shuffledOpts[i];
+      if (chosen === q.correctText) {
+        rcScore++;
+      } else {
+        rcMistakes.push({
+          question_jp: q.question_jp,
+          question_en: q.question_en,
+          userChoice: chosen,
+          correctAnswer: q.correctText,
+          explanation: q.explanation,
+          rawItem: q
+        });
+      }
+
+      if (rcIndex + 1 < rcQuestions.length) {
+        rcIndex++;
+      } else {
+        rcDone = true;
+      }
+      renderRC();
+    }
+
+    function retestRCMistakes() {
+      const itemsToTest = rcMistakes.map(m => m.rawItem);
+      initRCQuiz(itemsToTest);
+    }
+
+    // App Initialization
+    window.addEventListener("DOMContentLoaded", () => {
+      initHeader();
+
+      // 1. Vocab first
+      renderVocabGrid();
+      initVocabQuiz();
+
+      // 2. Grammar second
+      renderGrammar();
+      initGrammarQuiz();
+
+      // 3. Reading third
+      initArticle();
+      initRCQuiz();
+    });
+  </script>
+</body>
+</html>
