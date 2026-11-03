@@ -1,11 +1,20 @@
 name: Vance Autonomous Heartbeat
 
 on:
-  schedule:
-    # 20:17 UTC = 5:17 AM JST daily
-    # Using an odd minute (:17) bypasses the top-of-the-hour queue crush
-    - cron: '17 20 * * *'
-  workflow_dispatch: # Allows 1-click manual trigger anytime
+  workflow_dispatch:
+    inputs:
+      action:
+        description: 'Action to perform'
+        required: true
+        default: 'generate'
+        type: choice
+        options:
+          - generate
+          - delete
+      target_slug:
+        description: 'Slug to delete (only used if action is delete)'
+        required: false
+        type: string
 
 permissions:
   contents: write
@@ -29,17 +38,19 @@ jobs:
         env:
           GEMINI_API_KEY: ${{ secrets.GEMINI_API_KEY }}
           STRIPE_SECRET_KEY: ${{ secrets.STRIPE_SECRET_KEY }}
+          ACTION: ${{ inputs.action }}
+          TARGET_SLUG: ${{ inputs.target_slug }}
         run: node vance-agent.mjs
 
-      - name: Commit Updated State & New Web Assets
+      - name: Commit Updated State & Assets
         run: |
           git config user.name "Vance-Core (Autonomous Agent)"
           git config user.email "vance@users.noreply.github.com"
           git add -A
           if ! git diff --staged --quiet; then
-            git commit -m "Vance Autonomous Cycle: Telemetry + Daily Dossier [skip ci]"
+            git commit -m "Vance Cycle: ${{ inputs.action || 'generate' }} [skip ci]"
             git pull --rebase origin main
             git push origin main
           else
-            echo "No state changes or new assets to commit."
+            echo "No state changes or assets to commit."
           fi
