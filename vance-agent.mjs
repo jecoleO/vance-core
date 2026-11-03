@@ -13,8 +13,8 @@ const DISPATCH_DIR = './marketing/dispatches';
 const RSS_PATH = './feed.xml';
 
 // Commercial Rules
-const UNIVERSAL_MIN_CENTS = 100;    // $1.00 USD minimum floor
-const UNIVERSAL_PRESET_CENTS = 200; // $2.00 USD suggested preset
+const UNIVERSAL_MIN_CENTS = 100;    // $1.00 USD minimum floor on catalog cards
+const UNIVERSAL_PRESET_CENTS = 200; // $2.00 USD suggested preset on catalog cards
 const LIFETIME_PASS_CENTS = 3000;   // $30.00 USD one-time lifetime pass
 const NEWS_FREE_WINDOW = 7;         // Top 7 news editions free in-browser
 const DEFAULT_FREE_WINDOW = 5;      // Top 5 arcade/utility items free in-browser
@@ -98,7 +98,7 @@ async function ensureLifetimeStripeLink() {
     return state.financial_telemetry.lifetime_pass_url;
   }
 
-  console.log('[VANCE] Autonomously provisioning $30 Lifetime Supporter Pass on Stripe...');
+  console.log('[VANCE] Checking or provisioning $30 Lifetime Supporter Pass on Stripe...');
   const prodName = 'The Creativity Experiment: All-Access Lifetime Pass';
   let product = null;
 
@@ -151,14 +151,12 @@ async function ensureLifetimeStripeLink() {
   state.financial_telemetry.lifetime_pass_url = paymentLink.url;
   state.financial_telemetry.lifetime_price_id = price.id;
   state.financial_telemetry.lifetime_product_id = product.id;
-  console.log(`[VANCE] Live Autonomous Lifetime Pass Link: ${paymentLink.url}`);
+  console.log(`[VANCE] Verified Autonomous Lifetime Pass Link: ${paymentLink.url}`);
   return paymentLink.url;
 }
 
-// UNIVERSAL PWYW LINK PROVISIONER ($1.00 min / $2.00 preset)
+// UNIVERSAL PWYW LINK PROVISIONER ($1.00 min / $2.00 preset) FOR ROSTER CARDS
 async function getOrCreateStripeLink(item, targetRedirectUrl) {
-  console.log(`[VANCE] Provisioning Stripe asset: ${item.name} (Universal PWYW: $1.00 min / $2.00 preset)`);
-
   let product = null;
   try {
     const existing = await stripeRequest('products?active=true&limit=50');
@@ -172,7 +170,6 @@ async function getOrCreateStripeLink(item, targetRedirectUrl) {
     });
   }
 
-  // Find or create PWYW price (ignores legacy fixed prices)
   let price = null;
   try {
     const existingPrices = await stripeRequest(`prices?product=${product.id}&active=true&limit=20`);
@@ -182,7 +179,6 @@ async function getOrCreateStripeLink(item, targetRedirectUrl) {
   } catch (e) {}
 
   if (!price) {
-    console.log(`[VANCE] Creating fresh PWYW price for ${item.name}...`);
     price = await stripeRequest('prices', 'POST', {
       product: product.id,
       currency: 'usd',
@@ -194,7 +190,6 @@ async function getOrCreateStripeLink(item, targetRedirectUrl) {
     });
   }
 
-  // Reuse only if link belongs to THIS specific PWYW price
   try {
     const existingLinks = await stripeRequest('payment_links?active=true&limit=50');
     const match = Array.isArray(existingLinks.data)
@@ -217,28 +212,45 @@ async function getOrCreateStripeLink(item, targetRedirectUrl) {
   return { product_id: product.id, price_id: price.id, checkout_url: paymentLink.url };
 }
 
-// IN-APP HEADER WITH UNIFIED LIFETIME PASS + PWYW DOWNLOADING
-function packageHtml(rawHtml, item, checkoutUrl, hubUrl = '../index.html', hubName = 'The Pod') {
-  const lifetimeUrl = state.financial_telemetry?.lifetime_pass_url || '#';
-  const unlockKey = `vance_unlocked_${item.slug}`;
+// ---------------------------------------------------------------------
+// 2. IN-APP HARNESS SCRUBBER (UNIFIED $30 LIFETIME BANNER)
+// ---------------------------------------------------------------------
+function scrubAndApplyUniversalHarness(filePath, item, lifetimeUrl) {
+  if (!fs.existsSync(filePath)) return;
+  let html = fs.readFileSync(filePath, 'utf8');
 
-  const injectedSnippet = `
+  // Strip all legacy banners, old harnesses, and previous injected headers
+  html = html.replace(/<!--\s*\[VANCE-MERCHANT-HARNESS:\s*START\]\s*-->[\s\S]*?<!--\s*\[VANCE-MERCHANT-HARNESS:\s*END\]\s*-->/gi, '');
+  html = html.replace(/<!--\s*BEGIN VANCE OFFLINE LICENSE HARNESS\s*-->[\s\S]*?<!--\s*END VANCE OFFLINE LICENSE HARNESS\s*-->/gi, '');
+  html = html.replace(/<div id="vance-header"[\s\S]*?<\/script>/gi, '');
+  html = html.replace(/<div id="vance-license-bar"[\s\S]*?<\/div>/gi, '');
+
+  // Sanitize internal template links and references
+  html = html.replace(/href="https:\/\/buy\.stripe\.com\/[^"]*"/g, `href="${lifetimeUrl}"`);
+  html = html.replace(/\$5(\.00)?/g, '$30 Lifetime');
+  html = html.replace(/\$3(\.00)?/g, '$30 Lifetime');
+  html = html.replace(/Unlock Standalone[^<]*/gi, 'Get Lifetime Pass ($30)');
+
+  // Determine navigation backlink
+  const isArcade = item.pod === 'arcade' || item.type === 'arcade_cartridge' || filePath.includes('pixel-bistro');
+  const isNews = item.pod === 'news' || item.type === 'news_dossier' || filePath.includes('news-');
+  const hubUrl = isArcade ? '../arcade/index.html' : isNews ? '../news/index.html' : '../index.html';
+  const hubName = isArcade ? "JAE & Corvus' Arcade" : isNews ? "Japanese Today" : "The Studio Hub";
+
+  const singleHeaderHarness = `
 <!-- [VANCE-MERCHANT-HARNESS: START] -->
 <div id="vance-header" style="background:#090d16;color:#e2e8f0;padding:10px 18px;font-family:system-ui,-apple-system,sans-serif;font-size:13px;display:flex;justify-content:space-between;align-items:center;border-bottom:1px solid #1e293b;position:sticky;top:0;z-index:999999;">
   <div style="display:flex;align-items:center;gap:14px;">
     <a href="${hubUrl}" style="color:#38bdf8;text-decoration:none;font-weight:700;">&larr; ${hubName}</a>
     <span style="color:#64748b;">|</span>
-    <span style="font-weight:600;">${item.name}</span>
+    <span style="font-weight:600;color:#f8fafc;">${item.name || item.slug}</span>
     <span style="background:#10b98122;color:#10b981;font-size:11px;font-weight:700;padding:2px 6px;border-radius:4px;border:1px solid #10b98144;">FREE PREVIEW</span>
   </div>
   <div style="display:flex;align-items:center;gap:10px;">
-    <span id="vance-pro-badge" style="display:none;background:#10b98122;color:#10b981;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:700;border:1px solid #10b98144;">★ UNLOCKED</span>
-    <button id="vance-dl-btn" style="display:none;background:#10b981;color:#041f14;border:none;padding:5px 12px;border-radius:6px;font-weight:800;cursor:pointer;font-size:12px;">Download Offline .html</button>
-    <a id="vance-buy-btn" href="${checkoutUrl}" target="_blank" rel="noopener" style="background:#1e293b;color:#f8fafc;padding:5px 12px;border-radius:6px;font-weight:700;text-decoration:none;font-size:12px;border:1px solid #334155;">
-      Own File ($1+ PWYW)
-    </a>
-    <a id="vance-lifetime-btn" href="${lifetimeUrl}" target="_blank" rel="noopener" style="background:#38bdf8;color:#081726;padding:5px 12px;border-radius:6px;font-weight:800;text-decoration:none;font-size:12px;">
-      Get Lifetime Pass ($30)
+    <span id="vance-supporter-badge" style="display:none;background:#38bdf822;color:#38bdf8;padding:4px 8px;border-radius:4px;font-size:11px;font-weight:800;border:1px solid #38bdf844;">★ ALL-ACCESS SUPPORTER</span>
+    <button id="vance-dl-btn" style="display:none;background:#10b981;color:#041f14;border:none;padding:6px 14px;border-radius:6px;font-weight:800;cursor:pointer;font-size:12px;">Download Offline .html</button>
+    <a id="vance-lifetime-btn" href="${lifetimeUrl}" target="_blank" rel="noopener" style="background:#38bdf8;color:#020617;padding:6px 14px;border-radius:6px;font-weight:800;text-decoration:none;font-size:12px;box-shadow:0 2px 8px rgba(56,189,248,0.3);">
+      Get Studio Lifetime Pass &bull; $30
     </a>
   </div>
 </div>
@@ -246,18 +258,13 @@ function packageHtml(rawHtml, item, checkoutUrl, hubUrl = '../index.html', hubNa
 (function() {
   const params = new URLSearchParams(window.location.search);
   const isLifetime = params.get('lifetime') === 'unlocked' || localStorage.getItem('vance_lifetime_pass') === 'true';
-  const isItemUnlocked = params.get('unlocked') === 'true' || params.get('pro') === 'unlocked' || localStorage.getItem('${unlockKey}') === 'true';
 
-  if (isLifetime || isItemUnlocked) {
-    if (isLifetime) localStorage.setItem('vance_lifetime_pass', 'true');
-    if (isItemUnlocked) localStorage.setItem('${unlockKey}', 'true');
-
-    const buyBtn = document.getElementById('vance-buy-btn');
+  if (isLifetime) {
+    localStorage.setItem('vance_lifetime_pass', 'true');
     const lifetimeBtn = document.getElementById('vance-lifetime-btn');
-    const badge = document.getElementById('vance-pro-badge');
+    const badge = document.getElementById('vance-supporter-badge');
     const dlBtn = document.getElementById('vance-dl-btn');
 
-    if (buyBtn) buyBtn.style.display = 'none';
     if (lifetimeBtn) lifetimeBtn.style.display = 'none';
     if (badge) badge.style.display = 'inline-block';
     if (dlBtn) {
@@ -276,20 +283,24 @@ function packageHtml(rawHtml, item, checkoutUrl, hubUrl = '../index.html', hubNa
 <!-- [VANCE-MERCHANT-HARNESS: END] -->
 `;
 
-  if (rawHtml.includes('<body')) {
-    return rawHtml.replace(/<body[^>]*>/i, match => `${match}\n${injectedSnippet}`);
+  if (html.includes('<body')) {
+    html = html.replace(/<body[^>]*>/i, match => `${match}\n${singleHeaderHarness}`);
+  } else {
+    html = `${singleHeaderHarness}\n${html}`;
   }
-  return `${injectedSnippet}\n${rawHtml}`;
+
+  fs.writeFileSync(filePath, html, 'utf8');
+  console.log(`[HARNESS-SCRUBBER] Successfully scrubbed & stamped: ${filePath}`);
 }
 
 // ---------------------------------------------------------------------
-// 2. GEMINI CASCADE INFERENCE
+// 3. GEMINI CASCADE INFERENCE (3.5 FLASH LITE PRIORITY)
 // ---------------------------------------------------------------------
-async function callGemini(prompt, isJson = false, timeoutMs = 60000) {
+async function callGemini(prompt, isJson = false, timeoutMs = 90000) {
   const modelCascade = [
-    'gemini-3.5-flash-lite',
-    'gemini-3.1-flash-lite',
-    'gemini-2.5-flash-lite'
+    'gemini-3.5-flash-lite', // Primary: ultra-low latency and stable JSON generation
+    'gemini-3.1-flash-lite', // Secondary: fast fallback
+    'gemini-3.8-flash'       // Tertiary: heavy reasoning reserve
   ];
 
   for (let mIdx = 0; mIdx < modelCascade.length; mIdx++) {
@@ -324,13 +335,13 @@ async function callGemini(prompt, isJson = false, timeoutMs = 60000) {
       clearTimeout(timer);
 
       if (res.status === 503 || res.status === 429) {
-        console.warn(`[VANCE-AI] ${model} capacity limit hit. Cascading...`);
-        await new Promise(r => setTimeout(r, 2000));
+        console.warn(`[VANCE-AI] ${model} rate/capacity limit hit (HTTP ${res.status}). Waiting 6s before cascade...`);
+        await new Promise(r => setTimeout(r, 6000));
         continue;
       }
 
       if (!res.ok) {
-        console.warn(`[VANCE-AI] ${model} returned HTTP ${res.status}. Cascading...`);
+        console.warn(`[VANCE-AI] ${model} returned HTTP ${res.status}: ${raw.slice(0, 100)}. Cascading...`);
         continue;
       }
 
@@ -350,7 +361,7 @@ async function callGemini(prompt, isJson = false, timeoutMs = 60000) {
 }
 
 // ---------------------------------------------------------------------
-// 3. DAILY COMMUTE DOSSIER SYNTHESIS (JAPANESE TODAY POD)
+// 4. DAILY COMMUTE DOSSIER SYNTHESIS (JAPANESE TODAY POD)
 // ---------------------------------------------------------------------
 function getDailyJlptSpec() {
   const now = new Date();
@@ -374,7 +385,7 @@ function getDailyJlptSpec() {
   };
 }
 
-async function synthesizeDailyDossier() {
+async function synthesizeDailyDossier(lifetimeUrl) {
   if (!GEMINI_API_KEY) {
     console.log('[VANCE-AI] No GEMINI_API_KEY detected. Skipping Japanese Today synthesis.');
     return;
@@ -407,7 +418,7 @@ Output JSON ONLY matching this format:
 }`;
 
   try {
-    const rawJson = await callGemini(prompt, true, 45000);
+    const rawJson = await callGemini(prompt, true, 90000);
     const dossierData = JSON.parse(rawJson);
 
     if (!dossierData || !dossierData.edition_slug) return;
@@ -431,16 +442,15 @@ Output JSON ONLY matching this format:
       .replace('__DOSSIER_DATA__', JSON.stringify(dossierData))
       .replace('World News Japanese Dossier', `${dossierData.article.title_en} (${spec.level})`);
 
-    // Clean any legacy $5 copy from template
-    compiledHtml = compiledHtml.replace(/\$5(\.00)?/g, '$1+ PWYW');
+    compiledHtml = compiledHtml.replace(/\$5(\.00)?/g, '$1+');
     compiledHtml = compiledHtml.replace('href="#"', `href="${stripeData.checkout_url}"`);
 
-    // Package with in-app header harness
-    compiledHtml = packageHtml(compiledHtml, itemSpec, stripeData.checkout_url, '../news/index.html', 'Japanese Today');
-
     const targetDir = path.join(PRODUCTS_DIR, slug);
+    const targetFile = path.join(targetDir, 'index.html');
     fs.mkdirSync(targetDir, { recursive: true });
-    fs.writeFileSync(path.join(targetDir, 'index.html'), compiledHtml, 'utf8');
+    fs.writeFileSync(targetFile, compiledHtml, 'utf8');
+
+    scrubAndApplyUniversalHarness(targetFile, itemSpec, lifetimeUrl);
 
     state.autonomous_lab_assets.unshift({
       slug: slug,
@@ -465,7 +475,7 @@ Output JSON ONLY matching this format:
 }
 
 // ---------------------------------------------------------------------
-// 4. CLEANUP & DELETE
+// 5. CLEANUP & DELETE
 // ---------------------------------------------------------------------
 async function deleteAsset(targetSlug) {
   if (!targetSlug) return;
@@ -490,7 +500,7 @@ async function deleteAsset(targetSlug) {
 }
 
 // ---------------------------------------------------------------------
-// 5. FEDERATED STOREFRONTS BUILDER (ROLLING FREEMIUM VAULT + $30 BANNER)
+// 6. FEDERATED STOREFRONTS BUILDER & FLEET-WIDE IN-APP SCRUBBER
 // ---------------------------------------------------------------------
 function renderCard(a, isVaulted = false) {
   const isArcade = a.pod === 'arcade' || a.type === 'arcade_cartridge';
@@ -563,12 +573,10 @@ function generateRssFeed(allAssets) {
   }
 }
 
-function rebuildAllStorefronts() {
+function rebuildAllStorefronts(lifetimeUrl) {
   console.log('[VANCE] Assembling Storefronts with Unified $30 Lifetime Banner & Rolling Freemium Vault...');
   const allAssets = [...state.deployed_assets, ...state.autonomous_lab_assets];
-  const lifetimeUrl = state.financial_telemetry?.lifetime_pass_url || '#';
 
-  // The Unified $30 Lifetime Banner
   const universalBannerHtml = `
   <div class="vance-lifetime-banner" style="background:linear-gradient(135deg,rgba(56,189,248,0.08) 0%,rgba(168,85,247,0.08) 100%);border:1px solid rgba(56,189,248,0.25);border-radius:12px;padding:1.25rem 1.5rem;margin-bottom:2rem;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:1rem;">
     <div>
@@ -588,13 +596,11 @@ function rebuildAllStorefronts() {
     </div>
   </div>`;
 
-  // Filter Pod Assets
   const arcadeItems = allAssets.filter(a => a.pod === 'arcade' || a.type === 'arcade_cartridge');
   const tacticalItems = allAssets.filter(a => a.pod === 'tactical' || a.slug === 'jlpt-mastery-console');
   const utilityItems = allAssets.filter(a => (a.pod === 'utility' || a.type === 'autonomous_utility' || a.type === 'utility') && a.slug !== 'jlpt-mastery-console');
   const newsItems = allAssets.filter(a => a.pod === 'news' || a.type === 'news_dossier');
 
-  // Compile Pod with Banner and Vault Limit
   const compilePod = (shellName, outputDir, items, windowLimit) => {
     const templatePath = path.join(TEMPLATES_DIR, shellName);
     if (!fs.existsSync(templatePath)) return;
@@ -605,7 +611,6 @@ function rebuildAllStorefronts() {
       return renderCard(item, isVaulted);
     }).join('\n') || '<p style="color:#64748b; font-size:0.85rem;">No items staged in this pod yet.</p>';
 
-    // Inject $30 banner above the roster
     html = html.replace(
       /<!-- \[POD-ROSTER-START\] -->[\s\S]*?<!-- \[POD-ROSTER-END\] -->/,
       `${universalBannerHtml}\n<!-- [POD-ROSTER-START] -->\n<div class="grid">\n${cards}\n</div>\n<!-- [POD-ROSTER-END] -->`
@@ -620,7 +625,6 @@ function rebuildAllStorefronts() {
   compilePod('utility-shell.html', './utility', utilityItems, DEFAULT_FREE_WINDOW);
   compilePod('news-shell.html', './news', newsItems, NEWS_FREE_WINDOW);
 
-  // Compile Root Umbrella Portal (index.html)
   const hubTemplatePath = path.join(TEMPLATES_DIR, 'hub-shell.html');
   if (fs.existsSync(hubTemplatePath)) {
     let hubHtml = fs.readFileSync(hubTemplatePath, 'utf8');
@@ -630,7 +634,6 @@ function rebuildAllStorefronts() {
       .replace('__COUNT_UTILITY__', utilityItems.length)
       .replace('__COUNT_NEWS__', newsItems.length);
 
-    // Inject $30 banner into hub hero if placeholder exists, or above pods
     if (hubHtml.includes('<!-- [LIFETIME-BANNER] -->')) {
       hubHtml = hubHtml.replace('<!-- [LIFETIME-BANNER] -->', universalBannerHtml);
     } else {
@@ -641,15 +644,21 @@ function rebuildAllStorefronts() {
     console.log('[VANCE] Master Portal (index.html) recompiled.');
   }
 
-  // Sanitize existing product files (replace old $3/$5 hardcoded text with new link)
-  for (const asset of allAssets) {
-    const assetIndex = path.join(PRODUCTS_DIR, asset.slug, 'index.html');
-    if (fs.existsSync(assetIndex) && asset.checkout_url) {
-      let content = fs.readFileSync(assetIndex, 'utf8');
-      content = content.replace(/href="https:\/\/buy\.stripe\.com\/[^"]*"/g, `href="${asset.checkout_url}"`);
-      content = content.replace(/\$5(\.00)?/g, '$1+ PWYW');
-      content = content.replace(/\$3(\.00)?/g, '$1+ PWYW');
-      fs.writeFileSync(assetIndex, content, 'utf8');
+  // Fleet-wide in-app scrubber for all existing products on disk
+  if (fs.existsSync(PRODUCTS_DIR)) {
+    const folders = fs.readdirSync(PRODUCTS_DIR).filter(f => {
+      try {
+        return fs.statSync(path.join(PRODUCTS_DIR, f)).isDirectory();
+      } catch (e) {
+        return false;
+      }
+    });
+
+    console.log(`[HARNESS-SCRUBBER] Auditing and scrubbing ${folders.length} products on disk...`);
+    for (const folder of folders) {
+      const productHtmlPath = path.join(PRODUCTS_DIR, folder, 'index.html');
+      const itemRecord = allAssets.find(a => a.slug === folder) || { slug: folder, name: folder };
+      scrubAndApplyUniversalHarness(productHtmlPath, itemRecord, lifetimeUrl);
     }
   }
 
@@ -657,13 +666,13 @@ function rebuildAllStorefronts() {
 }
 
 // ---------------------------------------------------------------------
-// 6. INGEST STAGED ARTIFACTS
+// 7. INGEST STAGED ARTIFACTS
 // ---------------------------------------------------------------------
-async function ingestStagedArtifacts() {
+async function ingestStagedArtifacts(lifetimeUrl) {
   const stagingMappings = [
-    { dir: './staging/arcade', pod: 'arcade', hubUrl: '../arcade/index.html', hubName: "JAE & Corvus' Arcade" },
-    { dir: './staging/tactical', pod: 'tactical', hubUrl: '../tactical/index.html', hubName: 'Tactical Japanese Mastery' },
-    { dir: './staging/utility', pod: 'utility', hubUrl: '../utility/index.html', hubName: 'The Utility Belt' }
+    { dir: './staging/arcade', pod: 'arcade' },
+    { dir: './staging/tactical', pod: 'tactical' },
+    { dir: './staging/utility', pod: 'utility' }
   ];
 
   for (const mapping of stagingMappings) {
@@ -685,11 +694,13 @@ async function ingestStagedArtifacts() {
       const rawHtml = fs.readFileSync(sourceFile, 'utf8');
       const targetRedirectUrl = `${state.agent_identity.storefront_url}products/${slug}/?pro=unlocked`;
       const stripeData = await getOrCreateStripeLink(manifestEntry, targetRedirectUrl);
-      const packagedHtml = packageHtml(rawHtml, { ...manifestEntry, pod: mapping.pod }, stripeData.checkout_url, mapping.hubUrl, mapping.hubName);
 
       const targetDir = path.join(PRODUCTS_DIR, slug);
+      const targetFile = path.join(targetDir, 'index.html');
       fs.mkdirSync(targetDir, { recursive: true });
-      fs.writeFileSync(path.join(targetDir, 'index.html'), packagedHtml, 'utf8');
+      fs.writeFileSync(targetFile, rawHtml, 'utf8');
+
+      scrubAndApplyUniversalHarness(targetFile, { ...manifestEntry, pod: mapping.pod }, lifetimeUrl);
 
       const assetRecord = {
         slug: slug,
@@ -716,23 +727,26 @@ async function ingestStagedArtifacts() {
 }
 
 // ---------------------------------------------------------------------
-// 7. MAIN ENGINE RUNNER
+// 8. MAIN ENGINE RUNNER
 // ---------------------------------------------------------------------
 async function run() {
   await syncStripeTelemetry();
 
-  // Autonomously provision the $30 All-Access Lifetime Supporter Link
-  await ensureLifetimeStripeLink();
+  // 1. Verify or provision the $30 All-Access Lifetime Supporter Link
+  const lifetimeUrl = await ensureLifetimeStripeLink();
 
   if (ACTION === 'delete') {
     await deleteAsset(TARGET_SLUG);
   } else {
-    await ingestStagedArtifacts();
-    await synthesizeDailyDossier();
+    // 2. Ingest staged cartridges/utilities
+    await ingestStagedArtifacts(lifetimeUrl);
+
+    // 3. Synthesize today's Japanese Today Commute Dossier
+    await synthesizeDailyDossier(lifetimeUrl);
   }
 
-  // Rebuild all pod storefronts, root hub, and RSS wire
-  rebuildAllStorefronts();
+  // 4. Rebuild all pod storefronts, root hub, and scrub ALL deployed product headers
+  rebuildAllStorefronts(lifetimeUrl);
 
   fs.writeFileSync(STATE_PATH, JSON.stringify(state, null, 2), 'utf8');
   console.log('[VANCE] Full cycle complete.');
