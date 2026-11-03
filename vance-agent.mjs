@@ -213,7 +213,7 @@ async function getOrCreateStripeLink(item, targetRedirectUrl) {
 }
 
 // ---------------------------------------------------------------------
-// 2. IN-APP HARNESS SCRUBBER (UNIFIED $30 LIFETIME BANNER)
+// 2. IN-APP HARNESS SCRUBBER (UNIFIED $30 LIFETIME BANNER + CORRECT BACKLINKS)
 // ---------------------------------------------------------------------
 function scrubAndApplyUniversalHarness(filePath, item, lifetimeUrl) {
   if (!fs.existsSync(filePath)) return;
@@ -231,10 +231,10 @@ function scrubAndApplyUniversalHarness(filePath, item, lifetimeUrl) {
   html = html.replace(/\$3(\.00)?/g, '$30 Lifetime');
   html = html.replace(/Unlock Standalone[^<]*/gi, 'Get Lifetime Pass ($30)');
 
-  // Determine navigation backlink
+  // Determine navigation backlink with two hops (../../) to escape /products/<slug>/
   const isArcade = item.pod === 'arcade' || item.type === 'arcade_cartridge' || filePath.includes('pixel-bistro');
   const isNews = item.pod === 'news' || item.type === 'news_dossier' || filePath.includes('news-');
-  const hubUrl = isArcade ? '../arcade/index.html' : isNews ? '../news/index.html' : '../index.html';
+  const hubUrl = isArcade ? '../../arcade/index.html' : isNews ? '../../news/index.html' : '../../index.html';
   const hubName = isArcade ? "JAE & Corvus' Arcade" : isNews ? "Japanese Today" : "The Studio Hub";
 
   const singleHeaderHarness = `
@@ -298,9 +298,9 @@ function scrubAndApplyUniversalHarness(filePath, item, lifetimeUrl) {
 // ---------------------------------------------------------------------
 async function callGemini(prompt, isJson = false, timeoutMs = 90000) {
   const modelCascade = [
-    'gemini-3.5-flash-lite', // Primary: ultra-low latency and stable JSON generation
-    'gemini-3.1-flash-lite', // Secondary: fast fallback
-    'gemini-2.5-flash-lite'       // Tertiary: heavy reasoning reserve
+    'gemini-3.5-flash-lite',
+    'gemini-3.1-flash-lite',
+    'gemini-3.8-flash'
   ];
 
   for (let mIdx = 0; mIdx < modelCascade.length; mIdx++) {
