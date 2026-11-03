@@ -10,6 +10,13 @@ const STATE_PATH = './vance.state.json';
 const TEMPLATES_DIR = './templates';
 const PRODUCTS_DIR = './products';
 const DISPATCH_DIR = './marketing/dispatches';
+const RSS_PATH = './feed.xml';
+
+// Commercial Configuration: Universal $1.00 min / $2.00 preset floor
+const UNIVERSAL_MIN_CENTS = 100;
+const UNIVERSAL_PRESET_CENTS = 200;
+const NEWS_FREE_WINDOW = 7;
+const DEFAULT_FREE_WINDOW = 5;
 
 if (!STRIPE_SECRET_KEY) {
   console.error('[VANCE] Missing STRIPE_SECRET_KEY in environment.');
@@ -25,7 +32,7 @@ state.execution_log = Array.isArray(state.execution_log) ? state.execution_log :
 state.financial_telemetry = state.financial_telemetry || {};
 
 // ---------------------------------------------------------------------
-// 1. STRIPE API HELPERS & TELEMETRY
+// 1. STRIPE API HELPERS & TELEMETRY (PWYW: $1.00 Min / $2.00 Preset)
 // ---------------------------------------------------------------------
 function toFormUrlEncoded(obj, prefix = '') {
   const str = [];
@@ -84,7 +91,7 @@ async function syncStripeTelemetry() {
 }
 
 async function getOrCreateStripeLink(item, targetRedirectUrl) {
-  console.log(`[VANCE] Checking Stripe asset: ${item.name} ($${(item.price_cents / 100).toFixed(2)})`);
+  console.log(`[VANCE] Checking Stripe asset: ${item.name} (Universal PWYW: $1.00 min / $2.00 preset)`);
 
   let product = null;
   try {
@@ -102,14 +109,19 @@ async function getOrCreateStripeLink(item, targetRedirectUrl) {
   let price = null;
   try {
     const existingPrices = await stripeRequest(`prices?product=${product.id}&active=true&limit=10`);
-    price = Array.isArray(existingPrices.data) ? existingPrices.data.find(pr => pr.unit_amount === item.price_cents) : null;
+    // Find an existing custom_unit_amount PWYW price
+    price = Array.isArray(existingPrices.data) ? existingPrices.data.find(pr => pr.custom_unit_amount?.enabled) : null;
   } catch (e) {}
 
   if (!price) {
     price = await stripeRequest('prices', 'POST', {
       product: product.id,
-      unit_amount: item.price_cents,
-      currency: 'usd'
+      currency: 'usd',
+      custom_unit_amount: {
+        enabled: true,
+        minimum: UNIVERSAL_MIN_CENTS,
+        preset: UNIVERSAL_PRESET_CENTS
+      }
     });
   }
 
@@ -148,7 +160,7 @@ function packageHtml(rawHtml, item, checkoutUrl, hubUrl = '../index.html', hubNa
     <span id="vance-pro-badge" style="display:none;background:#10b98122;color:#10b981;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:700;border:1px solid #10b98144;">OFFLINE EDITION UNLOCKED</span>
     <button id="vance-dl-btn" style="display:none;background:#10b981;color:#041f14;border:none;padding:5px 12px;border-radius:6px;font-weight:700;cursor:pointer;font-size:12px;">Download Offline .html</button>
     <a id="vance-buy-btn" href="${checkoutUrl}" target="_blank" style="background:#38bdf8;color:#081726;padding:5px 12px;border-radius:6px;font-weight:700;text-decoration:none;font-size:12px;">
-      ${isArcade ? `Buy Standalone Cartridge ($${(item.price_cents / 100).toFixed(0)})` : `Unlock Standalone ($${(item.price_cents / 100).toFixed(0)})`}
+      Own Offline File ($1+ PWYW)
     </a>
   </div>
 </div>
@@ -254,7 +266,7 @@ async function callGemini(prompt, isJson = false, timeoutMs = 60000) {
     }
   }
 
-  throw new Error('All model tiers in the cascade (3.5 Lite -> 3.1 Lite -> 3.8 Flash) were exhausted.');
+  throw new Error('All model tiers in the cascade (3.8 Flash -> 3.5 Lite -> 3.1 Lite) were exhausted.');
 }
 
 // ---------------------------------------------------------------------
@@ -425,7 +437,7 @@ OUTPUT FORMAT (STRICT JSON ONLY):
       type: 'news_dossier',
       name: `World News Japanese: ${dossierData.article.title_en} (${spec.level})`,
       tagline: `${spec.dayName} Commute Edition &bull; 25-Word Match, 5 Grammar Cloze & Reading Check.`,
-      price_cents: 500
+      price_cents: UNIVERSAL_PRESET_CENTS
     };
 
     const targetRedirectUrl = `${state.agent_identity.storefront_url}products/${slug}/?unlocked=true`;
@@ -446,7 +458,7 @@ OUTPUT FORMAT (STRICT JSON ONLY):
     fs.writeFileSync(path.join(targetDir, 'index.html'), compiledHtml, 'utf8');
 
     const webUrl = `../products/${slug}/`;
-    state.autonomous_lab_assets.push({
+    state.autonomous_lab_assets.unshift({
       slug: slug,
       pod: 'news',
       type: 'news_dossier',
@@ -540,8 +552,8 @@ async function generateMarketingDispatch(toolSpec, webUrl, checkoutUrl, dossierD
 > ${dossierData.article.translation_en.replace(/\\n/g, '\\n> ')}
 
 ### Links
-- **Interactive App:** ${webUrl}
-- **Standalone Offline Copy ($5):** ${checkoutUrl}
+- **Interactive Web Edition (Free for 7 Days):** ${webUrl}
+- **Standalone Offline Workstation ($1+ PWYW):** ${checkoutUrl}
 `;
     fs.writeFileSync(path.join(DISPATCH_DIR, filename), markdownContent, 'utf8');
     console.log(`[VANCE-MARKETING] Dispatch saved: ${filename}`);
@@ -549,30 +561,83 @@ async function generateMarketingDispatch(toolSpec, webUrl, checkoutUrl, dossierD
 }
 
 // ---------------------------------------------------------------------
-// 6. FEDERATED STOREFRONTS BUILDER (UMBRELLA HUB + 4 PODS)
+// 6. FEDERATED STOREFRONTS BUILDER (ROLLING FREEMIUM VAULT)
 // ---------------------------------------------------------------------
-function renderCard(a) {
+function renderCard(a, isVaulted = false) {
   const isArcade = a.pod === 'arcade' || a.type === 'arcade_cartridge';
-  const buyBtnText = isArcade ? `Buy Cartridge ($${(a.price_cents / 100).toFixed(0)})` : `Buy Offline ($${(a.price_cents / 100).toFixed(0)})`;
-  return `
-    <div class="card">
+
+  if (!isVaulted) {
+    // ACTIVE FREE CARD
+    return `
+    <div class="card" style="background:#0f172a; border:1px solid #1e293b; border-radius:12px; padding:1.25rem; display:flex; flex-direction:column; justify-content:space-between; gap:1rem;">
       <div>
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
-          <div class="badge">$${(a.price_cents / 100).toFixed(2)} USD</div>
+          <div class="badge" style="background:#10b98122; color:#10b981; font-weight:700; font-size:0.75rem; padding:2px 8px; border-radius:4px; text-transform:uppercase;">Free Web Edition</div>
           ${a.level ? `<span style="font-size:0.75rem; font-weight:700; color:#38bdf8; background:#0369a133; padding:2px 8px; border-radius:9999px;">${a.level}</span>` : ''}
         </div>
         <h3 style="font-size:1.05rem; font-weight:700; margin-bottom:0.35rem; color:#fff;">${a.name}</h3>
         <p style="font-size:0.85rem; color:#94a3b8; line-height:1.4;">${a.tagline || ''}</p>
       </div>
       <div class="actions" style="display:flex; gap:0.5rem; margin-top:1.25rem;">
-        <a href="${a.web_url}" class="btn ${isArcade ? 'btn-play' : 'btn-launch'}" style="text-decoration:none; padding:0.5rem; border-radius:6px; font-size:0.8rem; font-weight:700; text-align:center; flex:1;">Launch</a>
-        <a href="${a.checkout_url}" target="_blank" class="btn btn-buy" style="text-decoration:none; padding:0.5rem; border-radius:6px; font-size:0.8rem; font-weight:700; text-align:center; flex:1;">${buyBtnText}</a>
+        <a href="${a.web_url}" class="btn ${isArcade ? 'btn-play' : 'btn-launch'}" style="text-decoration:none; padding:0.5rem; border-radius:6px; font-size:0.8rem; font-weight:700; text-align:center; flex:1; background:#1e293b; color:#fff; border:1px solid #334155;">Launch</a>
+        <a href="${a.checkout_url}" target="_blank" class="btn btn-buy" style="text-decoration:none; padding:0.5rem; border-radius:6px; font-size:0.8rem; font-weight:700; text-align:center; flex:1; background:#38bdf8; color:#081726;">Own File ($1+)</a>
       </div>
     </div>`;
+  } else {
+    // VAULT ARCHIVE CARD (Older than free window - locked)
+    return `
+    <div class="card vault-card" style="background:#090d16; border:1px dashed #334155; border-radius:12px; padding:1.25rem; display:flex; flex-direction:column; justify-content:space-between; gap:1rem; opacity:0.65;">
+      <div>
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
+          <div class="badge" style="background:#f59e0b22; color:#f59e0b; font-weight:700; font-size:0.75rem; padding:2px 8px; border-radius:4px; text-transform:uppercase;">Vault Archive</div>
+          ${a.level ? `<span style="font-size:0.75rem; font-weight:700; color:#64748b; background:#1e293b; padding:2px 8px; border-radius:9999px;">${a.level}</span>` : ''}
+        </div>
+        <h3 style="font-size:1.05rem; font-weight:700; margin-bottom:0.35rem; color:#cbd5e1;">${a.name}</h3>
+        <p style="font-size:0.85rem; color:#64748b; line-height:1.4;">${a.tagline || ''}</p>
+      </div>
+      <div class="actions" style="margin-top:1.25rem;">
+        <a href="${a.checkout_url}" target="_blank" class="btn btn-buy" style="display:block; text-decoration:none; padding:0.5rem; border-radius:6px; font-size:0.8rem; font-weight:700; text-align:center; background:#f59e0b; color:#081726;">Unlock Archive ($1+)</a>
+      </div>
+    </div>`;
+  }
+}
+
+function generateRssFeed(allAssets) {
+  try {
+    const itemsXml = allAssets.slice(0, 20).map(item => {
+      const pubDate = item.deployed_at || item.invented_at ? new Date(item.deployed_at || item.invented_at).toUTCString() : new Date().toUTCString();
+      const itemUrl = `https://jecoleo.github.io/vance-core/products/${item.slug}/`;
+      return `
+      <item>
+        <title><![CDATA[${item.name}]]></title>
+        <link>${itemUrl}</link>
+        <guid isPermaLink="true">${itemUrl}</guid>
+        <pubDate>${pubDate}</pubDate>
+        <description><![CDATA[${item.tagline || 'Standalone release on The Creativity Experiment'}]]></description>
+      </item>`;
+    }).join('');
+
+    const rss = `<?xml version="1.0" encoding="UTF-8" ?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+<channel>
+  <title>The Creativity Experiment</title>
+  <link>https://jecoleo.github.io/vance-core/</link>
+  <description>Autonomous zero-dependency software, retro arcade cartridges, and daily Japanese commute dossiers.</description>
+  <language>en-us</language>
+  <lastBuildDate>${new Date().toUTCString()}</lastBuildDate>
+  <atom:link href="https://jecoleo.github.io/vance-core/feed.xml" rel="self" type="application/rss+xml" />
+  ${itemsXml}
+</channel>
+</rss>`;
+    fs.writeFileSync(RSS_PATH, rss.trim(), 'utf8');
+    console.log('[VANCE] Public RSS wire generated: feed.xml');
+  } catch (err) {
+    console.warn('[VANCE] RSS generation error:', err.message);
+  }
 }
 
 function rebuildAllStorefronts() {
-  console.log('[VANCE] Assembling Federated Storefronts...');
+  console.log('[VANCE] Assembling Federated Storefronts with Rolling Freemium Vault...');
   const allAssets = [...state.deployed_assets, ...state.autonomous_lab_assets];
 
   // 1. Filter Pod Assets
@@ -581,12 +646,17 @@ function rebuildAllStorefronts() {
   const utilityItems = allAssets.filter(a => (a.pod === 'utility' || a.type === 'autonomous_utility' || a.type === 'utility') && a.slug !== 'jlpt-mastery-console');
   const newsItems = allAssets.filter(a => a.pod === 'news' || a.type === 'news_dossier');
 
-  // Helper to compile a pod
-  const compilePod = (shellName, outputDir, items) => {
+  // Helper to compile a pod with the rolling freemium vault limit
+  const compilePod = (shellName, outputDir, items, windowLimit) => {
     const templatePath = path.join(TEMPLATES_DIR, shellName);
     if (!fs.existsSync(templatePath)) return;
     let html = fs.readFileSync(templatePath, 'utf8');
-    const cards = items.map(renderCard).join('\n') || '<p style="color:#64748b; font-size:0.85rem;">No items staged in this pod yet.</p>';
+    
+    const cards = items.map((item, index) => {
+      const isVaulted = index >= windowLimit;
+      return renderCard(item, isVaulted);
+    }).join('\n') || '<p style="color:#64748b; font-size:0.85rem;">No items staged in this pod yet.</p>';
+
     html = html.replace(
       /<!-- \[POD-ROSTER-START\] -->[\s\S]*?<!-- \[POD-ROSTER-END\] -->/,
       `<!-- [POD-ROSTER-START] -->\n<div class="grid">\n${cards}\n</div>\n<!-- [POD-ROSTER-END] -->`
@@ -595,11 +665,11 @@ function rebuildAllStorefronts() {
     fs.writeFileSync(path.join(outputDir, 'index.html'), html, 'utf8');
   };
 
-  // Compile the 4 Pod sub-sites
-  compilePod('arcade-shell.html', './arcade', arcadeItems);
-  compilePod('tactical-shell.html', './tactical', tacticalItems);
-  compilePod('utility-shell.html', './utility', utilityItems);
-  compilePod('news-shell.html', './news', newsItems);
+  // Compile the 4 Pod sub-sites with respective free windows
+  compilePod('arcade-shell.html', './arcade', arcadeItems, DEFAULT_FREE_WINDOW);
+  compilePod('tactical-shell.html', './tactical', tacticalItems, DEFAULT_FREE_WINDOW);
+  compilePod('utility-shell.html', './utility', utilityItems, DEFAULT_FREE_WINDOW);
+  compilePod('news-shell.html', './news', newsItems, NEWS_FREE_WINDOW);
 
   // 2. Compile Master Umbrella Portal (Root index.html)
   const hubTemplatePath = path.join(TEMPLATES_DIR, 'hub-shell.html');
@@ -613,6 +683,9 @@ function rebuildAllStorefronts() {
     fs.writeFileSync('./index.html', hubHtml, 'utf8');
     console.log('[VANCE] Master Portal (index.html) successfully recompiled.');
   }
+
+  // 3. Generate Public RSS wire
+  generateRssFeed(allAssets);
 }
 
 // ---------------------------------------------------------------------
@@ -638,7 +711,7 @@ async function ingestStagedArtifacts() {
         slug: slug,
         name: slug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' '),
         tagline: 'Handcrafted standalone local-first release.',
-        price_cents: 300
+        price_cents: UNIVERSAL_PRESET_CENTS
       };
 
       const rawHtml = fs.readFileSync(sourceFile, 'utf8');
@@ -666,7 +739,8 @@ async function ingestStagedArtifacts() {
       if (existingIdx >= 0) {
         state.deployed_assets[existingIdx] = assetRecord;
       } else {
-        state.deployed_assets.push(assetRecord);
+        // Prepend so newest is at the top of the pod
+        state.deployed_assets.unshift(assetRecord);
       }
       manifestEntry.status = 'deployed';
       console.log(`[VANCE] Deployed ${slug} to pod: ${mapping.pod}`);
@@ -690,7 +764,7 @@ async function run() {
     await synthesizeDailyDossier();
   }
 
-  // 3. Assemble all storefronts
+  // 3. Assemble all storefronts with rolling freemium vault and RSS feed
   rebuildAllStorefronts();
 
   fs.writeFileSync(STATE_PATH, JSON.stringify(state, null, 2), 'utf8');
