@@ -300,7 +300,7 @@ async function callGemini(prompt, isJson = false, timeoutMs = 90000) {
   const modelCascade = [
     'gemini-3.5-flash-lite', // Primary: ultra-low latency and stable JSON generation
     'gemini-3.1-flash-lite', // Secondary: fast fallback
-    'gemini-3.8-flash'       // Tertiary: heavy reasoning reserve
+    'gemini-2.5-flash-lite'       // Tertiary: heavy reasoning reserve
   ];
 
   for (let mIdx = 0; mIdx < modelCascade.length; mIdx++) {
