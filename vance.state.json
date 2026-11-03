@@ -97,12 +97,13 @@
       "tagline": "A fast-paced 16-bit culinary arcade cartridge. Cook, plate, and serve against the kitchen clock.",
       "price_cents": 300,
       "web_url": "../products/pixel-bistro/",
-      "checkout_url": "https://buy.stripe.com/8x25kE0CM8tbgqg96V0Ny0j",
+      "checkout_url": "https://buy.stripe.com/7sYdRaetCaBjb5W82R0Ny0l",
       "stripe_product_id": "prod_VYhfWypZhn8l5T",
-      "deployed_at": "2026-11-03T11:14:46.519Z"
+      "deployed_at": "2026-11-03T12:35:24.929Z"
     }
   ],
   "execution_log": [
+    "2026-11-03: Deployed World News Japanese: Smartphone Payments Increasing in Japanese Supermarkets (N4)",
     "2026-11-03: Deployed World News Japanese: Hotel with Robot Staff Opens Anew (N4)",
     "2026-11-03: Deployed World News Japanese: Robot-staffed cafe in Tokyo gains popularity (N4)",
     "2026-11-03: Deployed World News Japanese: Many fans gather at a new regional baseball stadium (N4)",
@@ -122,6 +123,20 @@
     "2026-11-01: Staging ingest established for utilities and Substack creative arcade experiments."
   ],
   "autonomous_lab_assets": [
+    {
+      "slug": "news-n4-smartphone-payment",
+      "pod": "news",
+      "type": "news_dossier",
+      "level": "N4",
+      "name": "World News Japanese: Smartphone Payments Increasing in Japanese Supermarkets (N4)",
+      "tagline": "Tuesday Commute Edition &bull; 25-Word Match, 5 Grammar Cloze & Reading Check.",
+      "price_cents": 200,
+      "revenue_cents": 0,
+      "web_url": "../products/news-n4-smartphone-payment/",
+      "checkout_url": "https://buy.stripe.com/28EfZiclugZHb5Wgzn0Ny0m",
+      "stripe_product_id": "prod_VYoZpV4857CRcQ",
+      "invented_at": "2026-11-03T12:35:39.418Z"
+    },
     {
       "slug": "news-n4-robot-hotel-staff",
       "pod": "news",
