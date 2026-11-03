@@ -21,7 +21,7 @@
       "tier_1_survival": 30,
       "tier_2_ultra": 150
     },
-    "last_synced": "2026-11-01"
+    "last_synced": "2026-11-03"
   },
   "pipeline_policy": {
     "ingest_dir": "./staging",
@@ -86,10 +86,11 @@
       "web_url": "./products/jlpt-mastery-console/",
       "checkout_url": "https://buy.stripe.com/00w00kclugZHfmc5UJ0Ny04",
       "stripe_product_id": "prod_VY4vYcVBFLxm1C",
-      "deployed_at": "2026-11-01T23:07:28.242Z"
+      "deployed_at": "2026-11-03T02:16:12.260Z"
     }
   ],
   "execution_log": [
+    "2026-11-03: Vance Lab deployed World News Japanese: Many runners enthusiastically complete the Tokyo Marathon (N4)",
     "2026-11-01: Vance Lab deployed World News Japanese: New Hokuriku Shinkansen Extension Opens (N5)",
     "2026-11-01: Vance Lab deployed World News Japanese: New Ocean Robot Cleans Up Trash (N5)",
     "2026-11-01: Vance Lab deployed World News Japanese: New solar power creates the next era (N5)",
@@ -151,6 +152,19 @@
       "checkout_url": "https://buy.stripe.com/14A7sMfxG38R0ri6YN0Ny08",
       "stripe_product_id": "prod_VYEJV7Hz7CYhSs",
       "invented_at": "2026-11-01T23:07:39.038Z"
+    },
+    {
+      "slug": "news-n4-tokyo-marathon-return",
+      "type": "news_dossier",
+      "level": "N4",
+      "name": "World News Japanese: Many runners enthusiastically complete the Tokyo Marathon (N4)",
+      "tagline": "Tuesday Commute Edition &bull; 25-Word Match, 5 Grammar Cloze & Reading Check.",
+      "price_cents": 500,
+      "revenue_cents": 0,
+      "web_url": "../products/news-n4-tokyo-marathon-return/",
+      "checkout_url": "https://buy.stripe.com/6oU5kEadmaBj8XOfvj0Ny09",
+      "stripe_product_id": "prod_VYeaHiqaoJsPCZ",
+      "invented_at": "2026-11-03T02:16:24.830Z"
     }
   ]
 }
