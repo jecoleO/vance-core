@@ -189,9 +189,9 @@ function packageHtml(rawHtml, item, checkoutUrl, hubUrl = '../index.html', hubNa
 // ---------------------------------------------------------------------
 async function callGemini(prompt, isJson = false, timeoutMs = 60000) {
   const modelCascade = [
+    'gemini-3.8-flash',
     'gemini-3.5-flash-lite',
-    'gemini-3.1-flash-lite',
-    'gemini-3.8-flash'
+    'gemini-3.1-flash-lite'
   ];
 
   for (let mIdx = 0; mIdx < modelCascade.length; mIdx++) {
