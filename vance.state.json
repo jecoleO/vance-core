@@ -57,13 +57,13 @@
       "source_file": "staging/local-log-sanitizer/index.html",
       "status": "awaiting_staging"
     },
-   {
+    {
       "slug": "pixel-bistro",
       "pod": "arcade",
       "name": "Pixel Bistro: Cyber Diner Rush",
       "tagline": "A fast-paced 16-bit culinary arcade cartridge. Cook, plate, and serve against the kitchen clock.",
       "price_cents": 300,
-      "status": "staged"
+      "status": "deployed"
     },
     {
       "slug": "kotoba-monsters",
@@ -86,9 +86,21 @@
       "checkout_url": "https://buy.stripe.com/00w00kclugZHfmc5UJ0Ny04",
       "stripe_product_id": "prod_VY4vYcVBFLxm1C",
       "deployed_at": "2026-11-03T02:19:23.513Z"
+    },
+    {
+      "slug": "pixel-bistro",
+      "pod": "arcade",
+      "name": "Pixel Bistro: Cyber Diner Rush",
+      "tagline": "A fast-paced 16-bit culinary arcade cartridge. Cook, plate, and serve against the kitchen clock.",
+      "price_cents": 300,
+      "web_url": "../products/pixel-bistro/",
+      "checkout_url": "https://buy.stripe.com/00w28s4T224N8XOfvj0Ny0c",
+      "stripe_product_id": "prod_VYhfWypZhn8l5T",
+      "deployed_at": "2026-11-03T05:27:39.444Z"
     }
   ],
   "execution_log": [
+    "2026-11-03: Deployed World News Japanese: Food festival celebrating regional traditional dishes opens in Tokyo (N4)",
     "2026-11-03: Removed & archived asset japan-freelance-tax-engine",
     "2026-11-03: Deployed World News Japanese: Tourist destinations bustle with the Hokuriku Shinkansen extension (N4)",
     "2026-11-03: Deployed World News Japanese: New Robot Café Opens in Tokyo (N4)",
@@ -183,6 +195,20 @@
       "checkout_url": "https://buy.stripe.com/9B64gAadm8tbde43MB0Ny0b",
       "stripe_product_id": "prod_VYgbY3FwLTJpH3",
       "invented_at": "2026-11-03T04:21:55.337Z"
+    },
+    {
+      "slug": "news-n4-regional-cuisine-festival",
+      "pod": "news",
+      "type": "news_dossier",
+      "level": "N4",
+      "name": "World News Japanese: Food festival celebrating regional traditional dishes opens in Tokyo (N4)",
+      "tagline": "Tuesday Commute Edition &bull; 25-Word Match, 5 Grammar Cloze & Reading Check.",
+      "price_cents": 500,
+      "revenue_cents": 0,
+      "web_url": "../products/news-n4-regional-cuisine-festival/",
+      "checkout_url": "https://buy.stripe.com/cNicN62KUbFn4Hy4QF0Ny0d",
+      "stripe_product_id": "prod_VYhfBDIPh1PD3R",
+      "invented_at": "2026-11-03T05:27:52.209Z"
     }
   ]
 }
