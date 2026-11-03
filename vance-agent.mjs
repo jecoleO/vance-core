@@ -3,8 +3,13 @@ import path from 'path';
 
 const STRIPE_SECRET_KEY = process.env.STRIPE_SECRET_KEY;
 const GEMINI_API_KEY = process.env.GEMINI_API_KEY;
+const ACTION = process.env.ACTION || 'generate';
+const TARGET_SLUG = (process.env.TARGET_SLUG || '').trim();
+
 const STATE_PATH = './vance.state.json';
-const TEMPLATE_PATH = './templates/dossier-shell.html';
+const TEMPLATES_DIR = './templates';
+const PRODUCTS_DIR = './products';
+const DISPATCH_DIR = './marketing/dispatches';
 
 if (!STRIPE_SECRET_KEY) {
   console.error('[VANCE] Missing STRIPE_SECRET_KEY in environment.');
@@ -20,7 +25,7 @@ state.execution_log = Array.isArray(state.execution_log) ? state.execution_log :
 state.financial_telemetry = state.financial_telemetry || {};
 
 // ---------------------------------------------------------------------
-// 1. STRIPE HELPERS & TELEMETRY
+// 1. STRIPE API HELPERS & TELEMETRY
 // ---------------------------------------------------------------------
 function toFormUrlEncoded(obj, prefix = '') {
   const str = [];
@@ -79,7 +84,7 @@ async function syncStripeTelemetry() {
 }
 
 async function getOrCreateStripeLink(item, targetRedirectUrl) {
-  console.log(`[VANCE] Provisioning/checking Stripe asset: ${item.name} ($${(item.price_cents / 100).toFixed(2)})`);
+  console.log(`[VANCE] Checking Stripe asset: ${item.name} ($${(item.price_cents / 100).toFixed(2)})`);
 
   let product = null;
   try {
@@ -127,8 +132,8 @@ async function getOrCreateStripeLink(item, targetRedirectUrl) {
   return { product_id: product.id, price_id: price.id, checkout_url: paymentLink.url };
 }
 
-function packageHtml(rawHtml, item, checkoutUrl, hubUrl = '../../index.html', hubName = 'The Arcade') {
-  const isArcade = item.type === 'arcade_cartridge';
+function packageHtml(rawHtml, item, checkoutUrl, hubUrl = '../index.html', hubName = 'The Pod') {
+  const isArcade = item.pod === 'arcade' || item.type === 'arcade_cartridge';
   const unlockKey = `vance_unlocked_${item.slug}`;
 
   const injectedSnippet = `
@@ -143,7 +148,7 @@ function packageHtml(rawHtml, item, checkoutUrl, hubUrl = '../../index.html', hu
     <span id="vance-pro-badge" style="display:none;background:#10b98122;color:#10b981;padding:3px 8px;border-radius:4px;font-size:11px;font-weight:700;border:1px solid #10b98144;">OFFLINE EDITION UNLOCKED</span>
     <button id="vance-dl-btn" style="display:none;background:#10b981;color:#041f14;border:none;padding:5px 12px;border-radius:6px;font-weight:700;cursor:pointer;font-size:12px;">Download Offline .html</button>
     <a id="vance-buy-btn" href="${checkoutUrl}" target="_blank" style="background:#38bdf8;color:#081726;padding:5px 12px;border-radius:6px;font-weight:700;text-decoration:none;font-size:12px;">
-      ${isArcade ? `Buy Standalone Cartridge ($${(item.price_cents / 100).toFixed(0)})` : `Unlock Pro Edition ($${(item.price_cents / 100).toFixed(0)})`}
+      ${isArcade ? `Buy Standalone Cartridge ($${(item.price_cents / 100).toFixed(0)})` : `Unlock Standalone ($${(item.price_cents / 100).toFixed(0)})`}
     </a>
   </div>
 </div>
@@ -253,54 +258,19 @@ async function callGemini(prompt, isJson = false, timeoutMs = 60000) {
 }
 
 // ---------------------------------------------------------------------
-// 3. DAILY LEVEL PROGRESSION ROUTER & DOSSIER SYNTHESIS (STORE B)
+// 3. DAILY COMMUTE DOSSIER SYNTHESIS (JAPANESE TODAY POD)
 // ---------------------------------------------------------------------
 function getDailyJlptSpec() {
   const now = new Date();
   const jstDate = new Date(now.getTime() + (9 * 60 * 60 * 1000));
-  const jstDay = jstDate.getUTCDay(); // 0 = Sun, 1 = Mon, ..., 6 = Sat
+  const jstDay = jstDate.getUTCDay();
 
   const levelConfigs = {
-    1: {
-      level: "N5",
-      dayName: "Monday",
-      titleSuffix: "Elementary Foundations",
-      paragraphs: 2,
-      charCap: 200,
-      grammarGuide: "Strict JLPT N5 grammar: です/ます forms, core particles (は, が, を, に, で, と, も), basic adjective predicates, simple non-past/past."
-    },
-    2: {
-      level: "N4",
-      dayName: "Tuesday",
-      titleSuffix: "Early Intermediate Clauses",
-      paragraphs: 2,
-      charCap: 260,
-      grammarGuide: "JLPT N4 grammar: 〜たり〜たり, 〜ている, 〜てから, 〜たら/〜ば, 〜ので/から, basic potential and passive forms."
-    },
-    3: {
-      level: "N3",
-      dayName: "Wednesday",
-      titleSuffix: "Intermediate Bridge",
-      paragraphs: 3,
-      charCap: 340,
-      grammarGuide: "JLPT N3 grammar: 〜に対して, 〜によって, 〜に関する, 〜わけではない, compound verbs, authentic written だ/である register."
-    },
-    4: {
-      level: "N2",
-      dayName: "Thursday",
-      titleSuffix: "Advanced Press Register",
-      paragraphs: 3,
-      charCap: 380,
-      grammarGuide: "JLPT N2 newspaper register: 〜をはじめとする, 〜にともなって, 〜をめぐって, 〜ざるを得ない, high-density kanji compounds."
-    },
-    5: {
-      level: "N1",
-      dayName: "Friday",
-      titleSuffix: "Mastery Editorial Register",
-      paragraphs: 3,
-      charCap: 420,
-      grammarGuide: "JLPT N1 editorial register: 〜を余儀なくされる, 〜ならではの, 〜極まりない, formal discourse particles and nuanced critique."
-    }
+    1: { level: "N5", dayName: "Monday", titleSuffix: "Elementary Foundations", paragraphs: 2, charCap: 200, grammarGuide: "Strict JLPT N5 grammar: です/ます forms, core particles (は, が, を, に, で, と, も), basic adjective predicates, simple non-past/past." },
+    2: { level: "N4", dayName: "Tuesday", titleSuffix: "Early Intermediate Clauses", paragraphs: 2, charCap: 260, grammarGuide: "JLPT N4 grammar: 〜たり〜たり, 〜ている, 〜てから, 〜たら/〜ば, 〜ので/から, basic potential and passive forms." },
+    3: { level: "N3", dayName: "Wednesday", titleSuffix: "Intermediate Bridge", paragraphs: 3, charCap: 340, grammarGuide: "JLPT N3 grammar: 〜に対して, 〜によって, 〜に関する, 〜わけではない, compound verbs, authentic written だ/である register." },
+    4: { level: "N2", dayName: "Thursday", titleSuffix: "Advanced Press Register", paragraphs: 3, charCap: 380, grammarGuide: "JLPT N2 newspaper register: 〜をはじめとする, 〜にともなって, 〜をめぐって, 〜ざるを得ない, high-density kanji compounds." },
+    5: { level: "N1", dayName: "Friday", titleSuffix: "Mastery Editorial Register", paragraphs: 3, charCap: 420, grammarGuide: "JLPT N1 editorial register: 〜を余儀なくされる, 〜ならではの, 〜極まりない, formal discourse particles and nuanced critique." }
   };
 
   return levelConfigs[jstDay] || {
@@ -315,17 +285,18 @@ function getDailyJlptSpec() {
 
 async function synthesizeDailyDossier() {
   if (!GEMINI_API_KEY) {
-    console.log('[VANCE-AI] No GEMINI_API_KEY detected. Skipping Store B synthesis.');
+    console.log('[VANCE-AI] No GEMINI_API_KEY detected. Skipping Japanese Today synthesis.');
     return;
   }
 
-  if (!fs.existsSync(TEMPLATE_PATH)) {
-    console.warn(`[VANCE-AI] Master template ${TEMPLATE_PATH} missing. Skipping Store B synthesis.`);
+  const dossierTemplatePath = path.join(TEMPLATES_DIR, 'dossier-shell.html');
+  if (!fs.existsSync(dossierTemplatePath)) {
+    console.warn(`[VANCE-AI] Master template ${dossierTemplatePath} missing. Skipping synthesis.`);
     return;
   }
 
   const spec = getDailyJlptSpec();
-  console.log(`[VANCE-AI] Target schedule: ${spec.level} (${spec.dayName} Commute Edition)`);
+  console.log(`[VANCE-AI] Synthesizing Japanese Today: ${spec.level} (${spec.dayName} Commute Edition)`);
 
   const previousDossiers = (state.autonomous_lab_assets || []).map(a => a.name).join(', ');
 
@@ -378,7 +349,7 @@ OUTPUT FORMAT (STRICT JSON ONLY):
   "article": {
     "title_jp": "Natural Japanese Headline using standard adult kanji",
     "title_en": "Natural English Headline",
-    "raw_text": "Paragraph 1 in natural Japanese.\n\nParagraph 2...",
+    "raw_text": "Paragraph 1 in natural Japanese.\\n\\nParagraph 2...",
     "furi_html": "<p><ruby>新幹線<rt>しんかんせん</rt></ruby>の...</p><p>...</p>",
     "translation_en": "Natural, idiomatic English translation."
   },
@@ -450,6 +421,7 @@ OUTPUT FORMAT (STRICT JSON ONLY):
 
     const itemSpec = {
       slug: slug,
+      pod: 'news',
       type: 'news_dossier',
       name: `World News Japanese: ${dossierData.article.title_en} (${spec.level})`,
       tagline: `${spec.dayName} Commute Edition &bull; 25-Word Match, 5 Grammar Cloze & Reading Check.`,
@@ -459,54 +431,98 @@ OUTPUT FORMAT (STRICT JSON ONLY):
     const targetRedirectUrl = `${state.agent_identity.storefront_url}products/${slug}/?unlocked=true`;
     const stripeData = await getOrCreateStripeLink(itemSpec, targetRedirectUrl);
 
-    const templateHtml = fs.readFileSync(TEMPLATE_PATH, 'utf8');
+    const templateHtml = fs.readFileSync(dossierTemplatePath, 'utf8');
     let compiledHtml = templateHtml
       .replace('__DOSSIER_DATA__', JSON.stringify(dossierData))
       .replace('World News Japanese Dossier', `${dossierData.article.title_en} (${spec.level})`);
 
-    // Attach Vance Store B header and live checkout URL
     compiledHtml = compiledHtml.replace(
       'href="#" target="_blank" style="background:#0284c7;',
       `href="${stripeData.checkout_url}" target="_blank" style="background:#0284c7;`
     );
 
-    const targetDir = path.join(state.pipeline_policy.products_dir, slug);
+    const targetDir = path.join(PRODUCTS_DIR, slug);
     fs.mkdirSync(targetDir, { recursive: true });
     fs.writeFileSync(path.join(targetDir, 'index.html'), compiledHtml, 'utf8');
 
-    const webUrl = `${state.agent_identity.storefront_url}products/${slug}/`;
+    const webUrl = `../products/${slug}/`;
     state.autonomous_lab_assets.push({
       slug: slug,
+      pod: 'news',
       type: 'news_dossier',
       level: spec.level,
       name: itemSpec.name,
       tagline: itemSpec.tagline,
       price_cents: itemSpec.price_cents,
       revenue_cents: 0,
-      web_url: `../products/${slug}/`,
+      web_url: webUrl,
       checkout_url: stripeData.checkout_url,
       stripe_product_id: stripeData.product_id,
       invented_at: new Date().toISOString()
     });
 
-    state.execution_log.unshift(`${new Date().toISOString().slice(0, 10)}: Vance Lab deployed ${itemSpec.name}`);
-    console.log(`[VANCE-AI] Deployed ${itemSpec.name} to Vance Lab.`);
+    state.execution_log.unshift(`${new Date().toISOString().slice(0, 10)}: Deployed ${itemSpec.name}`);
+    console.log(`[VANCE-AI] Deployed ${itemSpec.name} to products/${slug}/`);
 
-    await generateMarketingDispatch(itemSpec, webUrl, stripeData.checkout_url, dossierData, spec);
+    await generateMarketingDispatch(itemSpec, `https://jecoleo.github.io/vance-core/products/${slug}/`, stripeData.checkout_url, dossierData, spec);
   } catch (err) {
     console.warn('[VANCE-AI] Dossier synthesis failed:', err.message);
   }
 }
 
 // ---------------------------------------------------------------------
-// 4. MARKETING DISPATCH GENERATION
+// 4. CLEANUP & DELETE (SITE + STRIPE ARCHIVE)
+// ---------------------------------------------------------------------
+async function deleteAsset(targetSlug) {
+  if (!targetSlug) {
+    console.warn('[VANCE-CLEANUP] No target_slug provided for deletion.');
+    return;
+  }
+
+  console.log(`[VANCE-CLEANUP] Initiating deletion & archival of asset: ${targetSlug}`);
+
+  // 1. Remove physical folder in /products/
+  const productDir = path.join(PRODUCTS_DIR, targetSlug);
+  if (fs.existsSync(productDir)) {
+    fs.rmSync(productDir, { recursive: true, force: true });
+    console.log(`[VANCE-CLEANUP] Deleted directory: ${productDir}`);
+  }
+
+  // 2. Remove marketing dispatch if it exists
+  const files = fs.existsSync(DISPATCH_DIR) ? fs.readdirSync(DISPATCH_DIR) : [];
+  for (const f of files) {
+    if (f.includes(targetSlug)) {
+      const p = path.join(DISPATCH_DIR, f);
+      fs.unlinkSync(p);
+      console.log(`[VANCE-CLEANUP] Deleted dispatch file: ${p}`);
+    }
+  }
+
+  // 3. Find asset and archive on Stripe
+  const allAssets = [...state.autonomous_lab_assets, ...state.deployed_assets];
+  const targetAsset = allAssets.find(a => a.slug === targetSlug);
+  if (targetAsset && targetAsset.stripe_product_id) {
+    try {
+      console.log(`[VANCE-CLEANUP] Archiving Stripe product: ${targetAsset.stripe_product_id}`);
+      await stripeRequest(`products/${targetAsset.stripe_product_id}`, 'POST', { active: 'false' });
+      console.log(`[VANCE-CLEANUP] Stripe product archived successfully.`);
+    } catch (err) {
+      console.warn(`[VANCE-CLEANUP] Stripe archival warning:`, err.message);
+    }
+  }
+
+  // 4. Remove from state arrays
+  state.autonomous_lab_assets = state.autonomous_lab_assets.filter(a => a.slug !== targetSlug);
+  state.deployed_assets = state.deployed_assets.filter(a => a.slug !== targetSlug);
+  state.execution_log.unshift(`${new Date().toISOString().slice(0, 10)}: Removed & archived asset ${targetSlug}`);
+}
+
+// ---------------------------------------------------------------------
+// 5. MARKETING DISPATCH
 // ---------------------------------------------------------------------
 async function generateMarketingDispatch(toolSpec, webUrl, checkoutUrl, dossierData = null, spec = null) {
   if (!GEMINI_API_KEY) return;
-  console.log(`[VANCE-MARKETING] Generating launch dispatch for ${toolSpec.name}...`);
-
-  const dispatchDir = './marketing/dispatches';
-  fs.mkdirSync(dispatchDir, { recursive: true });
+  fs.mkdirSync(DISPATCH_DIR, { recursive: true });
   const filename = `${new Date().toISOString().slice(0, 10)}-${toolSpec.slug}.md`;
 
   if (dossierData && spec) {
@@ -515,273 +531,167 @@ async function generateMarketingDispatch(toolSpec, webUrl, checkoutUrl, dossierD
 **Level:** ${spec.level} (${spec.dayName} Commute Edition)  
 **Topic:** ${dossierData.meta.category}  
 **Source Citation:** [${dossierData.meta.source_title}](${dossierData.meta.source_url})  
-**Format:** 2-Paragraph Japanese Text • 25 Vocab Match • 5 Grammar Cloze • 5 Comprehension Questions
-
----
 
 ### Headline
 **${dossierData.article.title_jp}**  
 *${dossierData.article.title_en}*
 
 ### Reading Summary (English Translation)
-> ${dossierData.article.translation_en.replace(/\n/g, '\n> ')}
+> ${dossierData.article.translation_en.replace(/\\n/g, '\\n> ')}
 
----
-
-### Key Grammar Points Covered
-${dossierData.grammar_5.map((g, i) => `${i + 1}. **${g.pattern}** (${g.formation}) — *${g.meaning}*`).join('\n')}
-
----
-
-### Interactive Web App Links
-- **Launch Interactive App:** ${webUrl}
-- **Unlock Standalone Offline Edition ($5):** ${checkoutUrl}
-- **Vance Autonomous Lab:** https://jecoleo.github.io/vance-core/lab/index.html
+### Links
+- **Interactive App:** ${webUrl}
+- **Standalone Offline Copy ($5):** ${checkoutUrl}
 `;
-
-    fs.writeFileSync(path.join(dispatchDir, filename), markdownContent, 'utf8');
-    console.log(`[VANCE-MARKETING] Saved launch dispatch to ${dispatchDir}/${filename}`);
-    return;
-  }
-
-  const prompt = `
-You are Vance, an autonomous commercial software operator.
-Write a concise, launch-ready promotional packet for our newly deployed tool:
-Name: ${toolSpec.name}
-Tagline: ${toolSpec.tagline}
-Web App Link: ${webUrl}
-Stripe Offline Download Link: ${checkoutUrl}
-
-Generate a clear Markdown document with:
-1. Substack Post Draft (Subject line + 3 short paragraphs explaining the pain point, zero-cloud offline utility, and links).
-2. Hacker News "Show HN" / Reddit r/webdev value post.
-3. A 280-character launch post.
-
-Keep the tone authentic, direct, and focused on local-first privacy. No fluff.
-`;
-
-  try {
-    const content = await callGemini(prompt, false, 45000);
-    if (content) {
-      fs.writeFileSync(path.join(dispatchDir, filename), content, 'utf8');
-      console.log(`[VANCE-MARKETING] Saved launch dispatch to ${dispatchDir}/${filename}`);
-    }
-  } catch (err) {
-    console.warn('[VANCE-MARKETING] Dispatch generation failed:', err.message);
+    fs.writeFileSync(path.join(DISPATCH_DIR, filename), markdownContent, 'utf8');
+    console.log(`[VANCE-MARKETING] Dispatch saved: ${filename}`);
   }
 }
 
 // ---------------------------------------------------------------------
-// 5. STORE A & STORE B REBUILDERS
+// 6. FEDERATED STOREFRONTS BUILDER (UMBRELLA HUB + 4 PODS)
 // ---------------------------------------------------------------------
-function rebuildStoreA() {
-  console.log('[VANCE] Building Store A: Creative Arcade & Author Vault (index.html)...');
-  const userAssets = state.deployed_assets || [];
-  const renderCard = a => `
-    <div class="card">
-      <div>
-        <div class="badge">$${(a.price_cents / 100).toFixed(2)} USD</div>
-        <h3>${a.name}</h3>
-        <p>${a.tagline}</p>
-      </div>
-      <div class="actions">
-        <a href="${a.web_url}" class="btn secondary">Launch Browser App</a>
-        <a href="${a.checkout_url}" class="btn primary">Buy Offline Copy ($${(a.price_cents / 100).toFixed(0)})</a>
-      </div>
-    </div>`;
-
-  const html = `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>JAE Cole // The Creative Arcade & Lore Vault</title>
-  <style>
-    :root { --bg: #0b0f19; --card: #131b2e; --text: #e2e8f0; --accent: #38bdf8; --emerald: #10b981; }
-    body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 2rem; line-height: 1.6; }
-    .container { max-width: 940px; margin: 0 auto; }
-    header { border-bottom: 1px solid #1e293b; padding-bottom: 1.5rem; margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; }
-    .lab-link { display: inline-flex; align-items: center; gap: 6px; font-size: 0.85rem; color: #a855f7; text-decoration: none; padding: 6px 12px; background: #2e106544; border: 1px solid #a855f744; border-radius: 8px; font-weight: 600; }
-    .grid { display: grid; gap: 1.5rem; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
-    .card { background: var(--card); padding: 1.5rem; border-radius: 12px; border: 1px solid #1e293b; display: flex; flex-direction: column; justify-content: space-between; }
-    .badge { display: inline-block; background: rgba(56, 189, 248, 0.15); color: var(--accent); padding: 0.25rem 0.6rem; border-radius: 6px; font-weight: 700; font-size: 0.8rem; margin-bottom: 0.75rem; }
-    .actions { display: flex; gap: 0.75rem; margin-top: 1.25rem; }
-    .btn { text-decoration: none; padding: 0.6rem 1rem; border-radius: 8px; font-weight: 600; font-size: 0.85rem; text-align: center; flex: 1; }
-    .btn.primary { background: var(--accent); color: #081726; }
-    .btn.secondary { background: #1e293b; color: var(--text); }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <header>
-      <div>
-        <h1 style="margin:0; color: var(--accent);">JAE COLE // THE ARCADE & VAULT</h1>
-        <p style="margin:0.25rem 0 0; color:#94a3b8;">Original Creative Experiments, Language Engines & Retro Cartridges</p>
-      </div>
-      <div>
-        <a href="./lab/index.html" class="lab-link">Visit Vance Autonomous Lab &rarr;</a>
-      </div>
-    </header>
-
-    <div class="grid">
-      ${userAssets.map(renderCard).join('\n') || '<p style="color:#64748b;">No items staged yet.</p>'}
-    </div>
-    <footer style="margin-top:3rem; font-size:0.8rem; color:#64748b; text-align:center;">
-      Curated by JAE Cole &middot; Powered by Vance Merchant Engine
-    </footer>
-  </div>
-</body>
-</html>`;
-
-  fs.writeFileSync('./index.html', html, 'utf8');
-}
-
-function rebuildStoreB() {
-  console.log('[VANCE] Building Store B: Vance Autonomous Lab (lab/index.html)...');
-  const allLabAssets = state.autonomous_lab_assets || [];
-  fs.mkdirSync('./lab', { recursive: true });
-
-  const earners = allLabAssets.filter(a => (a.revenue_cents || 0) > 0);
-  earners.sort((a, b) => b.revenue_cents - a.revenue_cents);
-
-  const unproven = allLabAssets.filter(a => !a.revenue_cents || a.revenue_cents === 0);
-  unproven.sort((a, b) => new Date(b.invented_at || 0) - new Date(a.invented_at || 0));
-
-  const showcase = [...earners, ...unproven].slice(0, 10);
-  const showcaseSlugs = new Set(showcase.map(s => s.slug));
-  const archived = allLabAssets.filter(a => !showcaseSlugs.has(a.slug));
-
-  const renderCard = a => `
+function renderCard(a) {
+  const isArcade = a.pod === 'arcade' || a.type === 'arcade_cartridge';
+  const buyBtnText = isArcade ? `Buy Cartridge ($${(a.price_cents / 100).toFixed(0)})` : `Buy Offline ($${(a.price_cents / 100).toFixed(0)})`;
+  return `
     <div class="card">
       <div>
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:0.75rem;">
           <div class="badge">$${(a.price_cents / 100).toFixed(2)} USD</div>
-          ${a.level ? `<span style="font-size:0.75rem; font-weight:700; color:#38bdf8; background:#0369a133; padding:2px 8px; border-radius:9999px; border:1px solid #38bdf844;">${a.level}</span>` : ''}
+          ${a.level ? `<span style="font-size:0.75rem; font-weight:700; color:#38bdf8; background:#0369a133; padding:2px 8px; border-radius:9999px;">${a.level}</span>` : ''}
         </div>
-        <h3>${a.name}</h3>
-        <p>${a.tagline}</p>
+        <h3 style="font-size:1.05rem; font-weight:700; margin-bottom:0.35rem; color:#fff;">${a.name}</h3>
+        <p style="font-size:0.85rem; color:#94a3b8; line-height:1.4;">${a.tagline || ''}</p>
       </div>
-      <div class="actions">
-        <a href="${a.web_url}" class="btn secondary">Launch App</a>
-        <a href="${a.checkout_url}" class="btn primary">Buy Offline ($${(a.price_cents / 100).toFixed(0)})</a>
+      <div class="actions" style="display:flex; gap:0.5rem; margin-top:1.25rem;">
+        <a href="${a.web_url}" class="btn ${isArcade ? 'btn-play' : 'btn-launch'}" style="text-decoration:none; padding:0.5rem; border-radius:6px; font-size:0.8rem; font-weight:700; text-align:center; flex:1;">Launch</a>
+        <a href="${a.checkout_url}" target="_blank" class="btn btn-buy" style="text-decoration:none; padding:0.5rem; border-radius:6px; font-size:0.8rem; font-weight:700; text-align:center; flex:1;">${buyBtnText}</a>
       </div>
     </div>`;
+}
 
-  const html = `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8" /><meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Vance Autonomous Lab // Zero-Cloud Utilities & Dossiers</title>
-  <style>
-    :root { --bg: #030712; --card: #0f172a; --text: #f8fafc; --accent: #a855f7; }
-    body { font-family: system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); margin: 0; padding: 2rem; line-height: 1.6; }
-    .container { max-width: 940px; margin: 0 auto; }
-    header { border-bottom: 1px solid #1e293b; padding-bottom: 1.5rem; margin-bottom: 2rem; display: flex; justify-content: space-between; align-items: flex-start; flex-wrap: wrap; gap: 1rem; }
-    .arcade-link { display: inline-flex; align-items: center; gap: 6px; font-size: 0.85rem; color: #38bdf8; text-decoration: none; padding: 6px 12px; background: #0c4a6e44; border: 1px solid #0284c744; border-radius: 8px; font-weight: 600; }
-    .grid { display: grid; gap: 1.5rem; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); }
-    .card { background: var(--card); padding: 1.5rem; border-radius: 12px; border: 1px solid #1e293b; display: flex; flex-direction: column; justify-content: space-between; }
-    .badge { display: inline-block; background: rgba(168, 85, 247, 0.15); color: var(--accent); padding: 0.25rem 0.6rem; border-radius: 6px; font-weight: 700; font-size: 0.8rem; margin-bottom: 0.75rem; }
-    .actions { display: flex; gap: 0.75rem; margin-top: 1.25rem; }
-    .btn { text-decoration: none; padding: 0.6rem 1rem; border-radius: 8px; font-weight: 600; font-size: 0.85rem; text-align: center; flex: 1; }
-    .btn.primary { background: var(--accent); color: #ffffff; }
-    .btn.secondary { background: #1e293b; color: var(--text); }
-    details { margin-top: 3rem; background: var(--card); border: 1px solid #1e293b; border-radius: 12px; padding: 1.25rem; }
-    summary { cursor: pointer; font-weight: 700; color: #94a3b8; font-size: 0.95rem; }
-    .archive-list { margin-top: 1rem; display: flex; flex-direction: column; gap: 0.75rem; }
-    .archive-item { display: flex; justify-content: space-between; align-items: center; padding: 0.5rem 0; border-bottom: 1px solid #1e293b; font-size: 0.85rem; }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <header>
-      <div>
-        <h1 style="margin:0; color: var(--accent);">VANCE // AUTONOMOUS LAB</h1>
-        <p style="margin:0.25rem 0 0; color:#94a3b8;">Daily JLPT News Dossiers & Zero-Cloud Offline Utilities</p>
-      </div>
-      <div>
-        <a href="../index.html" class="arcade-link">&larr; Return to Creative Arcade</a>
-      </div>
-    </header>
+function rebuildAllStorefronts() {
+  console.log('[VANCE] Assembling Federated Storefronts...');
+  const allAssets = [...state.deployed_assets, ...state.autonomous_lab_assets];
 
-    <div class="grid">
-      ${showcase.map(renderCard).join('\n') || '<p style="color:#64748b;">The Lab is formulating its daily dossier...</p>'}
-    </div>
+  // 1. Filter Pod Assets
+  const arcadeItems = allAssets.filter(a => a.pod === 'arcade' || a.type === 'arcade_cartridge');
+  const tacticalItems = allAssets.filter(a => a.pod === 'tactical' || a.slug === 'jlpt-mastery-console');
+  const utilityItems = allAssets.filter(a => (a.pod === 'utility' || a.type === 'autonomous_utility' || a.type === 'utility') && a.slug !== 'jlpt-mastery-console');
+  const newsItems = allAssets.filter(a => a.pod === 'news' || a.type === 'news_dossier');
 
-    ${archived.length > 0 ? `
-    <details>
-      <summary>View Lab Archives (${archived.length} earlier editions)</summary>
-      <div class="archive-list">
-        ${archived.map(a => `
-          <div class="archive-item">
-            <div>
-              <strong>${a.name}</strong> &mdash; <span style="color:#64748b;">${a.tagline}</span>
-            </div>
-            <div>
-              <a href="${a.web_url}" style="color:var(--accent); text-decoration:none; margin-right:12px;">Launch</a>
-              <a href="${a.checkout_url}" style="color:#38bdf8; text-decoration:none;">Buy ($${(a.price_cents / 100).toFixed(0)})</a>
-            </div>
-          </div>
-        `).join('')}
-      </div>
-    </details>
-    ` : ''}
+  // Helper to compile a pod
+  const compilePod = (shellName, outputDir, items) => {
+    const templatePath = path.join(TEMPLATES_DIR, shellName);
+    if (!fs.existsSync(templatePath)) return;
+    let html = fs.readFileSync(templatePath, 'utf8');
+    const cards = items.map(renderCard).join('\n') || '<p style="color:#64748b; font-size:0.85rem;">No items staged in this pod yet.</p>';
+    html = html.replace(
+      /<!-- \[POD-ROSTER-START\] -->[\s\S]*?<!-- \[POD-ROSTER-END\] -->/,
+      `<!-- [POD-ROSTER-START] -->\n<div class="grid">\n${cards}\n</div>\n<!-- [POD-ROSTER-END] -->`
+    );
+    fs.mkdirSync(outputDir, { recursive: true });
+    fs.writeFileSync(path.join(outputDir, 'index.html'), html, 'utf8');
+  };
 
-    <footer style="margin-top:3rem; font-size:0.8rem; color:#64748b; text-align:center;">
-      Autonomous Node Vance &middot; Self-synthesizing daily news dossiers & utilities
-    </footer>
-  </div>
-</body>
-</html>`;
+  // Compile the 4 Pod sub-sites
+  compilePod('arcade-shell.html', './arcade', arcadeItems);
+  compilePod('tactical-shell.html', './tactical', tacticalItems);
+  compilePod('utility-shell.html', './utility', utilityItems);
+  compilePod('news-shell.html', './news', newsItems);
 
-  fs.writeFileSync('./lab/index.html', html, 'utf8');
+  // 2. Compile Master Umbrella Portal (Root index.html)
+  const hubTemplatePath = path.join(TEMPLATES_DIR, 'hub-shell.html');
+  if (fs.existsSync(hubTemplatePath)) {
+    let hubHtml = fs.readFileSync(hubTemplatePath, 'utf8');
+    hubHtml = hubHtml
+      .replace('__COUNT_ARCADE__', arcadeItems.length)
+      .replace('__COUNT_TACTICAL__', tacticalItems.length)
+      .replace('__COUNT_UTILITY__', utilityItems.length)
+      .replace('__COUNT_NEWS__', newsItems.length);
+    fs.writeFileSync('./index.html', hubHtml, 'utf8');
+    console.log('[VANCE] Master Portal (index.html) successfully recompiled.');
+  }
 }
 
 // ---------------------------------------------------------------------
-// 6. MAIN ENGINE RUNNER
+// 7. INGEST STAGED ARTIFACTS
 // ---------------------------------------------------------------------
-async function run() {
-  await syncStripeTelemetry();
+async function ingestStagedArtifacts() {
+  const stagingMappings = [
+    { dir: './staging/arcade', pod: 'arcade', hubUrl: '../arcade/index.html', hubName: "JAE & Corvus' Arcade" },
+    { dir: './staging/tactical', pod: 'tactical', hubUrl: '../tactical/index.html', hubName: 'Tactical Japanese Mastery' },
+    { dir: './staging/utility', pod: 'utility', hubUrl: '../utility/index.html', hubName: 'The Utility Belt' }
+  ];
 
-  // 1. Process manually staged creations (Store A)
-  for (const item of state.catalog_manifest) {
-    if (fs.existsSync(item.source_file)) {
-      console.log(`[VANCE] Detected staged artifact: ${item.source_file}`);
-      const rawHtml = fs.readFileSync(item.source_file, 'utf8');
-      const targetRedirectUrl = `${state.agent_identity.storefront_url}products/${item.slug}/?pro=unlocked`;
-      const stripeData = await getOrCreateStripeLink(item, targetRedirectUrl);
-      const packagedHtml = packageHtml(rawHtml, item, stripeData.checkout_url, '../../index.html', 'The Arcade');
+  for (const mapping of stagingMappings) {
+    if (!fs.existsSync(mapping.dir)) continue;
+    const files = fs.readdirSync(mapping.dir).filter(f => f.endsWith('.html'));
 
-      const targetDir = path.join(state.pipeline_policy.products_dir, item.slug);
+    for (const file of files) {
+      const slug = path.basename(file, '.html');
+      const sourceFile = path.join(mapping.dir, file);
+      console.log(`[VANCE] Ingesting staged artifact from ${sourceFile}...`);
+
+      const manifestEntry = state.catalog_manifest.find(m => m.slug === slug) || {
+        slug: slug,
+        name: slug.split('-').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' '),
+        tagline: 'Handcrafted standalone local-first release.',
+        price_cents: 300
+      };
+
+      const rawHtml = fs.readFileSync(sourceFile, 'utf8');
+      const targetRedirectUrl = `${state.agent_identity.storefront_url}products/${slug}/?pro=unlocked`;
+      const stripeData = await getOrCreateStripeLink(manifestEntry, targetRedirectUrl);
+      const packagedHtml = packageHtml(rawHtml, { ...manifestEntry, pod: mapping.pod }, stripeData.checkout_url, mapping.hubUrl, mapping.hubName);
+
+      const targetDir = path.join(PRODUCTS_DIR, slug);
       fs.mkdirSync(targetDir, { recursive: true });
       fs.writeFileSync(path.join(targetDir, 'index.html'), packagedHtml, 'utf8');
 
       const assetRecord = {
-        slug: item.slug,
-        type: item.type,
-        name: item.name,
-        tagline: item.tagline,
-        price_cents: item.price_cents,
-        web_url: `./products/${item.slug}/`,
+        slug: slug,
+        pod: mapping.pod,
+        name: manifestEntry.name,
+        tagline: manifestEntry.tagline,
+        price_cents: manifestEntry.price_cents,
+        web_url: `../products/${slug}/`,
         checkout_url: stripeData.checkout_url,
         stripe_product_id: stripeData.product_id,
         deployed_at: new Date().toISOString()
       };
 
-      const existingIdx = state.deployed_assets.findIndex(a => a && a.slug === item.slug);
+      const existingIdx = state.deployed_assets.findIndex(a => a && a.slug === slug);
       if (existingIdx >= 0) {
         state.deployed_assets[existingIdx] = assetRecord;
       } else {
         state.deployed_assets.push(assetRecord);
       }
-      item.status = 'deployed';
+      manifestEntry.status = 'deployed';
+      console.log(`[VANCE] Deployed ${slug} to pod: ${mapping.pod}`);
     }
   }
+}
 
-  // 2. Synthesize & Deploy Today's Japanese News Dossier (Store B)
-  await synthesizeDailyDossier();
+// ---------------------------------------------------------------------
+// 8. MAIN ENGINE RUNNER
+// ---------------------------------------------------------------------
+async function run() {
+  await syncStripeTelemetry();
 
-  // 3. Assemble both storefronts
-  rebuildStoreA();
-  rebuildStoreB();
+  if (ACTION === 'delete') {
+    await deleteAsset(TARGET_SLUG);
+  } else {
+    // 1. Ingest staged artifacts across pods
+    await ingestStagedArtifacts();
+
+    // 2. Synthesize today's Japanese Today Commute Dossier
+    await synthesizeDailyDossier();
+  }
+
+  // 3. Assemble all storefronts
+  rebuildAllStorefronts();
 
   fs.writeFileSync(STATE_PATH, JSON.stringify(state, null, 2), 'utf8');
   console.log('[VANCE] Full cycle complete.');
