@@ -81,14 +81,14 @@
   "deployed_assets": [
     {
       "slug": "jlpt-mastery-console",
-      "type": "utility",
+      "pod": "tactical",
       "name": "JLPT N5–N1 Complete Tactical Study Console",
       "tagline": "Full N5 through N1 offline study console with Web Speech TTS, ruby furigana, romaji toggle, and 60-second speed drills.",
       "price_cents": 800,
-      "web_url": "./products/jlpt-mastery-console/",
-      "checkout_url": "",
+      "web_url": "../products/jlpt-mastery-console/",
+      "checkout_url": "https://buy.stripe.com/00w6oI5X638R6PGgzn0Ny0y",
       "stripe_product_id": "prod_VY4vYcVBFLxm1C",
-      "deployed_at": "2026-11-03T02:19:23.513Z"
+      "deployed_at": "2026-11-04T20:55:26.897Z"
     },
     {
       "slug": "pixel-bistro",
@@ -97,9 +97,9 @@
       "tagline": "A fast-paced 16-bit culinary arcade cartridge. Cook, plate, and serve against the kitchen clock.",
       "price_cents": 300,
       "web_url": "../products/pixel-bistro/",
-      "checkout_url": "https://buy.stripe.com/dRmcN685efVD1vmgzn0Ny0w",
+      "checkout_url": "https://buy.stripe.com/cNi6oI5X6cJrb5W2Ix0Ny0x",
       "stripe_product_id": "prod_VYhfWypZhn8l5T",
-      "deployed_at": "2026-11-04T20:46:19.235Z"
+      "deployed_at": "2026-11-04T20:55:25.488Z"
     }
   ],
   "execution_log": [
