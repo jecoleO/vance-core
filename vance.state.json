@@ -21,7 +21,7 @@
       "tier_1_survival": 30,
       "tier_2_ultra": 150
     },
-    "last_synced": "2026-11-03",
+    "last_synced": "2026-11-04",
     "lifetime_pass_url": "https://buy.stripe.com/7sYcN61GQ24N7TK6YN0Ny0f",
     "lifetime_price_id": "price_1UXeysLAgkJy5FcEmGzIhj1M",
     "lifetime_product_id": "prod_VYmXLA015b3x9r"
@@ -97,12 +97,13 @@
       "tagline": "A fast-paced 16-bit culinary arcade cartridge. Cook, plate, and serve against the kitchen clock.",
       "price_cents": 300,
       "web_url": "../products/pixel-bistro/",
-      "checkout_url": "https://buy.stripe.com/bJefZi4T26l35LC4QF0Ny0n",
+      "checkout_url": "https://buy.stripe.com/bJecN63OY4cVb5Wcj70Ny0q",
       "stripe_product_id": "prod_VYhfWypZhn8l5T",
-      "deployed_at": "2026-11-03T13:03:37.450Z"
+      "deployed_at": "2026-11-04T01:39:24.178Z"
     }
   ],
   "execution_log": [
+    "2026-11-04: Deployed World News Japanese: Ratio of Cashless Payments in Japan Exceeds 40% for the First Time (N3)",
     "2026-11-03: Deployed World News Japanese: New smartphones are popular (N5)",
     "2026-11-03: Deployed World News Japanese: Smartphone Payments Increasing in Japanese Supermarkets (N4)",
     "2026-11-03: Deployed World News Japanese: Hotel with Robot Staff Opens Anew (N4)",
@@ -124,6 +125,20 @@
     "2026-11-01: Staging ingest established for utilities and Substack creative arcade experiments."
   ],
   "autonomous_lab_assets": [
+    {
+      "slug": "news-n3-cashless-shopping-trend",
+      "pod": "news",
+      "type": "news_dossier",
+      "level": "N3",
+      "name": "World News Japanese: Ratio of Cashless Payments in Japan Exceeds 40% for the First Time (N3)",
+      "tagline": "Wednesday Commute Edition &bull; 25-Word Match, 5 Grammar Cloze & Reading Check.",
+      "price_cents": 200,
+      "revenue_cents": 0,
+      "web_url": "../products/news-n3-cashless-shopping-trend/",
+      "checkout_url": "https://buy.stripe.com/eVq4gAetC38R8XOdnb0Ny0r",
+      "stripe_product_id": "prod_VZ1DORky0meJ7T",
+      "invented_at": "2026-11-04T01:39:38.244Z"
+    },
     {
       "slug": "news-n5-smartphone-popularity",
       "pod": "news",
