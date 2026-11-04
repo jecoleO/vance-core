@@ -97,12 +97,13 @@
       "tagline": "A fast-paced 16-bit culinary arcade cartridge. Cook, plate, and serve against the kitchen clock.",
       "price_cents": 300,
       "web_url": "../products/pixel-bistro/",
-      "checkout_url": "https://buy.stripe.com/bJecN63OY4cVb5Wcj70Ny0q",
+      "checkout_url": "https://buy.stripe.com/8x2bJ20CMgZH3Du82R0Ny0s",
       "stripe_product_id": "prod_VYhfWypZhn8l5T",
-      "deployed_at": "2026-11-04T01:39:24.178Z"
+      "deployed_at": "2026-11-04T02:02:09.316Z"
     }
   ],
   "execution_log": [
+    "2026-11-04: Deployed World News Japanese: Japan's Cashless Payments Exceed 50% (N3)",
     "2026-11-04: Deployed World News Japanese: Ratio of Cashless Payments in Japan Exceeds 40% for the First Time (N3)",
     "2026-11-03: Deployed World News Japanese: New smartphones are popular (N5)",
     "2026-11-03: Deployed World News Japanese: Smartphone Payments Increasing in Japanese Supermarkets (N4)",
@@ -125,6 +126,20 @@
     "2026-11-01: Staging ingest established for utilities and Substack creative arcade experiments."
   ],
   "autonomous_lab_assets": [
+    {
+      "slug": "news-n3-cashless-payment-trend",
+      "pod": "news",
+      "type": "news_dossier",
+      "level": "N3",
+      "name": "World News Japanese: Japan's Cashless Payments Exceed 50% (N3)",
+      "tagline": "Wednesday Commute Edition &bull; 25-Word Match, 5 Grammar Cloze & Reading Check.",
+      "price_cents": 200,
+      "revenue_cents": 0,
+      "web_url": "../products/news-n3-cashless-payment-trend/",
+      "checkout_url": "https://buy.stripe.com/14AaEYbhqcJrfmcaaZ0Ny0t",
+      "stripe_product_id": "prod_VZ1arftI257Mlu",
+      "invented_at": "2026-11-04T02:02:21.892Z"
+    },
     {
       "slug": "news-n3-cashless-shopping-trend",
       "pod": "news",
