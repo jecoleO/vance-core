@@ -878,6 +878,14 @@ async function ingestStagedArtifacts(lifetimeUrl) {
 // ---------------------------------------------------------------------
 async function run() {
   console.log(`[VANCE-OPS] Action: "${ACTION}" | Target Level: "${TARGET_LEVEL}"`);
+
+  // Fast read-only exit for catalog audit (skips Stripe and builds)
+  if (ACTION === 'audit' || ACTION === 'list') {
+    await auditInventory();
+    console.log('[VANCE-OPS] Audit complete. Exiting cleanly.');
+    return;
+  }
+
   await syncStripeTelemetry();
 
   // 1. Verify or provision the $30 All-Access Lifetime Supporter Link
