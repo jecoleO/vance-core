@@ -125,6 +125,7 @@
     }
   ],
   "execution_log": [
+    "2026-11-05: Deployed World News Japanese: Japanese Office Culture Changing with the Establishment of Remote Work (N2)",
     "2026-11-04: Deployed World News Japanese: Japan's Cashless Payments Exceed 50% (N3)",
     "2026-11-04: Deployed World News Japanese: Ratio of Cashless Payments in Japan Exceeds 40% for the First Time (N3)",
     "2026-11-03: Deployed World News Japanese: New smartphones are popular (N5)",
@@ -148,6 +149,20 @@
     "2026-11-01: Staging ingest established for utilities and Substack creative arcade experiments."
   ],
   "autonomous_lab_assets": [
+    {
+      "slug": "news-n2-remote-work-culture",
+      "pod": "news",
+      "type": "news_dossier",
+      "level": "N2",
+      "name": "World News Japanese: Japanese Office Culture Changing with the Establishment of Remote Work (N2)",
+      "tagline": "Thursday Commute Edition &bull; 25-Word Match, 5 Grammar Cloze & Reading Check.",
+      "price_cents": 200,
+      "revenue_cents": 0,
+      "web_url": "../products/news-n2-remote-work-culture/",
+      "checkout_url": "https://buy.stripe.com/9B6dRagBK4cV4Hy82R0Ny0I",
+      "stripe_product_id": "prod_VZQCq4eBWziXt7",
+      "invented_at": "2026-11-05T03:28:50.612Z"
+    },
     {
       "slug": "news-n3-cashless-payment-trend",
       "pod": "news",
