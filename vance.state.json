@@ -21,7 +21,7 @@
       "tier_1_survival": 30,
       "tier_2_ultra": 150
     },
-    "last_synced": "2026-11-04",
+    "last_synced": "2026-11-05",
     "lifetime_pass_url": "https://buy.stripe.com/7sYcN61GQ24N7TK6YN0Ny0f",
     "lifetime_price_id": "price_1UXeysLAgkJy5FcEmGzIhj1M",
     "lifetime_product_id": "prod_VYmXLA015b3x9r"
@@ -86,9 +86,9 @@
       "tagline": "Handcrafted standalone local-first release.",
       "price_cents": 200,
       "web_url": "../products/Day-2/",
-      "checkout_url": "https://buy.stripe.com/aFa9AUadmgZH6PG96V0Ny0C",
+      "checkout_url": "https://buy.stripe.com/bJe14o4T2eRz7TKerf0Ny0G",
       "stripe_product_id": "prod_VZK1ryTXKjLRWZ",
-      "deployed_at": "2026-11-04T21:05:55.634Z"
+      "deployed_at": "2026-11-05T02:05:00.413Z"
     },
     {
       "slug": "Day-1",
@@ -97,9 +97,9 @@
       "tagline": "Handcrafted standalone local-first release.",
       "price_cents": 200,
       "web_url": "../products/Day-1/",
-      "checkout_url": "https://buy.stripe.com/fZubJ2fxGaBj8XO4QF0Ny0B",
+      "checkout_url": "https://buy.stripe.com/28E28s85e5gZgqgfvj0Ny0F",
       "stripe_product_id": "prod_VZJyJ5DZsB0mr6",
-      "deployed_at": "2026-11-04T21:05:54.805Z"
+      "deployed_at": "2026-11-05T02:04:59.323Z"
     },
     {
       "slug": "jlpt-mastery-console",
@@ -108,9 +108,9 @@
       "tagline": "Full N5 through N1 offline study console with Web Speech TTS, ruby furigana, romaji toggle, and 60-second speed drills.",
       "price_cents": 800,
       "web_url": "../products/jlpt-mastery-console/",
-      "checkout_url": "https://buy.stripe.com/cNi5kE4T2cJr6PG3MB0Ny0D",
+      "checkout_url": "https://buy.stripe.com/aFa8wQdpy5gZa1S3MB0Ny0H",
       "stripe_product_id": "prod_VY4vYcVBFLxm1C",
-      "deployed_at": "2026-11-04T21:05:56.471Z"
+      "deployed_at": "2026-11-05T02:05:01.516Z"
     },
     {
       "slug": "pixel-bistro",
@@ -119,9 +119,9 @@
       "tagline": "A fast-paced 16-bit culinary arcade cartridge. Cook, plate, and serve against the kitchen clock.",
       "price_cents": 300,
       "web_url": "../products/pixel-bistro/",
-      "checkout_url": "https://buy.stripe.com/eVq7sMclu24Na1S3MB0Ny0A",
+      "checkout_url": "https://buy.stripe.com/dRm5kEclu10Jb5W82R0Ny0E",
       "stripe_product_id": "prod_VYhfWypZhn8l5T",
-      "deployed_at": "2026-11-04T21:05:54.040Z"
+      "deployed_at": "2026-11-05T02:04:58.236Z"
     }
   ],
   "execution_log": [
