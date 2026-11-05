@@ -514,6 +514,80 @@ Output JSON ONLY matching this format:
 }
 
 // ---------------------------------------------------------------------
+// 4.5. AUDIT & INVENTORY ENGINE
+// ---------------------------------------------------------------------
+async function auditInventory() {
+  console.log('[VANCE-AUDIT] Scanning catalog state and physical disk...');
+
+  const allStateAssets = [
+    ...(state.autonomous_lab_assets || []),
+    ...(state.deployed_assets || [])
+  ];
+
+  let onDiskFolders = [];
+  if (fs.existsSync(PRODUCTS_DIR)) {
+    onDiskFolders = fs.readdirSync(PRODUCTS_DIR).filter(f => {
+      try {
+        return fs.statSync(path.join(PRODUCTS_DIR, f)).isDirectory();
+      } catch (e) {
+        return false;
+      }
+    });
+  }
+
+  const allSlugs = Array.from(new Set([
+    ...allStateAssets.map(a => a.slug),
+    ...onDiskFolders
+  ])).filter(Boolean).sort();
+
+  const inventory = allSlugs.map(slug => {
+    const record = allStateAssets.find(a => a.slug === slug);
+    const onDisk = onDiskFolders.includes(slug);
+    const pod = record?.pod || (slug.startsWith('news-') ? 'news' : slug.startsWith('day-') ? 'tactical' : 'arcade');
+    const name = record?.name || record?.title || slug;
+    const price = record?.price_cents ? `$${(record.price_cents / 100).toFixed(2)}` : '$2.00 (PWYW)';
+    const stripeActive = record?.stripe_product_id ? 'Yes' : 'No';
+
+    return { slug, pod, name, onDisk, stripeActive, price };
+  });
+
+  // Build GitHub Actions Step Summary Markdown
+  const pods = ['news', 'tactical', 'arcade', 'utility'];
+  let markdown = `## 📋 Vance-Core Catalog Inventory (${inventory.length} total items)\n\n`;
+  markdown += `*Generated: ${new Date().toUTCString()}*\n\n`;
+
+  for (const pod of pods) {
+    const items = inventory.filter(i => i.pod === pod);
+    if (items.length === 0) continue;
+
+    markdown += `### Pod: \`/${pod}/\` (${items.length} items)\n\n`;
+    markdown += `| Slug | Display Name | Disk | Stripe | Price |\n`;
+    markdown += `| :--- | :--- | :---: | :---: | :---: |\n`;
+    items.forEach(i => {
+      markdown += `| \`${i.slug}\` | ${i.name} | ${i.onDisk ? '✅' : '❌'} | ${i.stripeActive === 'Yes' ? '✅' : '—'} | ${i.price} |\n`;
+    });
+    markdown += `\n`;
+
+    const podSlugs = items.map(i => i.slug).join(', ');
+    markdown += `> **Copy-paste all \`${pod}\` slugs:**\n> \`\`\`text\n> ${podSlugs}\n> \`\`\`\n\n`;
+  }
+
+  // Print formatted terminal table
+  console.log('\n=================== CURRENT VANCE INVENTORY ===================');
+  inventory.forEach(i => {
+    console.log(`[${i.pod.padEnd(8)}] ${i.slug.padEnd(30)} | Disk: ${i.onDisk ? 'YES' : 'NO '} | Stripe: ${i.stripeActive.padEnd(3)} | ${i.name}`);
+  });
+  console.log('=================================================================\n');
+
+  // Write to GitHub Actions UI if running on CI
+  const summaryPath = process.env.GITHUB_STEP_SUMMARY;
+  if (summaryPath) {
+    fs.appendFileSync(summaryPath, markdown);
+    console.log('[VANCE-AUDIT] Inventory written to GitHub Actions Job Summary.');
+  }
+}
+
+// ---------------------------------------------------------------------
 // 5. CLEANUP & DELETE
 // ---------------------------------------------------------------------
 async function deleteAsset(targetSlug) {
