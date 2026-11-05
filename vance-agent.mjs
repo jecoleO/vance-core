@@ -309,7 +309,7 @@ function scrubAndApplyUniversalHarness(filePath, item, lifetimeUrl) {
 }
 
 // ---------------------------------------------------------------------
-// 3. GEMINI CASCADE INFERENCE
+// 3. GEMINI CASCADE INFERENCE (VALIDATED JSON STREAMING)
 // ---------------------------------------------------------------------
 async function callGemini(prompt, isJson = false, timeoutMs = 90000) {
   const modelCascade = [
@@ -326,7 +326,7 @@ async function callGemini(prompt, isJson = false, timeoutMs = 90000) {
       contents: [{ parts: [{ text: prompt }] }],
       generationConfig: {
         temperature: isJson ? 0.2 : 0.3,
-        maxOutputTokens: 6000
+        maxOutputTokens: 8192 // Expanded to prevent truncation on N2/N1 payloads
       }
     };
 
@@ -361,8 +361,29 @@ async function callGemini(prompt, isJson = false, timeoutMs = 90000) {
       }
 
       const data = JSON.parse(raw);
-      const text = data.candidates?.[0]?.content?.parts?.[0]?.text?.trim() || '';
-      if (!text) continue;
+      const candidate = data.candidates?.[0];
+      const finishReason = candidate?.finishReason;
+      const text = candidate?.content?.parts?.[0]?.text?.trim() || '';
+
+      if (!text) {
+        console.warn(`[VANCE-AI] ${model} returned empty content. Cascading...`);
+        continue;
+      }
+
+      if (finishReason === 'MAX_TOKENS') {
+        console.warn(`[VANCE-AI] ${model} hit MAX_TOKENS limit (output truncated). Cascading...`);
+        continue;
+      }
+
+      // Pre-validate JSON integrity before exiting cascade loop
+      if (isJson) {
+        try {
+          JSON.parse(text);
+        } catch (jsonErr) {
+          console.warn(`[VANCE-AI] ${model} output failed JSON parsing (${jsonErr.message}). Cascading...`);
+          continue;
+        }
+      }
 
       return text;
     } catch (err) {
@@ -414,7 +435,7 @@ async function synthesizeDailyDossier(lifetimeUrl, requestedLevel = 'auto') {
 
   const prompt = `
 You are a senior Japanese news editor and curriculum designer writing for adults learning Japanese.
-Generate an authentic news story and study dossier for JLPT Level ${spec.level}.
+Generate an authentic news story and study dossier for JLPT Level ${spec.level}. Keep explanations concise to avoid payload overflow.
 Output JSON ONLY matching this format:
 {
   "edition_slug": "news-${spec.level.toLowerCase()}-[kebab-slug]",
@@ -427,9 +448,9 @@ Output JSON ONLY matching this format:
     "translation_en": "English translation..."
   },
   "vocabulary_25": [ { "id": "v1", "category": "General", "word": "漢字", "kana": "かんじ", "en": "kanji", "type": "Noun" } ],
-  "grammar_5": [ { "id": "g1", "pattern": "〜によって", "formation": "Noun + によって", "meaning": "due to / by means of", "nuance": "Formal", "sentence_jp": "...", "sentence_furi": "...", "sentence_en": "...", "breakdown": "..." } ],
-  "grammar_quiz_10": [ { "id": 1, "prompt": "Sentence [ ? ]", "translation": "...", "options": ["に", "で", "を", "へ"], "correct": "に", "explanation": "..." } ],
-  "comprehension_quiz_5": [ { "id": "rc1", "question_jp": "...", "question_en": "...", "options": ["A", "B", "C", "D"], "correct": 0, "explanation": "..." } ]
+  "grammar_5": [ { "id": "g1", "pattern": "〜によって", "formation": "Noun + によって", "meaning": "due to / by means of", "nuance": "Formal", "sentence_jp": "...", "sentence_furi": "...", "sentence_en": "...", "breakdown": "Brief breakdown" } ],
+  "grammar_quiz_10": [ { "id": 1, "prompt": "Sentence [ ? ]", "translation": "...", "options": ["に", "で", "を", "へ"], "correct": "に", "explanation": "Brief reason" } ],
+  "comprehension_quiz_5": [ { "id": "rc1", "question_jp": "...", "question_en": "...", "options": ["A", "B", "C", "D"], "correct": 0, "explanation": "Brief reason" } ]
 }`;
 
   try {
