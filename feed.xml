@@ -5,43 +5,50 @@
   <link>https://jecoleo.github.io/vance-core/</link>
   <description>Autonomous zero-dependency software, retro arcade cartridges, and daily Japanese commute dossiers.</description>
   <language>en-us</language>
-  <lastBuildDate>Thu, 05 Nov 2026 21:07:07 GMT</lastBuildDate>
+  <lastBuildDate>Fri, 06 Nov 2026 02:06:59 GMT</lastBuildDate>
   <atom:link href="https://jecoleo.github.io/vance-core/feed.xml" rel="self" type="application/rss+xml" />
   
       <item>
         <title><![CDATA[Day 3]]></title>
         <link>https://jecoleo.github.io/vance-core/products/Day-3/</link>
         <guid isPermaLink="true">https://jecoleo.github.io/vance-core/products/Day-3/</guid>
-        <pubDate>Thu, 05 Nov 2026 21:07:06 GMT</pubDate>
+        <pubDate>Fri, 06 Nov 2026 02:06:43 GMT</pubDate>
         <description><![CDATA[Handcrafted standalone local-first release.]]></description>
       </item>
       <item>
         <title><![CDATA[Day 2]]></title>
         <link>https://jecoleo.github.io/vance-core/products/Day-2/</link>
         <guid isPermaLink="true">https://jecoleo.github.io/vance-core/products/Day-2/</guid>
-        <pubDate>Thu, 05 Nov 2026 21:07:05 GMT</pubDate>
+        <pubDate>Fri, 06 Nov 2026 02:06:42 GMT</pubDate>
         <description><![CDATA[Handcrafted standalone local-first release.]]></description>
       </item>
       <item>
         <title><![CDATA[Day 1]]></title>
         <link>https://jecoleo.github.io/vance-core/products/Day-1/</link>
         <guid isPermaLink="true">https://jecoleo.github.io/vance-core/products/Day-1/</guid>
-        <pubDate>Thu, 05 Nov 2026 21:07:04 GMT</pubDate>
+        <pubDate>Fri, 06 Nov 2026 02:06:41 GMT</pubDate>
         <description><![CDATA[Handcrafted standalone local-first release.]]></description>
       </item>
       <item>
         <title><![CDATA[JLPT N5–N1 Complete Tactical Study Console]]></title>
         <link>https://jecoleo.github.io/vance-core/products/jlpt-mastery-console/</link>
         <guid isPermaLink="true">https://jecoleo.github.io/vance-core/products/jlpt-mastery-console/</guid>
-        <pubDate>Thu, 05 Nov 2026 21:07:07 GMT</pubDate>
+        <pubDate>Fri, 06 Nov 2026 02:06:44 GMT</pubDate>
         <description><![CDATA[Full N5 through N1 offline study console with Web Speech TTS, ruby furigana, romaji toggle, and 60-second speed drills.]]></description>
       </item>
       <item>
         <title><![CDATA[Pixel Bistro: Cyber Diner Rush]]></title>
         <link>https://jecoleo.github.io/vance-core/products/pixel-bistro/</link>
         <guid isPermaLink="true">https://jecoleo.github.io/vance-core/products/pixel-bistro/</guid>
-        <pubDate>Thu, 05 Nov 2026 21:07:03 GMT</pubDate>
+        <pubDate>Fri, 06 Nov 2026 02:06:39 GMT</pubDate>
         <description><![CDATA[A fast-paced 16-bit culinary arcade cartridge. Cook, plate, and serve against the kitchen clock.]]></description>
+      </item>
+      <item>
+        <title><![CDATA[World News Japanese: Government to Introduce Digital Nomad Visa: Anticipation and Concerns Over Economic Impact (N1)]]></title>
+        <link>https://jecoleo.github.io/vance-core/products/news-n1-digital-nomad-visa/</link>
+        <guid isPermaLink="true">https://jecoleo.github.io/vance-core/products/news-n1-digital-nomad-visa/</guid>
+        <pubDate>Fri, 06 Nov 2026 02:06:59 GMT</pubDate>
+        <description><![CDATA[Friday Commute Edition &bull; 25-Word Match, 5 Grammar Cloze & Reading Check.]]></description>
       </item>
       <item>
         <title><![CDATA[World News Japanese: Japanese Office Culture Changing with the Establishment of Remote Work (N2)]]></title>
@@ -139,13 +146,6 @@
         <link>https://jecoleo.github.io/vance-core/products/news-n4-hokuriku-shinkansen-extension/</link>
         <guid isPermaLink="true">https://jecoleo.github.io/vance-core/products/news-n4-hokuriku-shinkansen-extension/</guid>
         <pubDate>Tue, 03 Nov 2026 04:21:55 GMT</pubDate>
-        <description><![CDATA[Tuesday Commute Edition &bull; 25-Word Match, 5 Grammar Cloze & Reading Check.]]></description>
-      </item>
-      <item>
-        <title><![CDATA[World News Japanese: Food festival celebrating regional traditional dishes opens in Tokyo (N4)]]></title>
-        <link>https://jecoleo.github.io/vance-core/products/news-n4-regional-cuisine-festival/</link>
-        <guid isPermaLink="true">https://jecoleo.github.io/vance-core/products/news-n4-regional-cuisine-festival/</guid>
-        <pubDate>Tue, 03 Nov 2026 05:27:52 GMT</pubDate>
         <description><![CDATA[Tuesday Commute Edition &bull; 25-Word Match, 5 Grammar Cloze & Reading Check.]]></description>
       </item>
 </channel>

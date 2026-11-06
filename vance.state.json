@@ -21,7 +21,7 @@
       "tier_1_survival": 30,
       "tier_2_ultra": 150
     },
-    "last_synced": "2026-11-05",
+    "last_synced": "2026-11-06",
     "lifetime_pass_url": "https://buy.stripe.com/7sYcN61GQ24N7TK6YN0Ny0f",
     "lifetime_price_id": "price_1UXeysLAgkJy5FcEmGzIhj1M",
     "lifetime_product_id": "prod_VYmXLA015b3x9r"
@@ -86,9 +86,9 @@
       "tagline": "Handcrafted standalone local-first release.",
       "price_cents": 200,
       "web_url": "../products/Day-3/",
-      "checkout_url": "https://buy.stripe.com/9B6cN61GQ5gZ8XO82R0Ny0M",
+      "checkout_url": "https://buy.stripe.com/bJeeVe0CM24N5LCbf30Ny0R",
       "stripe_product_id": "prod_VZhGtrgBerrFg6",
-      "deployed_at": "2026-11-05T21:07:06.464Z"
+      "deployed_at": "2026-11-06T02:06:43.370Z"
     },
     {
       "slug": "Day-2",
@@ -97,9 +97,9 @@
       "tagline": "Handcrafted standalone local-first release.",
       "price_cents": 200,
       "web_url": "../products/Day-2/",
-      "checkout_url": "https://buy.stripe.com/7sY00k5X6cJr7TK3MB0Ny0L",
+      "checkout_url": "https://buy.stripe.com/cNi28sdpy24Nb5Wfvj0Ny0Q",
       "stripe_product_id": "prod_VZK1ryTXKjLRWZ",
-      "deployed_at": "2026-11-05T21:07:05.262Z"
+      "deployed_at": "2026-11-06T02:06:42.262Z"
     },
     {
       "slug": "Day-1",
@@ -108,9 +108,9 @@
       "tagline": "Handcrafted standalone local-first release.",
       "price_cents": 200,
       "web_url": "../products/Day-1/",
-      "checkout_url": "https://buy.stripe.com/14A6oI3OYeRza1Serf0Ny0K",
+      "checkout_url": "https://buy.stripe.com/eVqfZi0CMaBjde4gzn0Ny0P",
       "stripe_product_id": "prod_VZJyJ5DZsB0mr6",
-      "deployed_at": "2026-11-05T21:07:04.128Z"
+      "deployed_at": "2026-11-06T02:06:41.171Z"
     },
     {
       "slug": "jlpt-mastery-console",
@@ -119,9 +119,9 @@
       "tagline": "Full N5 through N1 offline study console with Web Speech TTS, ruby furigana, romaji toggle, and 60-second speed drills.",
       "price_cents": 800,
       "web_url": "../products/jlpt-mastery-console/",
-      "checkout_url": "https://buy.stripe.com/4gMfZi4T2eRz1vmfvj0Ny0N",
+      "checkout_url": "https://buy.stripe.com/8x2aEYclugZHfmc0Ap0Ny0S",
       "stripe_product_id": "prod_VY4vYcVBFLxm1C",
-      "deployed_at": "2026-11-05T21:07:07.528Z"
+      "deployed_at": "2026-11-06T02:06:44.472Z"
     },
     {
       "slug": "pixel-bistro",
@@ -130,12 +130,13 @@
       "tagline": "A fast-paced 16-bit culinary arcade cartridge. Cook, plate, and serve against the kitchen clock.",
       "price_cents": 300,
       "web_url": "../products/pixel-bistro/",
-      "checkout_url": "https://buy.stripe.com/4gMeVe99ibFn6PGcj70Ny0J",
+      "checkout_url": "https://buy.stripe.com/cNi00kclu24N6PGgzn0Ny0O",
       "stripe_product_id": "prod_VYhfWypZhn8l5T",
-      "deployed_at": "2026-11-05T21:07:03.128Z"
+      "deployed_at": "2026-11-06T02:06:39.961Z"
     }
   ],
   "execution_log": [
+    "2026-11-06: Deployed World News Japanese: Government to Introduce Digital Nomad Visa: Anticipation and Concerns Over Economic Impact (N1)",
     "2026-11-05: Deployed World News Japanese: Japanese Office Culture Changing with the Establishment of Remote Work (N2)",
     "2026-11-04: Deployed World News Japanese: Japan's Cashless Payments Exceed 50% (N3)",
     "2026-11-04: Deployed World News Japanese: Ratio of Cashless Payments in Japan Exceeds 40% for the First Time (N3)",
@@ -160,6 +161,20 @@
     "2026-11-01: Staging ingest established for utilities and Substack creative arcade experiments."
   ],
   "autonomous_lab_assets": [
+    {
+      "slug": "news-n1-digital-nomad-visa",
+      "pod": "news",
+      "type": "news_dossier",
+      "level": "N1",
+      "name": "World News Japanese: Government to Introduce Digital Nomad Visa: Anticipation and Concerns Over Economic Impact (N1)",
+      "tagline": "Friday Commute Edition &bull; 25-Word Match, 5 Grammar Cloze & Reading Check.",
+      "price_cents": 200,
+      "revenue_cents": 0,
+      "web_url": "../products/news-n1-digital-nomad-visa/",
+      "checkout_url": "https://buy.stripe.com/cNieVe1GQcJr7TKcj70Ny0T",
+      "stripe_product_id": "prod_VZm66rnY0N7EZk",
+      "invented_at": "2026-11-06T02:06:59.437Z"
+    },
     {
       "slug": "news-n2-remote-work-culture",
       "pod": "news",
