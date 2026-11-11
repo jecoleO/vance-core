@@ -21,7 +21,7 @@
       "tier_1_survival": 30,
       "tier_2_ultra": 150
     },
-    "last_synced": "2026-11-10",
+    "last_synced": "2026-11-11",
     "lifetime_pass_url": "https://buy.stripe.com/7sYcN61GQ24N7TK6YN0Ny0f",
     "lifetime_price_id": "price_1UXeysLAgkJy5FcEmGzIhj1M",
     "lifetime_product_id": "prod_VYmXLA015b3x9r"
@@ -86,9 +86,9 @@
       "tagline": "Handcrafted standalone local-first release.",
       "price_cents": 200,
       "web_url": "../products/Day-3/",
-      "checkout_url": "https://buy.stripe.com/5kQ8wQbhqgZH7TKfvj0Ny1f",
+      "checkout_url": "https://buy.stripe.com/4gM4gA4T2gZH8XOaaZ0Ny1k",
       "stripe_product_id": "prod_VZhGtrgBerrFg6",
-      "deployed_at": "2026-11-10T03:59:53.754Z"
+      "deployed_at": "2026-11-11T01:46:01.801Z"
     },
     {
       "slug": "Day-2",
@@ -97,9 +97,9 @@
       "tagline": "Handcrafted standalone local-first release.",
       "price_cents": 200,
       "web_url": "../products/Day-2/",
-      "checkout_url": "https://buy.stripe.com/14A3cwadmfVDfmc0Ap0Ny1e",
+      "checkout_url": "https://buy.stripe.com/bJe7sMdpy9xffmc1Et0Ny1j",
       "stripe_product_id": "prod_VZK1ryTXKjLRWZ",
-      "deployed_at": "2026-11-10T03:59:52.846Z"
+      "deployed_at": "2026-11-11T01:46:01.067Z"
     },
     {
       "slug": "Day-1",
@@ -108,9 +108,9 @@
       "tagline": "Handcrafted standalone local-first release.",
       "price_cents": 200,
       "web_url": "../products/Day-1/",
-      "checkout_url": "https://buy.stripe.com/bJe3cw71agZHei882R0Ny1d",
+      "checkout_url": "https://buy.stripe.com/3cIeVe3OYfVDb5W3MB0Ny1i",
       "stripe_product_id": "prod_VZJyJ5DZsB0mr6",
-      "deployed_at": "2026-11-10T03:59:51.912Z"
+      "deployed_at": "2026-11-11T01:46:00.382Z"
     },
     {
       "slug": "jlpt-mastery-console",
@@ -119,9 +119,9 @@
       "tagline": "Full N5 through N1 offline study console with Web Speech TTS, ruby furigana, romaji toggle, and 60-second speed drills.",
       "price_cents": 800,
       "web_url": "../products/jlpt-mastery-console/",
-      "checkout_url": "https://buy.stripe.com/28E8wQ3OY8tbca0gzn0Ny1g",
+      "checkout_url": "https://buy.stripe.com/cNi4gAetC24N3Duerf0Ny1l",
       "stripe_product_id": "prod_VY4vYcVBFLxm1C",
-      "deployed_at": "2026-11-10T03:59:54.699Z"
+      "deployed_at": "2026-11-11T01:46:02.531Z"
     },
     {
       "slug": "pixel-bistro",
@@ -130,12 +130,13 @@
       "tagline": "A fast-paced 16-bit culinary arcade cartridge. Cook, plate, and serve against the kitchen clock.",
       "price_cents": 300,
       "web_url": "../products/pixel-bistro/",
-      "checkout_url": "https://buy.stripe.com/8x2dRabhq24Nca0erf0Ny1c",
+      "checkout_url": "https://buy.stripe.com/3cI7sM71a38R7TKdnb0Ny1h",
       "stripe_product_id": "prod_VYhfWypZhn8l5T",
-      "deployed_at": "2026-11-10T03:59:50.978Z"
+      "deployed_at": "2026-11-11T01:45:59.619Z"
     }
   ],
   "execution_log": [
+    "2026-11-11: Deployed World News Japanese: Popularity of Umbrella Sharing Services for Sudden Rain (N3)",
     "2026-11-09: Deployed World News Japanese: Smartphones and cameras to be banned at Kyoto temple (N5)",
     "2026-11-08: Deployed World News Japanese: Japan's cashless payment ratio exceeds 40% (N3)",
     "2026-11-07: Deployed World News Japanese: Smart umbrellas linked with weather forecasts gain popularity (N3)",
@@ -164,6 +165,20 @@
     "2026-11-01: Staging ingest established for utilities and Substack creative arcade experiments."
   ],
   "autonomous_lab_assets": [
+    {
+      "slug": "news-n3-smart-umbrella-rental",
+      "pod": "news",
+      "type": "news_dossier",
+      "level": "N3",
+      "name": "World News Japanese: Popularity of Umbrella Sharing Services for Sudden Rain (N3)",
+      "tagline": "Wednesday Commute Edition &bull; 25-Word Match, 5 Grammar Cloze & Reading Check.",
+      "price_cents": 200,
+      "revenue_cents": 0,
+      "web_url": "../products/news-n3-smart-umbrella-rental/",
+      "checkout_url": "https://buy.stripe.com/14A28sdpybFn6PGfvj0Ny1m",
+      "stripe_product_id": "prod_VbdtYBLHwAbryx",
+      "invented_at": "2026-11-11T01:46:20.430Z"
+    },
     {
       "slug": "news-n5-smartphone-kyoto",
       "pod": "news",
