@@ -21,7 +21,7 @@
       "tier_1_survival": 30,
       "tier_2_ultra": 150
     },
-    "last_synced": "2026-11-11",
+    "last_synced": "2026-11-12",
     "lifetime_pass_url": "https://buy.stripe.com/7sYcN61GQ24N7TK6YN0Ny0f",
     "lifetime_price_id": "price_1UXeysLAgkJy5FcEmGzIhj1M",
     "lifetime_product_id": "prod_VYmXLA015b3x9r"
@@ -86,9 +86,9 @@
       "tagline": "Handcrafted standalone local-first release.",
       "price_cents": 200,
       "web_url": "../products/Day-3/",
-      "checkout_url": "https://buy.stripe.com/4gM4gA4T2gZH8XOaaZ0Ny1k",
+      "checkout_url": "https://buy.stripe.com/dRm28sgBK38R6PG1Et0Ny1q",
       "stripe_product_id": "prod_VZhGtrgBerrFg6",
-      "deployed_at": "2026-11-11T01:46:01.801Z"
+      "deployed_at": "2026-11-12T02:46:54.886Z"
     },
     {
       "slug": "Day-2",
@@ -97,9 +97,9 @@
       "tagline": "Handcrafted standalone local-first release.",
       "price_cents": 200,
       "web_url": "../products/Day-2/",
-      "checkout_url": "https://buy.stripe.com/bJe7sMdpy9xffmc1Et0Ny1j",
+      "checkout_url": "https://buy.stripe.com/bJebJ271agZHa1Scj70Ny1p",
       "stripe_product_id": "prod_VZK1ryTXKjLRWZ",
-      "deployed_at": "2026-11-11T01:46:01.067Z"
+      "deployed_at": "2026-11-12T02:46:53.777Z"
     },
     {
       "slug": "Day-1",
@@ -108,9 +108,9 @@
       "tagline": "Handcrafted standalone local-first release.",
       "price_cents": 200,
       "web_url": "../products/Day-1/",
-      "checkout_url": "https://buy.stripe.com/3cIeVe3OYfVDb5W3MB0Ny1i",
+      "checkout_url": "https://buy.stripe.com/aFa4gAbhqeRz7TK3MB0Ny1o",
       "stripe_product_id": "prod_VZJyJ5DZsB0mr6",
-      "deployed_at": "2026-11-11T01:46:00.382Z"
+      "deployed_at": "2026-11-12T02:46:52.653Z"
     },
     {
       "slug": "jlpt-mastery-console",
@@ -119,9 +119,9 @@
       "tagline": "Full N5 through N1 offline study console with Web Speech TTS, ruby furigana, romaji toggle, and 60-second speed drills.",
       "price_cents": 800,
       "web_url": "../products/jlpt-mastery-console/",
-      "checkout_url": "https://buy.stripe.com/cNi4gAetC24N3Duerf0Ny1l",
+      "checkout_url": "https://buy.stripe.com/00wdRagBK6l38XOfvj0Ny1r",
       "stripe_product_id": "prod_VY4vYcVBFLxm1C",
-      "deployed_at": "2026-11-11T01:46:02.531Z"
+      "deployed_at": "2026-11-12T02:46:56.105Z"
     },
     {
       "slug": "pixel-bistro",
@@ -130,12 +130,13 @@
       "tagline": "A fast-paced 16-bit culinary arcade cartridge. Cook, plate, and serve against the kitchen clock.",
       "price_cents": 300,
       "web_url": "../products/pixel-bistro/",
-      "checkout_url": "https://buy.stripe.com/3cI7sM71a38R7TKdnb0Ny1h",
+      "checkout_url": "https://buy.stripe.com/eVqaEYbhqfVDb5Werf0Ny1n",
       "stripe_product_id": "prod_VYhfWypZhn8l5T",
-      "deployed_at": "2026-11-11T01:45:59.619Z"
+      "deployed_at": "2026-11-12T02:46:51.494Z"
     }
   ],
   "execution_log": [
+    "2026-11-12: Deployed World News Japanese: Ministry of Health, Labour and Welfare to Release New Remote Work Guidelines Draft (N2)",
     "2026-11-11: Deployed World News Japanese: Popularity of Umbrella Sharing Services for Sudden Rain (N3)",
     "2026-11-09: Deployed World News Japanese: Smartphones and cameras to be banned at Kyoto temple (N5)",
     "2026-11-08: Deployed World News Japanese: Japan's cashless payment ratio exceeds 40% (N3)",
@@ -165,6 +166,20 @@
     "2026-11-01: Staging ingest established for utilities and Substack creative arcade experiments."
   ],
   "autonomous_lab_assets": [
+    {
+      "slug": "news-n2-remote-work-guidelines",
+      "pod": "news",
+      "type": "news_dossier",
+      "level": "N2",
+      "name": "World News Japanese: Ministry of Health, Labour and Welfare to Release New Remote Work Guidelines Draft (N2)",
+      "tagline": "Thursday Commute Edition &bull; 25-Word Match, 5 Grammar Cloze & Reading Check.",
+      "price_cents": 200,
+      "revenue_cents": 0,
+      "web_url": "../products/news-n2-remote-work-guidelines/",
+      "checkout_url": "https://buy.stripe.com/00wbJ25X64cVfmc2Ix0Ny1s",
+      "stripe_product_id": "prod_Vc26SBSruEBaxb",
+      "invented_at": "2026-11-12T02:47:12.048Z"
+    },
     {
       "slug": "news-n3-smart-umbrella-rental",
       "pod": "news",
