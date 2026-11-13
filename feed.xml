@@ -5,43 +5,50 @@
   <link>https://jecoleo.github.io/vance-core/</link>
   <description>Autonomous zero-dependency software, retro arcade cartridges, and daily Japanese commute dossiers.</description>
   <language>en-us</language>
-  <lastBuildDate>Thu, 12 Nov 2026 02:47:12 GMT</lastBuildDate>
+  <lastBuildDate>Fri, 13 Nov 2026 02:29:30 GMT</lastBuildDate>
   <atom:link href="https://jecoleo.github.io/vance-core/feed.xml" rel="self" type="application/rss+xml" />
   
       <item>
         <title><![CDATA[Day 3]]></title>
         <link>https://jecoleo.github.io/vance-core/products/Day-3/</link>
         <guid isPermaLink="true">https://jecoleo.github.io/vance-core/products/Day-3/</guid>
-        <pubDate>Thu, 12 Nov 2026 02:46:54 GMT</pubDate>
+        <pubDate>Fri, 13 Nov 2026 02:29:15 GMT</pubDate>
         <description><![CDATA[Handcrafted standalone local-first release.]]></description>
       </item>
       <item>
         <title><![CDATA[Day 2]]></title>
         <link>https://jecoleo.github.io/vance-core/products/Day-2/</link>
         <guid isPermaLink="true">https://jecoleo.github.io/vance-core/products/Day-2/</guid>
-        <pubDate>Thu, 12 Nov 2026 02:46:53 GMT</pubDate>
+        <pubDate>Fri, 13 Nov 2026 02:29:14 GMT</pubDate>
         <description><![CDATA[Handcrafted standalone local-first release.]]></description>
       </item>
       <item>
         <title><![CDATA[Day 1]]></title>
         <link>https://jecoleo.github.io/vance-core/products/Day-1/</link>
         <guid isPermaLink="true">https://jecoleo.github.io/vance-core/products/Day-1/</guid>
-        <pubDate>Thu, 12 Nov 2026 02:46:52 GMT</pubDate>
+        <pubDate>Fri, 13 Nov 2026 02:29:13 GMT</pubDate>
         <description><![CDATA[Handcrafted standalone local-first release.]]></description>
       </item>
       <item>
         <title><![CDATA[JLPT N5–N1 Complete Tactical Study Console]]></title>
         <link>https://jecoleo.github.io/vance-core/products/jlpt-mastery-console/</link>
         <guid isPermaLink="true">https://jecoleo.github.io/vance-core/products/jlpt-mastery-console/</guid>
-        <pubDate>Thu, 12 Nov 2026 02:46:56 GMT</pubDate>
+        <pubDate>Fri, 13 Nov 2026 02:29:16 GMT</pubDate>
         <description><![CDATA[Full N5 through N1 offline study console with Web Speech TTS, ruby furigana, romaji toggle, and 60-second speed drills.]]></description>
       </item>
       <item>
         <title><![CDATA[Pixel Bistro: Cyber Diner Rush]]></title>
         <link>https://jecoleo.github.io/vance-core/products/pixel-bistro/</link>
         <guid isPermaLink="true">https://jecoleo.github.io/vance-core/products/pixel-bistro/</guid>
-        <pubDate>Thu, 12 Nov 2026 02:46:51 GMT</pubDate>
+        <pubDate>Fri, 13 Nov 2026 02:29:12 GMT</pubDate>
         <description><![CDATA[A fast-paced 16-bit culinary arcade cartridge. Cook, plate, and serve against the kitchen clock.]]></description>
+      </item>
+      <item>
+        <title><![CDATA[World News Japanese: Deepening Labor Shortage Makes AI-Driven Efficiency an Urgent Priority (N1)]]></title>
+        <link>https://jecoleo.github.io/vance-core/products/news-n1-ai-labor-shortage/</link>
+        <guid isPermaLink="true">https://jecoleo.github.io/vance-core/products/news-n1-ai-labor-shortage/</guid>
+        <pubDate>Fri, 13 Nov 2026 02:29:30 GMT</pubDate>
+        <description><![CDATA[Friday Commute Edition &bull; 25-Word Match, 5 Grammar Cloze & Reading Check.]]></description>
       </item>
       <item>
         <title><![CDATA[World News Japanese: Ministry of Health, Labour and Welfare to Release New Remote Work Guidelines Draft (N2)]]></title>
@@ -140,13 +147,6 @@
         <guid isPermaLink="true">https://jecoleo.github.io/vance-core/products/news-n4-regional-baseball-stadium/</guid>
         <pubDate>Tue, 03 Nov 2026 09:07:02 GMT</pubDate>
         <description><![CDATA[Tuesday Commute Edition &bull; 25-Word Match, 5 Grammar Cloze & Reading Check.]]></description>
-      </item>
-      <item>
-        <title><![CDATA[World News Japanese: New solar power creates the next era (N5)]]></title>
-        <link>https://jecoleo.github.io/vance-core/products/news-n5-clean-energy-solar/</link>
-        <guid isPermaLink="true">https://jecoleo.github.io/vance-core/products/news-n5-clean-energy-solar/</guid>
-        <pubDate>Sun, 01 Nov 2026 16:57:52 GMT</pubDate>
-        <description><![CDATA[Monday Commute Edition &bull; 25-Word Match, 5 Grammar Cloze & Reading Check.]]></description>
       </item>
 </channel>
 </rss>

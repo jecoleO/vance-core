@@ -21,7 +21,7 @@
       "tier_1_survival": 30,
       "tier_2_ultra": 150
     },
-    "last_synced": "2026-11-12",
+    "last_synced": "2026-11-13",
     "lifetime_pass_url": "https://buy.stripe.com/7sYcN61GQ24N7TK6YN0Ny0f",
     "lifetime_price_id": "price_1UXeysLAgkJy5FcEmGzIhj1M",
     "lifetime_product_id": "prod_VYmXLA015b3x9r"
@@ -86,9 +86,9 @@
       "tagline": "Handcrafted standalone local-first release.",
       "price_cents": 200,
       "web_url": "../products/Day-3/",
-      "checkout_url": "https://buy.stripe.com/dRm28sgBK38R6PG1Et0Ny1q",
+      "checkout_url": "https://buy.stripe.com/eVqeVegBK5gZde4gzn0Ny1w",
       "stripe_product_id": "prod_VZhGtrgBerrFg6",
-      "deployed_at": "2026-11-12T02:46:54.886Z"
+      "deployed_at": "2026-11-13T02:29:15.458Z"
     },
     {
       "slug": "Day-2",
@@ -97,9 +97,9 @@
       "tagline": "Handcrafted standalone local-first release.",
       "price_cents": 200,
       "web_url": "../products/Day-2/",
-      "checkout_url": "https://buy.stripe.com/bJebJ271agZHa1Scj70Ny1p",
+      "checkout_url": "https://buy.stripe.com/5kQ6oI2KUdNvfmcbf30Ny1v",
       "stripe_product_id": "prod_VZK1ryTXKjLRWZ",
-      "deployed_at": "2026-11-12T02:46:53.777Z"
+      "deployed_at": "2026-11-13T02:29:14.339Z"
     },
     {
       "slug": "Day-1",
@@ -108,9 +108,9 @@
       "tagline": "Handcrafted standalone local-first release.",
       "price_cents": 200,
       "web_url": "../products/Day-1/",
-      "checkout_url": "https://buy.stripe.com/aFa4gAbhqeRz7TK3MB0Ny1o",
+      "checkout_url": "https://buy.stripe.com/aFabJ2etCdNv6PG82R0Ny1u",
       "stripe_product_id": "prod_VZJyJ5DZsB0mr6",
-      "deployed_at": "2026-11-12T02:46:52.653Z"
+      "deployed_at": "2026-11-13T02:29:13.260Z"
     },
     {
       "slug": "jlpt-mastery-console",
@@ -119,9 +119,9 @@
       "tagline": "Full N5 through N1 offline study console with Web Speech TTS, ruby furigana, romaji toggle, and 60-second speed drills.",
       "price_cents": 800,
       "web_url": "../products/jlpt-mastery-console/",
-      "checkout_url": "https://buy.stripe.com/00wdRagBK6l38XOfvj0Ny1r",
+      "checkout_url": "https://buy.stripe.com/aFa4gAclucJrca0dnb0Ny1x",
       "stripe_product_id": "prod_VY4vYcVBFLxm1C",
-      "deployed_at": "2026-11-12T02:46:56.105Z"
+      "deployed_at": "2026-11-13T02:29:16.540Z"
     },
     {
       "slug": "pixel-bistro",
@@ -130,12 +130,13 @@
       "tagline": "A fast-paced 16-bit culinary arcade cartridge. Cook, plate, and serve against the kitchen clock.",
       "price_cents": 300,
       "web_url": "../products/pixel-bistro/",
-      "checkout_url": "https://buy.stripe.com/eVqaEYbhqfVDb5Werf0Ny1n",
+      "checkout_url": "https://buy.stripe.com/4gM6oIetC38R3Dugzn0Ny1t",
       "stripe_product_id": "prod_VYhfWypZhn8l5T",
-      "deployed_at": "2026-11-12T02:46:51.494Z"
+      "deployed_at": "2026-11-13T02:29:12.093Z"
     }
   ],
   "execution_log": [
+    "2026-11-13: Deployed World News Japanese: Deepening Labor Shortage Makes AI-Driven Efficiency an Urgent Priority (N1)",
     "2026-11-12: Deployed World News Japanese: Ministry of Health, Labour and Welfare to Release New Remote Work Guidelines Draft (N2)",
     "2026-11-11: Deployed World News Japanese: Popularity of Umbrella Sharing Services for Sudden Rain (N3)",
     "2026-11-09: Deployed World News Japanese: Smartphones and cameras to be banned at Kyoto temple (N5)",
@@ -166,6 +167,20 @@
     "2026-11-01: Staging ingest established for utilities and Substack creative arcade experiments."
   ],
   "autonomous_lab_assets": [
+    {
+      "slug": "news-n1-ai-labor-shortage",
+      "pod": "news",
+      "type": "news_dossier",
+      "level": "N1",
+      "name": "World News Japanese: Deepening Labor Shortage Makes AI-Driven Efficiency an Urgent Priority (N1)",
+      "tagline": "Friday Commute Edition &bull; 25-Word Match, 5 Grammar Cloze & Reading Check.",
+      "price_cents": 200,
+      "revenue_cents": 0,
+      "web_url": "../products/news-n1-ai-labor-shortage/",
+      "checkout_url": "https://buy.stripe.com/00w6oI71a10J3Du1Et0Ny1y",
+      "stripe_product_id": "prod_VcP3s1cRvwXkrj",
+      "invented_at": "2026-11-13T02:29:30.276Z"
+    },
     {
       "slug": "news-n2-remote-work-guidelines",
       "pod": "news",
