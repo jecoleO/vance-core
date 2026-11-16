@@ -5,43 +5,50 @@
   <link>https://jecoleo.github.io/vance-core/</link>
   <description>Autonomous zero-dependency software, retro arcade cartridges, and daily Japanese commute dossiers.</description>
   <language>en-us</language>
-  <lastBuildDate>Sun, 15 Nov 2026 01:38:14 GMT</lastBuildDate>
+  <lastBuildDate>Mon, 16 Nov 2026 01:41:57 GMT</lastBuildDate>
   <atom:link href="https://jecoleo.github.io/vance-core/feed.xml" rel="self" type="application/rss+xml" />
   
       <item>
         <title><![CDATA[Day 3]]></title>
         <link>https://jecoleo.github.io/vance-core/products/Day-3/</link>
         <guid isPermaLink="true">https://jecoleo.github.io/vance-core/products/Day-3/</guid>
-        <pubDate>Sun, 15 Nov 2026 01:38:02 GMT</pubDate>
+        <pubDate>Mon, 16 Nov 2026 01:41:44 GMT</pubDate>
         <description><![CDATA[Handcrafted standalone local-first release.]]></description>
       </item>
       <item>
         <title><![CDATA[Day 2]]></title>
         <link>https://jecoleo.github.io/vance-core/products/Day-2/</link>
         <guid isPermaLink="true">https://jecoleo.github.io/vance-core/products/Day-2/</guid>
-        <pubDate>Sun, 15 Nov 2026 01:38:01 GMT</pubDate>
+        <pubDate>Mon, 16 Nov 2026 01:41:43 GMT</pubDate>
         <description><![CDATA[Handcrafted standalone local-first release.]]></description>
       </item>
       <item>
         <title><![CDATA[Day 1]]></title>
         <link>https://jecoleo.github.io/vance-core/products/Day-1/</link>
         <guid isPermaLink="true">https://jecoleo.github.io/vance-core/products/Day-1/</guid>
-        <pubDate>Sun, 15 Nov 2026 01:38:00 GMT</pubDate>
+        <pubDate>Mon, 16 Nov 2026 01:41:42 GMT</pubDate>
         <description><![CDATA[Handcrafted standalone local-first release.]]></description>
       </item>
       <item>
         <title><![CDATA[JLPT N5–N1 Complete Tactical Study Console]]></title>
         <link>https://jecoleo.github.io/vance-core/products/jlpt-mastery-console/</link>
         <guid isPermaLink="true">https://jecoleo.github.io/vance-core/products/jlpt-mastery-console/</guid>
-        <pubDate>Sun, 15 Nov 2026 01:38:03 GMT</pubDate>
+        <pubDate>Mon, 16 Nov 2026 01:41:45 GMT</pubDate>
         <description><![CDATA[Full N5 through N1 offline study console with Web Speech TTS, ruby furigana, romaji toggle, and 60-second speed drills.]]></description>
       </item>
       <item>
         <title><![CDATA[Pixel Bistro: Cyber Diner Rush]]></title>
         <link>https://jecoleo.github.io/vance-core/products/pixel-bistro/</link>
         <guid isPermaLink="true">https://jecoleo.github.io/vance-core/products/pixel-bistro/</guid>
-        <pubDate>Sun, 15 Nov 2026 01:37:59 GMT</pubDate>
+        <pubDate>Mon, 16 Nov 2026 01:41:41 GMT</pubDate>
         <description><![CDATA[A fast-paced 16-bit culinary arcade cartridge. Cook, plate, and serve against the kitchen clock.]]></description>
+      </item>
+      <item>
+        <title><![CDATA[World News Japanese: The number of people paying with smartphones is increasing (N5)]]></title>
+        <link>https://jecoleo.github.io/vance-core/products/news-n5-smartphone-pay/</link>
+        <guid isPermaLink="true">https://jecoleo.github.io/vance-core/products/news-n5-smartphone-pay/</guid>
+        <pubDate>Mon, 16 Nov 2026 01:41:57 GMT</pubDate>
+        <description><![CDATA[Monday Commute Edition &bull; 25-Word Match, 5 Grammar Cloze & Reading Check.]]></description>
       </item>
       <item>
         <title><![CDATA[World News Japanese: Deepening Labor Shortage Makes AI-Driven Efficiency an Urgent Priority (N1)]]></title>
@@ -139,13 +146,6 @@
         <link>https://jecoleo.github.io/vance-core/products/news-n4-robot-cafe-tokyo/</link>
         <guid isPermaLink="true">https://jecoleo.github.io/vance-core/products/news-n4-robot-cafe-tokyo/</guid>
         <pubDate>Tue, 03 Nov 2026 10:31:29 GMT</pubDate>
-        <description><![CDATA[Tuesday Commute Edition &bull; 25-Word Match, 5 Grammar Cloze & Reading Check.]]></description>
-      </item>
-      <item>
-        <title><![CDATA[World News Japanese: Many fans gather at a new regional baseball stadium (N4)]]></title>
-        <link>https://jecoleo.github.io/vance-core/products/news-n4-regional-baseball-stadium/</link>
-        <guid isPermaLink="true">https://jecoleo.github.io/vance-core/products/news-n4-regional-baseball-stadium/</guid>
-        <pubDate>Tue, 03 Nov 2026 09:07:02 GMT</pubDate>
         <description><![CDATA[Tuesday Commute Edition &bull; 25-Word Match, 5 Grammar Cloze & Reading Check.]]></description>
       </item>
 </channel>
