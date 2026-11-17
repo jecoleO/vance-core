@@ -5,43 +5,50 @@
   <link>https://jecoleo.github.io/vance-core/</link>
   <description>Autonomous zero-dependency software, retro arcade cartridges, and daily Japanese commute dossiers.</description>
   <language>en-us</language>
-  <lastBuildDate>Mon, 16 Nov 2026 01:41:57 GMT</lastBuildDate>
+  <lastBuildDate>Tue, 17 Nov 2026 04:23:38 GMT</lastBuildDate>
   <atom:link href="https://jecoleo.github.io/vance-core/feed.xml" rel="self" type="application/rss+xml" />
   
       <item>
         <title><![CDATA[Day 3]]></title>
         <link>https://jecoleo.github.io/vance-core/products/Day-3/</link>
         <guid isPermaLink="true">https://jecoleo.github.io/vance-core/products/Day-3/</guid>
-        <pubDate>Mon, 16 Nov 2026 01:41:44 GMT</pubDate>
+        <pubDate>Tue, 17 Nov 2026 04:23:26 GMT</pubDate>
         <description><![CDATA[Handcrafted standalone local-first release.]]></description>
       </item>
       <item>
         <title><![CDATA[Day 2]]></title>
         <link>https://jecoleo.github.io/vance-core/products/Day-2/</link>
         <guid isPermaLink="true">https://jecoleo.github.io/vance-core/products/Day-2/</guid>
-        <pubDate>Mon, 16 Nov 2026 01:41:43 GMT</pubDate>
+        <pubDate>Tue, 17 Nov 2026 04:23:25 GMT</pubDate>
         <description><![CDATA[Handcrafted standalone local-first release.]]></description>
       </item>
       <item>
         <title><![CDATA[Day 1]]></title>
         <link>https://jecoleo.github.io/vance-core/products/Day-1/</link>
         <guid isPermaLink="true">https://jecoleo.github.io/vance-core/products/Day-1/</guid>
-        <pubDate>Mon, 16 Nov 2026 01:41:42 GMT</pubDate>
+        <pubDate>Tue, 17 Nov 2026 04:23:25 GMT</pubDate>
         <description><![CDATA[Handcrafted standalone local-first release.]]></description>
       </item>
       <item>
         <title><![CDATA[JLPT N5–N1 Complete Tactical Study Console]]></title>
         <link>https://jecoleo.github.io/vance-core/products/jlpt-mastery-console/</link>
         <guid isPermaLink="true">https://jecoleo.github.io/vance-core/products/jlpt-mastery-console/</guid>
-        <pubDate>Mon, 16 Nov 2026 01:41:45 GMT</pubDate>
+        <pubDate>Tue, 17 Nov 2026 04:23:27 GMT</pubDate>
         <description><![CDATA[Full N5 through N1 offline study console with Web Speech TTS, ruby furigana, romaji toggle, and 60-second speed drills.]]></description>
       </item>
       <item>
         <title><![CDATA[Pixel Bistro: Cyber Diner Rush]]></title>
         <link>https://jecoleo.github.io/vance-core/products/pixel-bistro/</link>
         <guid isPermaLink="true">https://jecoleo.github.io/vance-core/products/pixel-bistro/</guid>
-        <pubDate>Mon, 16 Nov 2026 01:41:41 GMT</pubDate>
+        <pubDate>Tue, 17 Nov 2026 04:23:24 GMT</pubDate>
         <description><![CDATA[A fast-paced 16-bit culinary arcade cartridge. Cook, plate, and serve against the kitchen clock.]]></description>
+      </item>
+      <item>
+        <title><![CDATA[World News Japanese: New cafe where robots work is gaining popularity (N4)]]></title>
+        <link>https://jecoleo.github.io/vance-core/products/news-n4-robot-cafe/</link>
+        <guid isPermaLink="true">https://jecoleo.github.io/vance-core/products/news-n4-robot-cafe/</guid>
+        <pubDate>Tue, 17 Nov 2026 04:23:38 GMT</pubDate>
+        <description><![CDATA[Tuesday Commute Edition &bull; 25-Word Match, 5 Grammar Cloze & Reading Check.]]></description>
       </item>
       <item>
         <title><![CDATA[World News Japanese: The number of people paying with smartphones is increasing (N5)]]></title>
@@ -139,13 +146,6 @@
         <link>https://jecoleo.github.io/vance-core/products/news-n4-robot-hotel-staff/</link>
         <guid isPermaLink="true">https://jecoleo.github.io/vance-core/products/news-n4-robot-hotel-staff/</guid>
         <pubDate>Tue, 03 Nov 2026 11:14:57 GMT</pubDate>
-        <description><![CDATA[Tuesday Commute Edition &bull; 25-Word Match, 5 Grammar Cloze & Reading Check.]]></description>
-      </item>
-      <item>
-        <title><![CDATA[World News Japanese: Robot-staffed cafe in Tokyo gains popularity (N4)]]></title>
-        <link>https://jecoleo.github.io/vance-core/products/news-n4-robot-cafe-tokyo/</link>
-        <guid isPermaLink="true">https://jecoleo.github.io/vance-core/products/news-n4-robot-cafe-tokyo/</guid>
-        <pubDate>Tue, 03 Nov 2026 10:31:29 GMT</pubDate>
         <description><![CDATA[Tuesday Commute Edition &bull; 25-Word Match, 5 Grammar Cloze & Reading Check.]]></description>
       </item>
 </channel>
