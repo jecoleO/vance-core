@@ -21,7 +21,7 @@
       "tier_1_survival": 30,
       "tier_2_ultra": 150
     },
-    "last_synced": "2026-11-21",
+    "last_synced": "2026-11-22",
     "lifetime_pass_url": "https://buy.stripe.com/7sYcN61GQ24N7TK6YN0Ny0f",
     "lifetime_price_id": "price_1UXeysLAgkJy5FcEmGzIhj1M",
     "lifetime_product_id": "prod_VYmXLA015b3x9r"
@@ -86,9 +86,9 @@
       "tagline": "Handcrafted standalone local-first release.",
       "price_cents": 200,
       "web_url": "../products/Day-3/",
-      "checkout_url": "https://buy.stripe.com/7sY6oI5X6gZH2zqfvj0Ny2d",
+      "checkout_url": "https://buy.stripe.com/3cIfZi4T2bFn7TK1Et0Ny2j",
       "stripe_product_id": "prod_VZhGtrgBerrFg6",
-      "deployed_at": "2026-11-21T03:02:23.501Z"
+      "deployed_at": "2026-11-22T01:58:43.207Z"
     },
     {
       "slug": "Day-2",
@@ -97,9 +97,9 @@
       "tagline": "Handcrafted standalone local-first release.",
       "price_cents": 200,
       "web_url": "../products/Day-2/",
-      "checkout_url": "https://buy.stripe.com/dRm7sM99i24N4Hy3MB0Ny2c",
+      "checkout_url": "https://buy.stripe.com/3cIeVedpy9xfde496V0Ny2i",
       "stripe_product_id": "prod_VZK1ryTXKjLRWZ",
-      "deployed_at": "2026-11-21T03:02:22.792Z"
+      "deployed_at": "2026-11-22T01:58:42.434Z"
     },
     {
       "slug": "Day-1",
@@ -108,9 +108,9 @@
       "tagline": "Handcrafted standalone local-first release.",
       "price_cents": 200,
       "web_url": "../products/Day-1/",
-      "checkout_url": "https://buy.stripe.com/9B65kEgBKgZH1vmgzn0Ny2b",
+      "checkout_url": "https://buy.stripe.com/28E4gAfxG38R7TK5UJ0Ny2h",
       "stripe_product_id": "prod_VZJyJ5DZsB0mr6",
-      "deployed_at": "2026-11-21T03:02:22.056Z"
+      "deployed_at": "2026-11-22T01:58:41.669Z"
     },
     {
       "slug": "jlpt-mastery-console",
@@ -119,9 +119,9 @@
       "tagline": "Full N5 through N1 offline study console with Web Speech TTS, ruby furigana, romaji toggle, and 60-second speed drills.",
       "price_cents": 800,
       "web_url": "../products/jlpt-mastery-console/",
-      "checkout_url": "https://buy.stripe.com/fZu14ogBK24N8XO1Et0Ny2e",
+      "checkout_url": "https://buy.stripe.com/6oU6oIclufVDca05UJ0Ny2k",
       "stripe_product_id": "prod_VY4vYcVBFLxm1C",
-      "deployed_at": "2026-11-21T03:02:24.187Z"
+      "deployed_at": "2026-11-22T01:58:43.946Z"
     },
     {
       "slug": "pixel-bistro",
@@ -130,12 +130,13 @@
       "tagline": "A fast-paced 16-bit culinary arcade cartridge. Cook, plate, and serve against the kitchen clock.",
       "price_cents": 300,
       "web_url": "../products/pixel-bistro/",
-      "checkout_url": "https://buy.stripe.com/8x27sMgBKcJrei8aaZ0Ny2a",
+      "checkout_url": "https://buy.stripe.com/5kQ3cwbhq6l3ei8fvj0Ny2g",
       "stripe_product_id": "prod_VYhfWypZhn8l5T",
-      "deployed_at": "2026-11-21T03:02:21.306Z"
+      "deployed_at": "2026-11-22T01:58:40.907Z"
     }
   ],
   "execution_log": [
+    "2026-11-22: Deployed World News Japanese: Japan's Cashless Payment Ratio Reaches Record High (N3)",
     "2026-11-21: Deployed World News Japanese: Japan's Cashless Payment Ratio Reaches Record High (N3)",
     "2026-11-17: Deployed World News Japanese: New cafe where robots work is gaining popularity (N4)",
     "2026-11-16: Deployed World News Japanese: The number of people paying with smartphones is increasing (N5)",
@@ -170,6 +171,20 @@
     "2026-11-01: Staging ingest established for utilities and Substack creative arcade experiments."
   ],
   "autonomous_lab_assets": [
+    {
+      "slug": "news-n3-cashless-payment",
+      "pod": "news",
+      "type": "news_dossier",
+      "level": "N3",
+      "name": "World News Japanese: Japan's Cashless Payment Ratio Reaches Record High (N3)",
+      "tagline": "Wednesday Commute Edition &bull; 25-Word Match, 5 Grammar Cloze & Reading Check.",
+      "price_cents": 200,
+      "revenue_cents": 0,
+      "web_url": "../products/news-n3-cashless-payment/",
+      "checkout_url": "https://buy.stripe.com/3cI6oI5X6bFn0ri96V0Ny2l",
+      "stripe_product_id": "prod_VfPOZrKc2ylJsS",
+      "invented_at": "2026-11-22T01:58:54.789Z"
+    },
     {
       "slug": "news-n3-cashless-payment-trends",
       "pod": "news",
