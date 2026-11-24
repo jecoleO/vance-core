@@ -21,7 +21,7 @@
       "tier_1_survival": 30,
       "tier_2_ultra": 150
     },
-    "last_synced": "2026-11-23",
+    "last_synced": "2026-11-24",
     "lifetime_pass_url": "https://buy.stripe.com/7sYcN61GQ24N7TK6YN0Ny0f",
     "lifetime_price_id": "price_1UXeysLAgkJy5FcEmGzIhj1M",
     "lifetime_product_id": "prod_VYmXLA015b3x9r"
@@ -86,9 +86,9 @@
       "tagline": "Handcrafted standalone local-first release.",
       "price_cents": 200,
       "web_url": "../products/Day-3/",
-      "checkout_url": "https://buy.stripe.com/6oU8wQ3OYcJrde44QF0Ny2p",
+      "checkout_url": "https://buy.stripe.com/4gMeVeclu8tbei8bf30Ny2u",
       "stripe_product_id": "prod_VZhGtrgBerrFg6",
-      "deployed_at": "2026-11-23T02:24:47.063Z"
+      "deployed_at": "2026-11-24T05:47:40.004Z"
     },
     {
       "slug": "Day-2",
@@ -97,9 +97,9 @@
       "tagline": "Handcrafted standalone local-first release.",
       "price_cents": 200,
       "web_url": "../products/Day-2/",
-      "checkout_url": "https://buy.stripe.com/5kQ5kEetC4cVgqg4QF0Ny2o",
+      "checkout_url": "https://buy.stripe.com/aFa28setC9xf0ri1Et0Ny2t",
       "stripe_product_id": "prod_VZK1ryTXKjLRWZ",
-      "deployed_at": "2026-11-23T02:24:45.947Z"
+      "deployed_at": "2026-11-24T05:47:39.202Z"
     },
     {
       "slug": "Day-1",
@@ -108,9 +108,9 @@
       "tagline": "Handcrafted standalone local-first release.",
       "price_cents": 200,
       "web_url": "../products/Day-1/",
-      "checkout_url": "https://buy.stripe.com/3cI4gAadmdNv0ri96V0Ny2n",
+      "checkout_url": "https://buy.stripe.com/00w9AUfxGeRzfmc1Et0Ny2s",
       "stripe_product_id": "prod_VZJyJ5DZsB0mr6",
-      "deployed_at": "2026-11-23T02:24:44.875Z"
+      "deployed_at": "2026-11-24T05:47:38.477Z"
     },
     {
       "slug": "jlpt-mastery-console",
@@ -119,9 +119,9 @@
       "tagline": "Full N5 through N1 offline study console with Web Speech TTS, ruby furigana, romaji toggle, and 60-second speed drills.",
       "price_cents": 800,
       "web_url": "../products/jlpt-mastery-console/",
-      "checkout_url": "https://buy.stripe.com/00w6oI99ieRzca0cj70Ny2q",
+      "checkout_url": "https://buy.stripe.com/fZu28s4T24cVde482R0Ny2v",
       "stripe_product_id": "prod_VY4vYcVBFLxm1C",
-      "deployed_at": "2026-11-23T02:24:48.165Z"
+      "deployed_at": "2026-11-24T05:47:40.742Z"
     },
     {
       "slug": "pixel-bistro",
@@ -130,9 +130,9 @@
       "tagline": "A fast-paced 16-bit culinary arcade cartridge. Cook, plate, and serve against the kitchen clock.",
       "price_cents": 300,
       "web_url": "../products/pixel-bistro/",
-      "checkout_url": "https://buy.stripe.com/fZu14o85e38R2zqerf0Ny2m",
+      "checkout_url": "https://buy.stripe.com/fZueVeclu7p7ca01Et0Ny2r",
       "stripe_product_id": "prod_VYhfWypZhn8l5T",
-      "deployed_at": "2026-11-23T02:24:43.751Z"
+      "deployed_at": "2026-11-24T05:47:37.676Z"
     }
   ],
   "execution_log": [
