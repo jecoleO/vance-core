@@ -21,7 +21,7 @@
       "tier_1_survival": 30,
       "tier_2_ultra": 150
     },
-    "last_synced": "2026-11-26",
+    "last_synced": "2026-11-27",
     "lifetime_pass_url": "https://buy.stripe.com/7sYcN61GQ24N7TK6YN0Ny0f",
     "lifetime_price_id": "price_1UXeysLAgkJy5FcEmGzIhj1M",
     "lifetime_product_id": "prod_VYmXLA015b3x9r"
@@ -86,9 +86,9 @@
       "tagline": "Handcrafted standalone local-first release.",
       "price_cents": 200,
       "web_url": "../products/Day-3/",
-      "checkout_url": "https://buy.stripe.com/28E9AU3OY8tbca06YN0Ny2E",
+      "checkout_url": "https://buy.stripe.com/cNieVefxG5gZ1vmbf30Ny2J",
       "stripe_product_id": "prod_VZhGtrgBerrFg6",
-      "deployed_at": "2026-11-26T04:01:56.113Z"
+      "deployed_at": "2026-11-27T03:59:44.370Z"
     },
     {
       "slug": "Day-2",
@@ -97,9 +97,9 @@
       "tagline": "Handcrafted standalone local-first release.",
       "price_cents": 200,
       "web_url": "../products/Day-2/",
-      "checkout_url": "https://buy.stripe.com/aFacN63OY5gZ8XOgzn0Ny2D",
+      "checkout_url": "https://buy.stripe.com/4gM9AUgBKeRzde4aaZ0Ny2I",
       "stripe_product_id": "prod_VZK1ryTXKjLRWZ",
-      "deployed_at": "2026-11-26T04:01:54.872Z"
+      "deployed_at": "2026-11-27T03:59:43.287Z"
     },
     {
       "slug": "Day-1",
@@ -108,9 +108,9 @@
       "tagline": "Handcrafted standalone local-first release.",
       "price_cents": 200,
       "web_url": "../products/Day-1/",
-      "checkout_url": "https://buy.stripe.com/cNi8wQ99i8tb2zqaaZ0Ny2C",
+      "checkout_url": "https://buy.stripe.com/3cI8wQ85e8tb7TKaaZ0Ny2H",
       "stripe_product_id": "prod_VZJyJ5DZsB0mr6",
-      "deployed_at": "2026-11-26T04:01:54.026Z"
+      "deployed_at": "2026-11-27T03:59:42.111Z"
     },
     {
       "slug": "jlpt-mastery-console",
@@ -119,9 +119,9 @@
       "tagline": "Full N5 through N1 offline study console with Web Speech TTS, ruby furigana, romaji toggle, and 60-second speed drills.",
       "price_cents": 800,
       "web_url": "../products/jlpt-mastery-console/",
-      "checkout_url": "https://buy.stripe.com/fZu7sM99i9xf3Du4QF0Ny2F",
+      "checkout_url": "https://buy.stripe.com/9B6eVe5X6bFn1vm96V0Ny2K",
       "stripe_product_id": "prod_VY4vYcVBFLxm1C",
-      "deployed_at": "2026-11-26T04:01:57.000Z"
+      "deployed_at": "2026-11-27T03:59:45.538Z"
     },
     {
       "slug": "pixel-bistro",
@@ -130,12 +130,13 @@
       "tagline": "A fast-paced 16-bit culinary arcade cartridge. Cook, plate, and serve against the kitchen clock.",
       "price_cents": 300,
       "web_url": "../products/pixel-bistro/",
-      "checkout_url": "https://buy.stripe.com/9B6dRabhqgZHgqgerf0Ny2B",
+      "checkout_url": "https://buy.stripe.com/aFa14o3OY4cVde4aaZ0Ny2G",
       "stripe_product_id": "prod_VYhfWypZhn8l5T",
-      "deployed_at": "2026-11-26T04:01:53.126Z"
+      "deployed_at": "2026-11-27T03:59:40.899Z"
     }
   ],
   "execution_log": [
+    "2026-11-27: Deployed World News Japanese: Fusion of Traditional Crafts and AI: Efforts to Digitalize Artisanal Skills Get Underway (N1)",
     "2026-11-22: Deployed World News Japanese: Japan's Cashless Payment Ratio Reaches Record High (N3)",
     "2026-11-21: Deployed World News Japanese: Japan's Cashless Payment Ratio Reaches Record High (N3)",
     "2026-11-17: Deployed World News Japanese: New cafe where robots work is gaining popularity (N4)",
@@ -171,6 +172,20 @@
     "2026-11-01: Staging ingest established for utilities and Substack creative arcade experiments."
   ],
   "autonomous_lab_assets": [
+    {
+      "slug": "news-n1-ai-traditional-crafts",
+      "pod": "news",
+      "type": "news_dossier",
+      "level": "N1",
+      "name": "World News Japanese: Fusion of Traditional Crafts and AI: Efforts to Digitalize Artisanal Skills Get Underway (N1)",
+      "tagline": "Friday Commute Edition &bull; 25-Word Match, 5 Grammar Cloze & Reading Check.",
+      "price_cents": 200,
+      "revenue_cents": 0,
+      "web_url": "../products/news-n1-ai-traditional-crafts/",
+      "checkout_url": "https://buy.stripe.com/00wbJ271a4cVca082R0Ny2L",
+      "stripe_product_id": "prod_VhffJ9MBN9zhj4",
+      "invented_at": "2026-11-27T04:00:01.807Z"
+    },
     {
       "slug": "news-n3-cashless-payment",
       "pod": "news",
